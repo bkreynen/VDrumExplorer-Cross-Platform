@@ -18,6 +18,7 @@ namespace VDrumExplorer.Model.Midi
         private const byte NoteOnStatus = 0x90;
         private const byte NoteOffStatus = 0x80;
         private const byte ChannelCommandStatus = 0xb0;
+        private const byte ProgramChangeStatus = 0xC0;
         private const byte AllSoundsOffCommand = 0x78;
         private const byte DataRequestCommand = 0x11;
         private const byte DataSetCommand = 0x12;
@@ -96,6 +97,21 @@ namespace VDrumExplorer.Model.Midi
                 0x0 // Fixed for AllSoundsOff
             };
             output.Send(new MidiMessage(allSoundsOffMessage));
+        }
+
+        /// <summary>
+        /// Sends a MIDI Program Change message to switch the current kit/patch on the device.
+        /// </summary>
+        /// <param name="channel">The MIDI channel (1-16), typically 10 for drums.</param>
+        /// <param name="program">The program number (0-indexed). For the TD-17, kit 1 = 0, kit 100 = 99.</param>
+        public void SendProgramChange(int channel, int program)
+        {
+            var message = new byte[]
+            {
+                (byte) (ProgramChangeStatus | (channel - 1)),
+                (byte) program
+            };
+            output.Send(new MidiMessage(message));
         }
 
         private void HandleDataSetMessage(DataSetMessage message)

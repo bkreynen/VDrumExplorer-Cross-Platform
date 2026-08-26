@@ -45,5 +45,48 @@ namespace VDrumExplorer.Model.Test.Midi
             };
             Assert.AreEqual(expectedRequestData, actualRequestData);
         }
+
+        [Test]
+        public void SendProgramChange_Channel10_Kit1()
+        {
+            var input = new FakeMidiInput();
+            var output = new FakeMidiOutput();
+            var client = new RolandMidiClient(input, output, "TD-17", "TD-17", 0x10, ModuleIdentifier.TD17);
+
+            // Kit 1 is 0-indexed as program 0, on channel 10 (the standard drum channel).
+            client.SendProgramChange(10, 0);
+
+            Assert.AreEqual(1, output.Messages.Count);
+            // Program Change status byte: 0xC0 | (channel - 1) = 0xC0 | 0x09 = 0xC9
+            Assert.AreEqual(new byte[] { 0xC9, 0x00 }, output.Messages[0].Data);
+        }
+
+        [Test]
+        public void SendProgramChange_Channel10_Kit100()
+        {
+            var input = new FakeMidiInput();
+            var output = new FakeMidiOutput();
+            var client = new RolandMidiClient(input, output, "TD-17", "TD-17", 0x10, ModuleIdentifier.TD17);
+
+            // Kit 100 is 0-indexed as program 99, on channel 10.
+            client.SendProgramChange(10, 99);
+
+            Assert.AreEqual(1, output.Messages.Count);
+            Assert.AreEqual(new byte[] { 0xC9, 0x63 }, output.Messages[0].Data);
+        }
+
+        [Test]
+        public void SendProgramChange_Channel1()
+        {
+            var input = new FakeMidiInput();
+            var output = new FakeMidiOutput();
+            var client = new RolandMidiClient(input, output, "TD-17", "TD-17", 0x10, ModuleIdentifier.TD17);
+
+            // Channel 1 maps to status byte 0xC0 | 0x00 = 0xC0.
+            client.SendProgramChange(1, 5);
+
+            Assert.AreEqual(1, output.Messages.Count);
+            Assert.AreEqual(new byte[] { 0xC0, 0x05 }, output.Messages[0].Data);
+        }
     }
 }
