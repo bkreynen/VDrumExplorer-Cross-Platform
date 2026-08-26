@@ -45,7 +45,7 @@ public partial class DataExplorer : Window
                 }
                 else
                 {
-                    ViewModel.CopyNodeCommand.Execute(null);
+                    ViewModel.CopyNodeCommand.Execute(null!);
                 }
                 e.Handled = true;
             }
@@ -62,7 +62,7 @@ public partial class DataExplorer : Window
             }
             else if (ViewModel.CopiedSnapshot is not null && ViewModel.PasteNodeCommand.Enabled)
             {
-                ViewModel.PasteNodeCommand.Execute(null);
+                ViewModel.PasteNodeCommand.Execute(null!);
                 e.Handled = true;
             }
         }
