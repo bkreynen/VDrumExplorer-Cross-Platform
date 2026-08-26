@@ -117,8 +117,8 @@
                                                             </DataTemplate>
                                                             <DataTemplate DataType="vmd:EditableNumericDataFieldViewModel">
                                                                 <StackPanel Orientation="Horizontal">
-                                                                    <Slider Padding="0" Margin="2,1,0,0" Value="{Binding Value}" Minimum="{Binding MinValue}" Maximum="{Binding MaxValue}" Width="150" SmallChange="1" LargeChange="{Binding LargeChange}" />
-                                                                    <TextBlock Text="{Binding FormattedText}" Margin="{StaticResource ValueMargin}" />
+                                                                    <Slider Padding="0" Margin="2,1,0,0" Value="{Binding Value}" Minimum="{Binding MinValue}" Maximum="{Binding MaxValue}" Width="250" SmallChange="1" LargeChange="{Binding LargeChange}" IsSnapToTickEnabled="True" TickFrequency="1" />
+                                                                    <TextBox Text="{Binding FormattedValue}" Width="60" Margin="{StaticResource ValueMargin}" />
                                                                 </StackPanel>
                                                             </DataTemplate>
                                                             <DataTemplate DataType="vmd:EditableInstrumentDataFieldViewModel">

@@ -18,6 +18,7 @@ namespace VDrumExplorer.ViewModel.Data
         {
             RaisePropertyChanged(nameof(Value));
             RaisePropertyChanged(nameof(FormattedText));
+            RaisePropertyChanged(nameof(FormattedValue));
         }
 
         public int MinValue => Model.SchemaField.Min;
@@ -31,5 +32,19 @@ namespace VDrumExplorer.ViewModel.Data
         }
 
         public string FormattedText => Model.FormattedText;
+
+        public string FormattedValue
+        {
+            get => Model.FormattedText;
+            set
+            {
+                if (Model.TrySetFormattedText(value))
+                {
+                    RaisePropertyChanged(nameof(Value));
+                    RaisePropertyChanged(nameof(FormattedText));
+                    RaisePropertyChanged(nameof(FormattedValue));
+                }
+            }
+        }
     }
 }
