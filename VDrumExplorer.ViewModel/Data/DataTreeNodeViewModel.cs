@@ -28,10 +28,10 @@ namespace VDrumExplorer.ViewModel.Data
         {
             get
             {
-                if (KitNumber is int kit)
+                if (IsKitRoot)
                 {
                     string name = Kit.GetKitName(Model);
-                    return Root.IsKitExplorer ? name : $"Kit {kit}: {name}";
+                    return Root.IsKitExplorer ? name : $"Kit {KitNumber}: {name}";
                 }
                 else
                 {
@@ -42,8 +42,30 @@ namespace VDrumExplorer.ViewModel.Data
 
         public IReadOnlyList<DataTreeNodeViewModel> Children => children.Value;
 
-        public int? KitNumber => Model.SchemaNode.KitNumber;
-        public bool KitContextCommandsEnabled => Root.IsModuleExplorer && KitNumber.HasValue;
+        public int? KitNumber
+        {
+            get
+            {
+                // The kit number is set on the kit-root schema node. Walk up the tree
+                // to find it so that child nodes (instruments, triggers, etc.) also
+                // know which kit they belong to.
+                var node = Model.SchemaNode;
+                while (node is not null)
+                {
+                    if (node.KitNumber is int kit)
+                    {
+                        return kit;
+                    }
+                    node = node.Parent;
+                }
+                return null;
+            }
+        }
+
+        // True only for kit-root nodes, used to gate kit-level context menu commands
+        // (Copy Kit, Export Kit, etc.) that should not appear on child nodes.
+        public bool IsKitRoot => Model.SchemaNode.KitNumber.HasValue;
+        public bool KitContextCommandsEnabled => Root.IsModuleExplorer && IsKitRoot;
 
         public string? MidiNotePath => Model.SchemaNode.MidiNotePath;
 

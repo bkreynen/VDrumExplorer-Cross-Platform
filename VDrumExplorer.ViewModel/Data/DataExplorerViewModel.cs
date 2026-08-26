@@ -8,6 +8,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using VDrumExplorer.Model;
 using VDrumExplorer.Model.Data;
@@ -39,6 +41,7 @@ namespace VDrumExplorer.ViewModel.Data
         public DelegateCommand ExportJsonCommand { get; }
         public CommandBase CopyDataToDeviceCommand { get; }
         public virtual ICommand CopyToTemporaryStudioSetCommand => CommandBase.NotImplemented;
+        public virtual ICommand CopyMultipleKitsCommand => CommandBase.NotImplemented;
 
         public ICommand ConvertCommand { get; }
 
@@ -103,7 +106,9 @@ namespace VDrumExplorer.ViewModel.Data
             set => SetProperty(ref attack, value);
         }
 
-        private NodeSnapshot? copiedSnapshot;
+        // Static so the clipboard is shared across all DataExplorer windows, allowing
+        // copy/paste of node settings (e.g. a tom's parameters) from one window to another.
+        private static NodeSnapshot? copiedSnapshot;
         public NodeSnapshot? CopiedSnapshot
         {
             get => copiedSnapshot;
@@ -172,12 +177,12 @@ namespace VDrumExplorer.ViewModel.Data
 
         private void SaveFile() => SaveFileImpl(FileName);
 
-        private void SaveFileImpl(string? defaultFileName)
+        private async void SaveFileImpl(string? defaultFileName)
         {
             string? fileName = defaultFileName;
             if (fileName is null)
             {
-                fileName = ViewServices.ShowSaveFileDialog(SaveFileFilter);
+                fileName = await ViewServices.ShowSaveFileDialogAsync(SaveFileFilter);
                 if (fileName is null)
                 {
                     return;
@@ -190,9 +195,9 @@ namespace VDrumExplorer.ViewModel.Data
             }
         }
 
-        private void ExportJson()
+        private async void ExportJson()
         {
-            var fileName = ViewServices.ShowSaveFileDialog(FileFilters.JsonFiles);
+            var fileName = await ViewServices.ShowSaveFileDialogAsync(FileFilters.JsonFiles);
             if (fileName is null)
             {
                 return;
@@ -217,6 +222,81 @@ namespace VDrumExplorer.ViewModel.Data
         private void CommitEdit()
         {
             ReadOnly = true;
+        }
+
+        private readonly Stack<ModuleDataSnapshot> undoStack = new();
+        private readonly Stack<ModuleDataSnapshot> redoStack = new();
+
+        /// <summary>
+        /// Maximum number of undo operations to remember.
+        /// </summary>
+        private const int MaxUndoStack = 50;
+
+        public bool CanUndo => undoStack.Count > 0;
+        public bool CanRedo => redoStack.Count > 0;
+
+        /// <summary>
+        /// Takes a snapshot of the current data state and pushes it to the undo stack.
+        /// Call this BEFORE any edit operation so the previous state can be restored.
+        /// </summary>
+        protected void PushUndoState()
+        {
+            undoStack.Push(data.CreateSnapshot());
+            if (undoStack.Count > MaxUndoStack)
+            {
+                // Remove the oldest entry by converting to a temporary list, removing the first element, and rebuilding.
+                var items = undoStack.ToList();
+                items.RemoveAt(items.Count - 1); // Remove oldest (last in the list from ToList on a stack)
+                undoStack.Clear();
+                foreach (var item in items)
+                {
+                    undoStack.Push(item);
+                }
+            }
+            redoStack.Clear();
+            RaisePropertyChanged(nameof(CanUndo));
+            RaisePropertyChanged(nameof(CanRedo));
+        }
+
+        /// <summary>
+        /// Undoes the last edit operation by restoring the previous data state.
+        /// </summary>
+        public void Undo()
+        {
+            if (undoStack.Count == 0)
+            {
+                return;
+            }
+            redoStack.Push(data.CreateSnapshot());
+            var previous = undoStack.Pop();
+            data.LoadSnapshot(previous, NullLogger.Instance);
+            RaisePropertyChanged(nameof(CanUndo));
+            RaisePropertyChanged(nameof(CanRedo));
+            // Refresh the details panel to reflect the restored data.
+            if (SelectedNode is DataTreeNodeViewModel node)
+            {
+                SelectedNodeDetails = node.CreateDetails();
+            }
+        }
+
+        /// <summary>
+        /// Redoes the last undone operation by restoring the next data state.
+        /// </summary>
+        public void Redo()
+        {
+            if (redoStack.Count == 0)
+            {
+                return;
+            }
+            undoStack.Push(data.CreateSnapshot());
+            var next = redoStack.Pop();
+            data.LoadSnapshot(next, NullLogger.Instance);
+            RaisePropertyChanged(nameof(CanUndo));
+            RaisePropertyChanged(nameof(CanRedo));
+            if (SelectedNode is DataTreeNodeViewModel node)
+            {
+                SelectedNodeDetails = node.CreateDetails();
+            }
         }
 
         public SingleItemCollection<DataTreeNodeViewModel> Root { get; }
@@ -244,7 +324,7 @@ namespace VDrumExplorer.ViewModel.Data
             set => SetProperty(ref selectedNodeDetails, value);
         }
 
-        private void PlayNote()
+        private async void PlayNote()
         {
             var device = DeviceViewModel.ConnectedDevice;
             if (device is null)
@@ -256,7 +336,23 @@ namespace VDrumExplorer.ViewModel.Data
             {
                 return;
             }
-            
+
+            // Switch the TD-17 to the kit that the selected node belongs to,
+            // so the note plays with the correct kit's instrument settings.
+            if (SelectedNode is DataTreeNodeViewModel node && node.KitNumber is int kitNumber)
+            {
+                try
+                {
+                    await device.SetCurrentKitAsync(kitNumber, CancellationToken.None);
+                    // Give the TD-17 a moment to process the kit switch before sending the note.
+                    await Task.Delay(100, CancellationToken.None);
+                }
+                catch
+                {
+                    // If we can't switch kits, play the note anyway with whatever kit is active.
+                }
+            }
+
             device.PlayNote(SelectedMidiChannel, midiNote.Value, Attack);
         }
 
@@ -293,11 +389,12 @@ namespace VDrumExplorer.ViewModel.Data
             {
                 return;
             }
+            PushUndoState();
             var relocated = CopiedSnapshot.Data.Relocated(CopiedSnapshot.SourceNode, targetNode!);
             Model.LoadPartialSnapshot(relocated, Logger);
         }
 
-        private void MultiPaste()
+        private async void MultiPaste()
         {
             if (CopiedSnapshot is not NodeSnapshot snapshot)
             {
@@ -305,8 +402,9 @@ namespace VDrumExplorer.ViewModel.Data
             }
             var candidates = Root.Single().Model.SchemaNode.DescendantsAndSelf().Where(snapshot.IsValidForTarget).ToList();
             var vm = new MultiPasteViewModel(snapshot, candidates);
-            if (ViewServices.ChooseMultiPasteTargets(vm))
+            if (await ViewServices.ChooseMultiPasteTargetsAsync(vm))
             {
+                PushUndoState();
                 foreach (var candidate in vm.Candidates.Where(c => c.Checked))
                 {
                     var relocated = CopiedSnapshot.Data.Relocated(CopiedSnapshot.SourceNode, candidate.Candidate);
