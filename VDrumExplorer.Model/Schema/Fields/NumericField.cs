@@ -101,7 +101,7 @@ namespace VDrumExplorer.Model.Schema.Fields
                 var value = scaled * (Divisor ?? 1m);
                 value /= (Multiplier ?? 1);
                 value -= ValueOffset ?? 0;
-                return (int) value;
+                return (int)value;
             }
 
             private decimal ScaleRawValueForFormatting(int value)

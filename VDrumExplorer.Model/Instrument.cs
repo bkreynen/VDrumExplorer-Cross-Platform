@@ -16,12 +16,12 @@ namespace VDrumExplorer.Model
         /// The numeric ID of the instrument.
         /// </summary>
         public int Id { get; }
-        
+
         /// <summary>
         /// The name of the instrument.
         /// </summary>
         public string Name { get; }
-        
+
         /// <summary>
         /// The instrument group containing the instrument. (This might be
         /// the group of user samples.)

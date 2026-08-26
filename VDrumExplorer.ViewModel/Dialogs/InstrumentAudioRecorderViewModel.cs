@@ -135,7 +135,7 @@ namespace VDrumExplorer.ViewModel.Dialogs
         private async Task<ModuleAudio> RecordInstruments(IAudioInput audioInput, int midiChannel, CancellationToken token)
         {
             int attack = Settings.Attack;
-            TimeSpan duration = TimeSpan.FromSeconds((double) Settings.RecordingTime);
+            TimeSpan duration = TimeSpan.FromSeconds((double)Settings.RecordingTime);
             TimeSpan recordToPlayDelay = TimeSpan.FromMilliseconds(Settings.RecordToPlayDelay);
             int kitNumber = Settings.KitNumber;
 
@@ -175,7 +175,7 @@ namespace VDrumExplorer.ViewModel.Dialogs
             finally
             {
                 Progress.CurrentInstrumentRecording = "Restoring kit data";
-                logger.LogInformation($"Restoring snapshot to kit {kitNumber}");                
+                logger.LogInformation($"Restoring snapshot to kit {kitNumber}");
                 await device.SaveDescendants(
                     savedKit.Data.LogicalRoot,
                     targetAddress: schemaKitRoot.Container.Address,

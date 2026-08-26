@@ -125,7 +125,7 @@ internal sealed class RevisionFilter
             {
                 if (array[i] is JObject obj && obj.Property(ContainerRevisionPropertyName) is JProperty prop)
                 {
-                    var expression = Parse((string) prop.Value!);
+                    var expression = Parse((string)prop.Value!);
                     if (expression.Matches(revision))
                     {
                         prop.Remove();

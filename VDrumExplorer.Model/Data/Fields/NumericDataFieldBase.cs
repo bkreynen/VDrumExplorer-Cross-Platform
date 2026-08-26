@@ -68,7 +68,7 @@ namespace VDrumExplorer.Model.Data.Fields
 
     public abstract class NumericDataFieldBase<TField> : NumericDataFieldBase where TField : NumericFieldBase
     {
-        public new TField SchemaField => (TField) base.SchemaField;
+        public new TField SchemaField => (TField)base.SchemaField;
 
         protected NumericDataFieldBase(TField schemaField) : base(schemaField)
         {

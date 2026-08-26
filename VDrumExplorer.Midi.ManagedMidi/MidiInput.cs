@@ -41,7 +41,7 @@ namespace VDrumExplorer.Midi.ManagedMidi
                 return;
             }
             disposed = true;
-            
+
             // Calling CloseAsync is significantly faster than calling Dispose.
             // This is slightly odd, as the implementation for desktop seems to call
             // CloseAsync too. Not sure what's going on, and maybe we should be waiting

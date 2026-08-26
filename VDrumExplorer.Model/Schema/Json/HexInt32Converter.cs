@@ -14,6 +14,6 @@ namespace VDrumExplorer.Model.Schema.Json
             writer.WriteValue(value?.ToString());
 
         public override HexInt32 ReadJson(JsonReader reader, Type objectType, HexInt32? existingValue, bool hasExistingValue, JsonSerializer serializer) =>
-            HexInt32.Parse(Preconditions.AssertNotNull((string?) reader.Value));
+            HexInt32.Parse(Preconditions.AssertNotNull((string?)reader.Value));
     }
 }

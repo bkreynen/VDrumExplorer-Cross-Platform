@@ -135,6 +135,6 @@ namespace VDrumExplorer.Model.Schema.Logical
             .OfType<FieldContainerNodeDetail>()
             .Select(detail => detail.Container)
             .Distinct();
-            
+
     }
 }

@@ -14,7 +14,7 @@ namespace VDrumExplorer.Proto
     {
         internal Model.ModuleIdentifier ToModel() =>
             new Model.ModuleIdentifier(Name, ModelId, FamilyCode, FamilyNumberCode, SoftwareRevision);
-        
+
         internal static ModuleIdentifier FromModel(Model.ModuleIdentifier id) =>
             new ModuleIdentifier
             {

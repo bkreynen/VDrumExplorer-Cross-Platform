@@ -45,7 +45,7 @@ namespace VDrumExplorer.Model.Data.Logical
             fields = formattable.FormatPaths.ToReadOnlyList(path => data.GetDataField(formattable.Container.ResolveField(path)));
             formatString = formattable.FormatString;
         }
-        
+
         private void FieldHasChanged(object sender, PropertyChangedEventArgs e) =>
             propertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Text)));
 

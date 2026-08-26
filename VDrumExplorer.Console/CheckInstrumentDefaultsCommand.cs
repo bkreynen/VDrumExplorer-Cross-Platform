@@ -39,7 +39,7 @@ namespace VDrumExplorer.Console
             await device.LoadDescendants(deviceDataRoot, targetAddress: null, progressHandler: null, CancellationToken.None);
             var originalSnapshot = deviceData.CreateSnapshot();
             var instrumentField = device.Schema.GetMainInstrumentField(kit, trigger: 1);
-            var modelInstrumentField = (InstrumentDataField) modelData.GetDataField(instrumentField);
+            var modelInstrumentField = (InstrumentDataField)modelData.GetDataField(instrumentField);
 
             var instrumentContainers = triggerRoot.DescendantFieldContainers();
 

@@ -25,7 +25,7 @@ namespace VDrumExplorer.Model.Schema.Json
         /// The path relative to the parent of the field container with the fields to display.
         /// </summary>
         public string? Path { get; set; }
-        
+
         /// <summary>
         /// The paths of values to obtain from fields, relative to the current node.
         /// These may refer to {index} and {item} obtained from the Repeat.

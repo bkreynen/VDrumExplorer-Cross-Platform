@@ -26,7 +26,7 @@ namespace VDrumExplorer.Console
         {
             var schema = ModuleSchema.KnownSchemas[ModuleIdentifier.AE10].Value;
             var instrumentField = schema.PhysicalRoot.ResolveField("TemporaryStudioSet/Part[1]/Instrument");
-            var instrumentDataField = new EnumDataField((EnumField) instrumentField);
+            var instrumentDataField = new EnumDataField((EnumField)instrumentField);
             var deviceController = new DeviceController(client, new ConsoleLogger(console));
 
             var temporaryKitRoot = schema.LogicalRoot.ResolveNode("TemporaryStudioSet");
@@ -36,7 +36,7 @@ namespace VDrumExplorer.Console
             for (int i = 1; i <= 100; i++)
             {
                 console.WriteLine($"Copying studio set {i}");
-                client.SendData(0x01_00_00_06, new byte[] { (byte) ((i - 1) & 0x7f) });
+                client.SendData(0x01_00_00_06, new byte[] { (byte)((i - 1) & 0x7f) });
                 await Task.Delay(40);
                 var data = ModuleData.FromLogicalRootNode(temporaryKitRoot);
                 await deviceController.LoadDescendants(data.LogicalRoot, null, progressHandler: null, cancellationToken: default);

@@ -31,7 +31,7 @@ namespace VDrumExplorer.Console
             bool interpret = parseResult.GetRequiredValue<bool>("interpret");
             var root = device.Schema.LogicalRoot.ResolveNode(path);
 
-            var container = (FieldContainer) root.Container;
+            var container = (FieldContainer)root.Container;
             var segment = await device.LoadSegment(container.Address, container.Size, default);
             foreach (var field in container.Fields)
             {
@@ -43,7 +43,7 @@ namespace VDrumExplorer.Console
                     for (int i = 0; i < overlay.NestedFieldCount; i++)
                     {
                         string description = $"{field.Description} {i + 1}";
-                        var nestedBytes = bytes[(i * sizePerNestedField) .. ((i + 1) * sizePerNestedField)];
+                        var nestedBytes = bytes[(i * sizePerNestedField)..((i + 1) * sizePerNestedField)];
                         console.WriteLine($"{description,-30}: {BitConverter.ToString(nestedBytes).Replace('-', ' ')}");
                     }
                 }

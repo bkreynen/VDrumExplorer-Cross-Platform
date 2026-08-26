@@ -15,7 +15,7 @@ namespace VDrumExplorer.Model.Test
             using (var stream = typeof(ModuleSchemaTest).Assembly.GetManifestResourceStream("td27.vdrum"))
             {
                 // TODO: Validate that there are no validation errors via a logger.
-                return (Module) ProtoIo.ReadModel(stream, NullLogger.Instance);
+                return (Module)ProtoIo.ReadModel(stream, NullLogger.Instance);
             }
         }
     }

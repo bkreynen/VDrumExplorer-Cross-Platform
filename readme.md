@@ -18,9 +18,9 @@ configurations may not work.
 
 ## Key changes from the upstream
 
-- **Avalonia UI port** — the WPF GUI (`VDrumExplorer.Gui`) has been
-  ported to a new Avalonia project (`VDrumExplorer.Gui.Avalonia`)
-  targeting `net10.0`.
+- **Avalonia UI** — the legacy WPF GUI (`VDrumExplorer.Gui`) has been
+  removed. The app now uses the Avalonia project
+  (`VDrumExplorer.Gui.Avalonia`) targeting `net10.0`.
 - **Cross-platform MIDI** — uses the managed-midi backend
   (`VDrumExplorer.Midi.ManagedMidi`) with ALSA on Linux.
 - **UX improvements** — hotkey copy/paste for kits and instruments,
@@ -43,10 +43,6 @@ is licensed under the MIT License. See
 The [Google.Protobuf](https://github.com/protocolbuffers/protobuf)
 library is licensed under the BSD 2.0 license. See
 [LICENSE.Protobuf.txt](LICENSE.Protobuf.txt) for details.
-
-The [NAudio](https://github.com/naudio/NAudio) library is licensed
-under the Microsoft Public License (Ms-PL). See
-[LICENSE.NAudio.txt](LICENSE.NAudio.txt) for details.
 
 The [byte-base64](https://github.com/euo/byte-base64) library (used in
 the Blazor app) is licensed under the MIT License. See

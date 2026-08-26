@@ -15,18 +15,18 @@ public class RevisionFilterTest
 {
     private static readonly JArray allTests = JArray.Parse(LoadTestJson());
 
-    private static IEnumerable<string> AllTestNames => allTests.Cast<JObject>().Select(obj => (string) obj["name"]);
+    private static IEnumerable<string> AllTestNames => allTests.Cast<JObject>().Select(obj => (string)obj["name"]);
 
     [TestCaseSource(nameof(AllTestNames))]
     public void TestVisit(string testName)
     {
-        var test = allTests.Cast<JObject>().Single(obj => (string) obj["name"] == testName);
-        var source = (JObject) test["source"];
-        var expectedResults = (JObject) test["expectedResults"];
+        var test = allTests.Cast<JObject>().Single(obj => (string)obj["name"] == testName);
+        var source = (JObject)test["source"];
+        var expectedResults = (JObject)test["expectedResults"];
         foreach (var prop in expectedResults.Properties())
         {
             int revision = HexInt32.Parse(prop.Name).Value;
-            JObject clone = (JObject) source.DeepClone();
+            JObject clone = (JObject)source.DeepClone();
             RevisionFilter.VisitObject(clone, revision);
             string actualText = clone.ToString();
             string expectedText = prop.Value.ToString();

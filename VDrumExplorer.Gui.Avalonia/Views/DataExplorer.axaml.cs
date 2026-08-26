@@ -45,44 +45,44 @@ public partial class DataExplorer : Window
                 }
                 else
                 {
-                    ViewModel.CopyNodeCommand.Execute(null);
+                    ViewModel.CopyNodeCommand.Execute(null!);
                 }
                 e.Handled = true;
             }
         }
-            else if (e.Key == Key.V && e.KeyModifiers == KeyModifiers.Control)
+        else if (e.Key == Key.V && e.KeyModifiers == KeyModifiers.Control)
+        {
+            // Ctrl+V: Paste.
+            // If a kit was copied (in Module Explorer), paste the kit into the selected kit slot.
+            // Otherwise, paste the node's settings into the selected node.
+            if (ViewModel is ModuleExplorerViewModel moduleVm && moduleVm.HasCopiedKit)
             {
-                // Ctrl+V: Paste.
-                // If a kit was copied (in Module Explorer), paste the kit into the selected kit slot.
-                // Otherwise, paste the node's settings into the selected node.
-                if (ViewModel is ModuleExplorerViewModel moduleVm && moduleVm.HasCopiedKit)
-                {
-                    moduleVm.PasteKitFromClipboard();
-                    e.Handled = true;
-                }
-                else if (ViewModel.CopiedSnapshot is not null && ViewModel.PasteNodeCommand.Enabled)
-                {
-                    ViewModel.PasteNodeCommand.Execute(null);
-                    e.Handled = true;
-                }
+                moduleVm.PasteKitFromClipboard();
+                e.Handled = true;
             }
-            else if (e.Key == Key.Z && e.KeyModifiers == KeyModifiers.Control)
+            else if (ViewModel.CopiedSnapshot is not null && ViewModel.PasteNodeCommand.Enabled)
             {
-                // Ctrl+Z: Undo the last edit operation.
-                if (ViewModel.CanUndo)
-                {
-                    ViewModel.Undo();
-                    e.Handled = true;
-                }
-            }
-            else if (e.Key == Key.Y && e.KeyModifiers == KeyModifiers.Control)
-            {
-                // Ctrl+Y: Redo the last undone operation.
-                if (ViewModel.CanRedo)
-                {
-                    ViewModel.Redo();
-                    e.Handled = true;
-                }
+                ViewModel.PasteNodeCommand.Execute(null!);
+                e.Handled = true;
             }
         }
+        else if (e.Key == Key.Z && e.KeyModifiers == KeyModifiers.Control)
+        {
+            // Ctrl+Z: Undo the last edit operation.
+            if (ViewModel.CanUndo)
+            {
+                ViewModel.Undo();
+                e.Handled = true;
+            }
+        }
+        else if (e.Key == Key.Y && e.KeyModifiers == KeyModifiers.Control)
+        {
+            // Ctrl+Y: Redo the last undone operation.
+            if (ViewModel.CanRedo)
+            {
+                ViewModel.Redo();
+                e.Handled = true;
+            }
+        }
+    }
 }

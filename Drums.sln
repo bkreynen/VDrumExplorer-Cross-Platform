@@ -5,13 +5,9 @@ VisualStudioVersion = 16.0.29102.190
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VDrumExplorer.Console", "VDrumExplorer.Console\VDrumExplorer.Console.csproj", "{2346D21D-F46F-4EEC-933E-5181993ADA67}"
 EndProject
-Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "VDrumExplorer.Setup", "VDrumExplorer.Setup\VDrumExplorer.Setup.wixproj", "{23A40C39-8777-43ED-80B1-0320B0422837}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VDrumExplorer.Model", "VDrumExplorer.Model\VDrumExplorer.Model.csproj", "{56E4D0FF-8EDD-4E98-B0A8-C9EEADC3CACF}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VDrumExplorer.Model.Test", "VDrumExplorer.Model.Test\VDrumExplorer.Model.Test.csproj", "{DC566EA7-48F0-4EBD-867A-059BD077CEC2}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VDrumExplorer.Gui", "VDrumExplorer.Gui\VDrumExplorer.Gui.csproj", "{DAFCEAED-37E4-43C2-AD93-38308AC1E2AE}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VDrumExplorer.ViewModel", "VDrumExplorer.ViewModel\VDrumExplorer.ViewModel.csproj", "{1E76FDD9-9F71-4FEB-9078-CE255BACD9BD}"
 EndProject
@@ -23,13 +19,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VDrumExplorer.Utility", "VD
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VDrumExplorer.Benchmarks", "VDrumExplorer.Benchmarks\VDrumExplorer.Benchmarks.csproj", "{9B52264C-6557-4492-8C84-70181EB823FE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VDrumExplorer.NAudio", "VDrumExplorer.NAudio\VDrumExplorer.NAudio.csproj", "{D1B9B690-5BA7-46B3-AF2D-0A025C49C1D0}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VDrumExplorer.Midi.ManagedMidi", "VDrumExplorer.Midi.ManagedMidi\VDrumExplorer.Midi.ManagedMidi.csproj", "{CEF2DED9-E055-4AA2-BFEE-E21A3762648D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VDrumExplorer.Blazor", "VDrumExplorer.Blazor\VDrumExplorer.Blazor.csproj", "{03BB73C3-36EF-45F7-BF52-B250F982EC5A}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VDrumExplorer.NetFrameworkProfiling", "VDrumExplorer.NetFrameworkProfiling\VDrumExplorer.NetFrameworkProfiling.csproj", "{EE60424E-8A09-43C8-89E8-1960BFA795C2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VDrumExplorer.InstrumentParser", "VDrumExplorer.InstrumentParser\VDrumExplorer.InstrumentParser.csproj", "{FF49A7E1-32B2-47BD-8E37-8E45774098BD}"
 EndProject
@@ -57,14 +49,6 @@ Global
 		{2346D21D-F46F-4EEC-933E-5181993ADA67}.Release|x64.Build.0 = Release|Any CPU
 		{2346D21D-F46F-4EEC-933E-5181993ADA67}.Release|x86.ActiveCfg = Release|Any CPU
 		{2346D21D-F46F-4EEC-933E-5181993ADA67}.Release|x86.Build.0 = Release|Any CPU
-		{23A40C39-8777-43ED-80B1-0320B0422837}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{23A40C39-8777-43ED-80B1-0320B0422837}.Debug|x64.ActiveCfg = Debug|x86
-		{23A40C39-8777-43ED-80B1-0320B0422837}.Debug|x86.ActiveCfg = Debug|x86
-		{23A40C39-8777-43ED-80B1-0320B0422837}.Debug|x86.Build.0 = Debug|x86
-		{23A40C39-8777-43ED-80B1-0320B0422837}.Release|Any CPU.ActiveCfg = Release|x86
-		{23A40C39-8777-43ED-80B1-0320B0422837}.Release|x64.ActiveCfg = Release|x86
-		{23A40C39-8777-43ED-80B1-0320B0422837}.Release|x86.ActiveCfg = Release|x86
-		{23A40C39-8777-43ED-80B1-0320B0422837}.Release|x86.Build.0 = Release|x86
 		{56E4D0FF-8EDD-4E98-B0A8-C9EEADC3CACF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{56E4D0FF-8EDD-4E98-B0A8-C9EEADC3CACF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{56E4D0FF-8EDD-4E98-B0A8-C9EEADC3CACF}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -89,18 +73,6 @@ Global
 		{DC566EA7-48F0-4EBD-867A-059BD077CEC2}.Release|x64.Build.0 = Release|Any CPU
 		{DC566EA7-48F0-4EBD-867A-059BD077CEC2}.Release|x86.ActiveCfg = Release|Any CPU
 		{DC566EA7-48F0-4EBD-867A-059BD077CEC2}.Release|x86.Build.0 = Release|Any CPU
-		{DAFCEAED-37E4-43C2-AD93-38308AC1E2AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DAFCEAED-37E4-43C2-AD93-38308AC1E2AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DAFCEAED-37E4-43C2-AD93-38308AC1E2AE}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{DAFCEAED-37E4-43C2-AD93-38308AC1E2AE}.Debug|x64.Build.0 = Debug|Any CPU
-		{DAFCEAED-37E4-43C2-AD93-38308AC1E2AE}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{DAFCEAED-37E4-43C2-AD93-38308AC1E2AE}.Debug|x86.Build.0 = Debug|Any CPU
-		{DAFCEAED-37E4-43C2-AD93-38308AC1E2AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DAFCEAED-37E4-43C2-AD93-38308AC1E2AE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DAFCEAED-37E4-43C2-AD93-38308AC1E2AE}.Release|x64.ActiveCfg = Release|Any CPU
-		{DAFCEAED-37E4-43C2-AD93-38308AC1E2AE}.Release|x64.Build.0 = Release|Any CPU
-		{DAFCEAED-37E4-43C2-AD93-38308AC1E2AE}.Release|x86.ActiveCfg = Release|Any CPU
-		{DAFCEAED-37E4-43C2-AD93-38308AC1E2AE}.Release|x86.Build.0 = Release|Any CPU
 		{1E76FDD9-9F71-4FEB-9078-CE255BACD9BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1E76FDD9-9F71-4FEB-9078-CE255BACD9BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1E76FDD9-9F71-4FEB-9078-CE255BACD9BD}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -161,18 +133,6 @@ Global
 		{9B52264C-6557-4492-8C84-70181EB823FE}.Release|x64.Build.0 = Release|Any CPU
 		{9B52264C-6557-4492-8C84-70181EB823FE}.Release|x86.ActiveCfg = Release|Any CPU
 		{9B52264C-6557-4492-8C84-70181EB823FE}.Release|x86.Build.0 = Release|Any CPU
-		{D1B9B690-5BA7-46B3-AF2D-0A025C49C1D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D1B9B690-5BA7-46B3-AF2D-0A025C49C1D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D1B9B690-5BA7-46B3-AF2D-0A025C49C1D0}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{D1B9B690-5BA7-46B3-AF2D-0A025C49C1D0}.Debug|x64.Build.0 = Debug|Any CPU
-		{D1B9B690-5BA7-46B3-AF2D-0A025C49C1D0}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{D1B9B690-5BA7-46B3-AF2D-0A025C49C1D0}.Debug|x86.Build.0 = Debug|Any CPU
-		{D1B9B690-5BA7-46B3-AF2D-0A025C49C1D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D1B9B690-5BA7-46B3-AF2D-0A025C49C1D0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D1B9B690-5BA7-46B3-AF2D-0A025C49C1D0}.Release|x64.ActiveCfg = Release|Any CPU
-		{D1B9B690-5BA7-46B3-AF2D-0A025C49C1D0}.Release|x64.Build.0 = Release|Any CPU
-		{D1B9B690-5BA7-46B3-AF2D-0A025C49C1D0}.Release|x86.ActiveCfg = Release|Any CPU
-		{D1B9B690-5BA7-46B3-AF2D-0A025C49C1D0}.Release|x86.Build.0 = Release|Any CPU
 		{CEF2DED9-E055-4AA2-BFEE-E21A3762648D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CEF2DED9-E055-4AA2-BFEE-E21A3762648D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CEF2DED9-E055-4AA2-BFEE-E21A3762648D}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -197,18 +157,6 @@ Global
 		{03BB73C3-36EF-45F7-BF52-B250F982EC5A}.Release|x64.Build.0 = Release|Any CPU
 		{03BB73C3-36EF-45F7-BF52-B250F982EC5A}.Release|x86.ActiveCfg = Release|Any CPU
 		{03BB73C3-36EF-45F7-BF52-B250F982EC5A}.Release|x86.Build.0 = Release|Any CPU
-		{EE60424E-8A09-43C8-89E8-1960BFA795C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EE60424E-8A09-43C8-89E8-1960BFA795C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EE60424E-8A09-43C8-89E8-1960BFA795C2}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{EE60424E-8A09-43C8-89E8-1960BFA795C2}.Debug|x64.Build.0 = Debug|Any CPU
-		{EE60424E-8A09-43C8-89E8-1960BFA795C2}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{EE60424E-8A09-43C8-89E8-1960BFA795C2}.Debug|x86.Build.0 = Debug|Any CPU
-		{EE60424E-8A09-43C8-89E8-1960BFA795C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EE60424E-8A09-43C8-89E8-1960BFA795C2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EE60424E-8A09-43C8-89E8-1960BFA795C2}.Release|x64.ActiveCfg = Release|Any CPU
-		{EE60424E-8A09-43C8-89E8-1960BFA795C2}.Release|x64.Build.0 = Release|Any CPU
-		{EE60424E-8A09-43C8-89E8-1960BFA795C2}.Release|x86.ActiveCfg = Release|Any CPU
-		{EE60424E-8A09-43C8-89E8-1960BFA795C2}.Release|x86.Build.0 = Release|Any CPU
 		{FF49A7E1-32B2-47BD-8E37-8E45774098BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{FF49A7E1-32B2-47BD-8E37-8E45774098BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FF49A7E1-32B2-47BD-8E37-8E45774098BD}.Debug|x64.ActiveCfg = Debug|Any CPU

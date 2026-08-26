@@ -40,7 +40,7 @@ namespace VDrumExplorer.Console
             var keys = parseResult.GetRequiredValue<string>("keys");
             var midiNote = parseResult.GetRequiredValue<int>("note");
 
-            var noteOn = (byte) (0x90 | (channel - 1));
+            var noteOn = (byte)(0x90 | (channel - 1));
 
             // Now listen for the foot switch...
             client.MessageReceived += (sender, message) =>
