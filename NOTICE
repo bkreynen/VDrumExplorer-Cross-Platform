@@ -21,6 +21,5 @@ respective licenses:
   Copyright (c) 2010 Atsushi Eno
 - Google.Protobuf (BSD 2-Clause License) — https://github.com/protocolbuffers/protobuf
   Copyright 2008 Google Inc. All rights reserved.
-- NAudio (Microsoft Public License, Ms-PL) — https://github.com/naudio/NAudio
 - byte-base64 (MIT License) — https://github.com/euo/byte-base64
   Copyright (c) 2020 Egor Nepomnyaschih
