@@ -1,0 +1,39 @@
+<Application xmlns="https://github.com/avaloniaui"
+            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+            xmlns:vm="clr-namespace:VDrumExplorer.ViewModel;assembly=VDrumExplorer.ViewModel"
+            x:Class="VDrumExplorer.Gui.Avalonia.App"
+            RequestedThemeVariant="Light">
+    <Application.Styles>
+        <FluentTheme />
+        <StyleInclude Source="avares://VDrumExplorer.Gui.Avalonia/Styles/RegularScaling.axaml" />
+    </Application.Styles>
+
+    <Application.Resources>
+        <ResourceDictionary>
+            <!-- Margin to the left of a value when being displayed as a key/value pair. -->
+            <Thickness x:Key="ValueMargin">10,0,0,0</Thickness>
+            <Thickness x:Key="ValueMarginWithVertical">10,3,0,3</Thickness>
+            <Thickness x:Key="ValueMarginWithMarginAbove">10,3,0,0</Thickness>
+
+            <!-- Margin above a stack panel for vertical separation -->
+            <Thickness x:Key="PanelMargin">0,5,0,0</Thickness>
+
+            <Thickness x:Key="AllAroundMargin">5,5,5,5</Thickness>
+
+            <!-- DataTemplate for a single key-value pair row, used by ItemsControls that display
+                 key/value tables. The first column uses SharedSizeGroup so all rows align.
+                 The parent ItemsControl must use a StackPanel with Grid.IsSharedSizeScope="True"
+                 as its ItemsPanel for the SharedSizeGroup to take effect. -->
+            <DataTemplate x:Key="KeyValueItemTemplate" x:DataType="vm:KeyValueViewModel">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition SharedSizeGroup="Col0" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{Binding Key}" ToolTip.Tip="{Binding KeyToolTip}"/>
+                    <TextBlock Grid.Column="1" Text="{Binding Value}" Margin="{StaticResource ValueMargin}" ToolTip.Tip="{Binding ValueToolTip}" />
+                </Grid>
+            </DataTemplate>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

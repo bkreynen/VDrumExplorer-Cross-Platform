@@ -32,7 +32,19 @@ namespace VDrumExplorer.Midi.ManagedMidi
                 return;
             }
             disposed = true;
-            managedOutput.Dispose();
+            // The ManagedMidi ALSA implementation (AlsaMidiOutput.Dispose) can throw
+            // an "Operation not permitted" AlsaException during cleanup on Linux,
+            // because it calls DisconnectTo with incorrect port addresses. The
+            // identity request has already been sent by this point, so the cleanup
+            // failure should not prevent device detection from completing.
+            try
+            {
+                managedOutput.Dispose();
+            }
+            catch
+            {
+                // Swallow cleanup exceptions from the underlying ALSA sequencer.
+            }
         }
     }
 }

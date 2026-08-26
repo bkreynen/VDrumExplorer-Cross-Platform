@@ -1,0 +1,185 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vmd="clr-namespace:VDrumExplorer.ViewModel.Data;assembly=VDrumExplorer.ViewModel"
+        x:Class="VDrumExplorer.Gui.Avalonia.Views.DataExplorer"
+        x:CompileBindings="False"
+        Title="{Binding Title}" Height="450" Width="800">
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="_File">
+                <MenuItem Command="{Binding SaveFileCommand}" Header="Save"/>
+                <MenuItem Command="{Binding SaveFileAsCommand}" Header="Save As"/>
+                <MenuItem Command="{Binding ExportJsonCommand}" Header="Export JSON"/>
+                <MenuItem Header="Convert to..." ItemsSource="{Binding ConvertibleModuleIdentifiers}" IsVisible="{Binding HasConvertibleModuleIdentifiers}">
+                    <MenuItem.ItemTemplate>
+                        <DataTemplate>
+                            <MenuItem Command="{Binding $parent[Menu].DataContext.ConvertCommand}"
+                                      CommandParameter="{Binding}"
+                                      Header="{Binding DisplayName}" />
+                        </DataTemplate>
+                    </MenuItem.ItemTemplate>
+                </MenuItem>
+            </MenuItem>
+        </Menu>
+
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" IsVisible="{Binding IsKitExplorer}" Margin="{StaticResource PanelMargin}">
+            <TextBlock Margin="{StaticResource ValueMargin}" Text="Default kit number:"/>
+            <TextBox Margin="{StaticResource ValueMargin}" Width="30" VerticalAlignment="Center" Text="{Binding DefaultKitNumber}"/>
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="{StaticResource PanelMargin}">
+            <Button Margin="{StaticResource ValueMargin}" Command="{Binding EditCommand}" Content="Edit mode"/>
+            <Button Margin="{StaticResource ValueMargin}" Command="{Binding CommitCommand}" Content="Commit changes"/>
+            <Button Margin="{StaticResource ValueMargin}" Command="{Binding CancelEditCommand}" Content="Cancel changes"/>
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="{StaticResource PanelMargin}">
+            <Button Margin="{StaticResource ValueMargin}" Command="{Binding CopyNodeCommand}" Content="Copy node"/>
+            <Button Margin="{StaticResource ValueMargin}" Command="{Binding PasteNodeCommand}" Content="Paste node"/>
+            <Button Margin="{StaticResource ValueMargin}" Command="{Binding MultiPasteCommand}" Content="Multi-paste"/>
+            <Button Margin="{StaticResource ValueMargin}" Command="{Binding CopyMultipleKitsCommand}" IsVisible="{Binding IsModuleExplorer}" Content="Copy kits..."/>
+            <TextBlock Margin="{StaticResource ValueMargin}" Text="Copied node path:"/>
+            <TextBlock Margin="{StaticResource ValueMargin}" Text="{Binding CopiedSnapshot.Path}" />
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" IsVisible="{Binding DeviceViewModel.DeviceConnected}" Margin="{StaticResource PanelMargin}">
+            <Button Margin="{StaticResource ValueMargin}" Command="{Binding CopyDataToDeviceCommand}" CommandParameter="{Binding SelectedNode}" Content="{Binding CopyDataTitle}" VerticalAlignment="Center"/>
+            <TextBlock Margin="{StaticResource ValueMargin}" IsVisible="{Binding IsKitExplorer}" VerticalAlignment="Center" Text="Kit to copy to:"/>
+            <TextBox Margin="{StaticResource ValueMargin}" IsVisible="{Binding IsKitExplorer}" VerticalAlignment="Center" Text="{Binding KitCopyTargetNumber}" Width="30"/>
+            <Button Margin="{StaticResource ValueMargin}" Command="{Binding PlayNoteCommand}" VerticalAlignment="Center" Content="Play note"/>
+            <TextBlock Margin="{StaticResource ValueMargin}" VerticalAlignment="Center" Text="Midi Channel:"/>
+            <ComboBox Margin="{StaticResource ValueMargin}" ItemsSource="{Binding MidiChannels}" SelectedItem="{Binding SelectedMidiChannel}" VerticalAlignment="Center"/>
+            <TextBlock Margin="{StaticResource ValueMargin}" VerticalAlignment="Center" Text="Attack:"/>
+            <Slider Margin="{StaticResource ValueMargin}" Minimum="{Binding MinAttack}" Maximum="{Binding MaxAttack}" Value="{Binding Attack}" VerticalAlignment="Center" Width="100" IsSnapToTickEnabled="True" TickFrequency="1" />
+            <TextBlock Margin="{StaticResource ValueMargin}" HorizontalAlignment="Left" Text="{Binding Attack}" VerticalAlignment="Center"/>
+            <Button Margin="{StaticResource ValueMargin}" Command="{Binding CopyToTemporaryStudioSetCommand}" VerticalAlignment="Center" IsVisible="{Binding IsAerophoneKitExplorer}" Content="Test settings"/>
+        </StackPanel>
+
+        <Separator DockPanel.Dock="Top" Margin="{StaticResource PanelMargin}"/>
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="5" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Tree of container nodes. -->
+            <TreeView x:Name="treeView" Grid.Column="0" BorderThickness="0" ItemsSource="{Binding Root}" SelectionChanged="TreeView_SelectionChanged" Margin="{StaticResource AllAroundMargin}">
+                <TreeView.ItemTemplate>
+                    <TreeDataTemplate ItemsSource="{Binding Children}">
+                        <TextBlock Text="{Binding Title}">
+                            <TextBlock.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="Open copy in Kit Explorer" Command="{Binding Root.OpenCopyInKitExplorerCommand}" CommandParameter="{Binding}" />
+                                    <MenuItem Header="Copy to another kit" Command="{Binding Root.CopyKitCommand}" CommandParameter="{Binding}" />
+                                    <MenuItem Header="Import from file" Command="{Binding Root.ImportKitFromFileCommand}" CommandParameter="{Binding}" />
+                                    <MenuItem Header="Export to file" Command="{Binding Root.ExportKitCommand}" CommandParameter="{Binding}" />
+                                </ContextMenu>
+                            </TextBlock.ContextMenu>
+                        </TextBlock>
+                    </TreeDataTemplate>
+                </TreeView.ItemTemplate>
+            </TreeView>
+            <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" />
+
+            <!-- Details for the selected node. -->
+            <ScrollViewer Grid.Column="2" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                <StackPanel Margin="5,0,5,0">
+                    <ItemsControl ItemsSource="{Binding SelectedNodeDetails}">
+                        <ItemsControl.DataTemplates>
+                            <!-- Read-only field containers -->
+                            <DataTemplate DataType="vmd:FieldContainerDataNodeDetailViewModel">
+                                <GroupBox Header="{Binding Description}">
+                                    <ItemsControl ItemsSource="{Binding Fields}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid Margin="0,3,0,0">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="200" />
+                                                        <ColumnDefinition Width="*" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Grid.Column="0" Text="{Binding Description}" VerticalAlignment="Center" />
+                                                    <ContentControl Grid.Column="1" Content="{Binding}" Margin="{StaticResource ValueMargin}" HorizontalAlignment="Left" VerticalAlignment="Center">
+                                                        <ContentControl.DataTemplates>
+                                                            <!-- Effectively a switch on how to display a value, based on its type. -->
+                                                            <DataTemplate DataType="vmd:ReadOnlyDataFieldViewModel">
+                                                                <TextBlock Text="{Binding FormattedText}" />
+                                                            </DataTemplate>
+                                                            <DataTemplate DataType="vmd:EditableEnumDataFieldViewModel">
+                                                                <ComboBox ItemsSource="{Binding ValidValues}" SelectedItem="{Binding Value}" Margin="2" />
+                                                            </DataTemplate>
+                                                            <DataTemplate DataType="vmd:EditableBooleanDataFieldViewModel">
+                                                                <CheckBox IsChecked="{Binding Value}" VerticalAlignment="Center" />
+                                                            </DataTemplate>
+                                                            <DataTemplate DataType="vmd:EditableStringDataFieldViewModel">
+                                                                <TextBox Text="{Binding Text}" MaxLength="{Binding MaxLength}" MinWidth="{Binding MinWidth}"/>
+                                                            </DataTemplate>
+                                                            <DataTemplate DataType="vmd:EditableNumericDataFieldViewModel">
+                                                                <StackPanel Orientation="Horizontal">
+                                                                    <Slider Padding="0" Margin="2,1,0,0" Value="{Binding Value}" Minimum="{Binding MinValue}" Maximum="{Binding MaxValue}" Width="150" SmallChange="1" LargeChange="{Binding LargeChange}" />
+                                                                    <TextBlock Text="{Binding FormattedText}" Margin="{StaticResource ValueMargin}" />
+                                                                </StackPanel>
+                                                            </DataTemplate>
+                                                            <DataTemplate DataType="vmd:EditableInstrumentDataFieldViewModel">
+                                                                <StackPanel Orientation="Horizontal">
+                                                                    <ComboBox ItemsSource="{Binding InstrumentGroups}"
+                                                                              SelectedItem="{Binding Group}"
+                                                                              Margin="2"
+                                                                              VerticalAlignment="Center" />
+                                                                    <ComboBox ItemsSource="{Binding Group.Instruments}"
+                                                                              SelectedItem="{Binding Instrument}"
+                                                                              Margin="2"
+                                                                              IsVisible="{Binding IsPreset}"
+                                                                              VerticalAlignment="Center" />
+                                                                    <TextBlock IsVisible="{Binding IsUserSample}"
+                                                                               VerticalAlignment="Center"
+                                                                               Margin="{StaticResource ValueMargin}"
+                                                                               Text="Sample number:" />
+                                                                    <TextBox Text="{Binding UserSample}"
+                                                                             Width="50"
+                                                                             IsVisible="{Binding IsUserSample}"
+                                                                             Margin="{StaticResource ValueMargin}"
+                                                                             VerticalAlignment="Center" />
+                                                                </StackPanel>
+                                                            </DataTemplate>
+                                                            <DataTemplate DataType="vmd:EditableTempoDataFieldViewModel">
+                                                                <StackPanel Orientation="Horizontal">
+                                                                    <TextBlock Text="Tempo sync" VerticalAlignment="Center"/>
+                                                                    <CheckBox IsChecked="{Binding TempoSync}" Margin="{StaticResource ValueMargin}" VerticalAlignment="Center" />
+                                                                    <ComboBox ItemsSource="{Binding ValidMusicalNoteValues}" SelectedItem="{Binding MusicalNote}" Margin="{StaticResource ValueMargin}"
+                                                                              IsVisible="{Binding TempoSync}" />
+                                                                    <Slider Padding="0" Margin="2,1,0,0" Value="{Binding NumericValue}" Minimum="{Binding MinNumericValue}" Maximum="{Binding MaxNumericValue}" Width="150" SmallChange="1" LargeChange="{Binding LargeNumericChange}"
+                                                                            IsVisible="{Binding NotTempoSync}"/>
+                                                                    <TextBlock Text="{Binding NumericFormattedText}" Margin="{StaticResource ValueMargin}"
+                                                                               IsVisible="{Binding NotTempoSync}"/>
+                                                                </StackPanel>
+                                                            </DataTemplate>
+                                                        </ContentControl.DataTemplates>
+                                                    </ContentControl>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </GroupBox>
+                            </DataTemplate>
+
+                            <!-- Lists (always read-only) -->
+                            <DataTemplate DataType="vmd:ListDataNodeDetailViewModel">
+                                <GroupBox Header="{Binding Description}">
+                                    <ItemsControl ItemsSource="{Binding Items}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Text}" />
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </GroupBox>
+                            </DataTemplate>
+                        </ItemsControl.DataTemplates>
+                    </ItemsControl>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+    </DockPanel>
+</Window>

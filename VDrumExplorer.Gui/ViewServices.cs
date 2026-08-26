@@ -23,34 +23,40 @@ namespace VDrumExplorer.Gui
         {
         }
 
-        public string? ShowOpenFileDialog(string filter)
+        public Task<string?> ShowOpenFileDialogAsync(string filter)
         {
             OpenFileDialog dialog = new OpenFileDialog
             {
                 Multiselect = false,
                 Filter = filter
             };
-            return dialog.ShowDialog() == true ? dialog.FileName : null;
+            return Task.FromResult(dialog.ShowDialog() == true ? dialog.FileName : null);
         }
 
-        public string? ShowSaveFileDialog(string filter)
+        public Task<string?> ShowSaveFileDialogAsync(string filter)
         {
             SaveFileDialog dialog = new SaveFileDialog { Filter = filter };
-            return dialog.ShowDialog() == true ? dialog.FileName : null;
+            return Task.FromResult(dialog.ShowDialog() == true ? dialog.FileName : null);
         }
 
-        public int? ChooseCopyKitTarget(CopyKitViewModel viewModel)
+        public Task<int?> ChooseCopyKitTargetAsync(CopyKitViewModel viewModel)
         {
             var dialog = new CopyKitTargetDialog { DataContext = viewModel };
             var result = dialog.ShowDialog();
-            return result == true ? viewModel.DestinationKitNumber : default(int?);
+            return Task.FromResult(result == true ? viewModel.DestinationKitNumber : default(int?));
         }
 
-        public bool ChooseMultiPasteTargets(MultiPasteViewModel viewModel)
+        public Task<bool> ChooseCopyKitsTargetAsync(CopyKitsViewModel viewModel)
+        {
+            // TODO: Implement WPF dialog if needed. For now, return false (cancelled).
+            return Task.FromResult(false);
+        }
+
+        public Task<bool> ChooseMultiPasteTargetsAsync(MultiPasteViewModel viewModel)
         {
             var dialog = new MultiPasteDialog { DataContext = viewModel };
             var result = dialog.ShowDialog();
-            return result == true;
+            return Task.FromResult(result == true);
         }
 
         public void ShowKitExplorer(KitExplorerViewModel viewModel) =>

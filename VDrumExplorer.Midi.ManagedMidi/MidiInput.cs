@@ -46,7 +46,19 @@ namespace VDrumExplorer.Midi.ManagedMidi
             // This is slightly odd, as the implementation for desktop seems to call
             // CloseAsync too. Not sure what's going on, and maybe we should be waiting
             // the task to complete... but it doesn't seem to cause any harm.
-            managedInput.CloseAsync();
+            // The ManagedMidi ALSA implementation (AlsaMidiInput.Dispose, invoked via
+            // CloseAsync) can throw an "Operation not permitted" AlsaException during
+            // cleanup on Linux, because it calls DisconnectTo with incorrect port
+            // addresses. Swallow the cleanup exception so it does not prevent device
+            // detection from completing.
+            try
+            {
+                managedInput.CloseAsync();
+            }
+            catch
+            {
+                // Swallow cleanup exceptions from the underlying ALSA sequencer.
+            }
         }
     }
 }

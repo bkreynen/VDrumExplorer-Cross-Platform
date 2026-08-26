@@ -1,0 +1,23 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vmd="clr-namespace:VDrumExplorer.ViewModel.Dialogs;assembly=VDrumExplorer.ViewModel"
+        x:Class="VDrumExplorer.Gui.Avalonia.Views.Dialogs.DataTransferDialog"
+        x:CompileBindings="True"
+        x:DataType="vmd:DataTransferViewModel"
+        Title="{Binding Title}"
+        Height="140" Width="300"
+        CanResize="False"
+        Closing="HandleClosing">
+    <StackPanel Margin="6">
+        <TextBlock Text="{Binding ProgressDescription}" />
+        <Grid Margin="0,8,0,0" Height="23">
+            <ProgressBar Value="{Binding Completed, Mode=OneWay}" Maximum="{Binding Total}" />
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <TextBlock Text="{Binding Completed}" />
+                <TextBlock Text=" / " />
+                <TextBlock Text="{Binding Total}" />
+            </StackPanel>
+        </Grid>
+        <Button Margin="0,8,0,0" Command="{Binding CancelCommand}" HorizontalAlignment="Left" Content="Cancel" />
+    </StackPanel>
+</Window>

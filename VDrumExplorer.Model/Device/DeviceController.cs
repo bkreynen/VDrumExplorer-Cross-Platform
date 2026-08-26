@@ -72,8 +72,13 @@ namespace VDrumExplorer.Model.Device
 
         public Task SetCurrentKitAsync(int kit, CancellationToken cancellationToken)
         {
-            var segment = new DataSegment(CurrentKitAddress, new[] { (byte) (kit - 1) });
-            return SaveSegment(segment, cancellationToken);
+            // Send a MIDI Program Change to switch the active kit on the device.
+            // The TD-17 responds to Program Change on its configured MIDI channel (typically channel 10).
+            // Program numbers are 0-indexed: kit 1 = program 0, kit 100 = program 99.
+            // Note: SysEx Data Set to the "Current" register (address 0x00_00_00_00) only updates the
+            // stored value but does not trigger the actual kit switch on the TD-17.
+            client.SendProgramChange(10, kit - 1);
+            return Task.CompletedTask;
         }
 
         public async Task<Kit> LoadKitAsync(int kit, IProgress<TransferProgress>? progressHandler, CancellationToken cancellationToken)
@@ -121,18 +126,120 @@ namespace VDrumExplorer.Model.Device
 
         private async Task<ModuleDataSnapshot> LoadDescendantsAsync(TreeNode root, IProgress<TransferProgress>? progressHandler, CancellationToken cancellationToken)
         {
-            var containers = root.DescendantFieldContainers().ToList();
+            // Sort containers by address so we can find adjacent ones.
+            var containers = root.DescendantFieldContainers().OrderBy(c => c.Address).ToList();
             var snapshot = new ModuleDataSnapshot();
             int completed = 0;
-            foreach (var container in containers)
+
+            // Batch adjacent containers into single requests to reduce round-trips.
+            // This is conservative: we only batch containers that are contiguous in address space
+            // and whose combined size fits within the 383-byte (0x17f) maximum request size.
+            var batches = CreateBatches(containers);
+            foreach (var batch in batches)
             {
-                progressHandler?.Report(new TransferProgress(completed, containers.Count, container.Path));
-                var segment = await LoadSegment(container.Address, container.Size, cancellationToken);
-                completed++;
-                snapshot.Add(segment);
+                progressHandler?.Report(new TransferProgress(completed, containers.Count, batch.Path));
+
+                if (batch.Containers.Count == 1)
+                {
+                    // Single container — load directly (same as before).
+                    var container = batch.Containers[0];
+                    var segment = await LoadSegment(container.Address, container.Size, cancellationToken);
+                    snapshot.Add(segment);
+                }
+                else
+                {
+                    // Multiple containers — load as one request and split the result.
+                    var firstContainer = batch.Containers[0];
+                    var segment = await LoadSegment(firstContainer.Address, batch.TotalSize, cancellationToken);
+                    var data = segment.CopyData();
+                    int offset = 0;
+                    foreach (var container in batch.Containers)
+                    {
+                        var containerData = new byte[container.Size];
+                        Array.Copy(data, offset, containerData, 0, container.Size);
+                        snapshot.Add(new DataSegment(container.Address, containerData));
+                        offset += container.Size;
+                    }
+                }
+                completed += batch.Containers.Count;
             }
             progressHandler?.Report(new TransferProgress(containers.Count, containers.Count, "complete"));
             return snapshot;
+        }
+
+        /// <summary>
+        /// Groups adjacent field containers into batches for more efficient loading.
+        /// Only containers that are contiguous in address space (no gaps) and whose
+        /// combined size fits within the 383-byte maximum request size are batched.
+        /// </summary>
+        private static List<ContainerBatch> CreateBatches(List<FieldContainer> containers)
+        {
+            const int maxBatchSize = 0x17f; // 383 bytes — the maximum single request size.
+            var batches = new List<ContainerBatch>();
+            var currentBatch = new List<FieldContainer>();
+            int currentBatchSize = 0;
+
+            foreach (var container in containers)
+            {
+                int containerSize = container.Size;
+
+                if (currentBatch.Count == 0)
+                {
+                    // Start a new batch.
+                    currentBatch.Add(container);
+                    currentBatchSize = containerSize;
+                }
+                else
+                {
+                    // Check if this container is adjacent to the previous one.
+                    var previous = currentBatch[currentBatch.Count - 1];
+                    int previousEnd = previous.Address.LogicalValue + previous.Size;
+                    int containerStart = container.Address.LogicalValue;
+
+                    bool isAdjacent = containerStart == previousEnd;
+                    bool fitsInBatch = currentBatchSize + containerSize <= maxBatchSize;
+
+                    if (isAdjacent && fitsInBatch)
+                    {
+                        // Add to current batch.
+                        currentBatch.Add(container);
+                        currentBatchSize += containerSize;
+                    }
+                    else
+                    {
+                        // Finalize current batch and start a new one.
+                        batches.Add(new ContainerBatch(currentBatch, currentBatchSize));
+                        currentBatch = new List<FieldContainer> { container };
+                        currentBatchSize = containerSize;
+                    }
+                }
+            }
+
+            if (currentBatch.Count > 0)
+            {
+                batches.Add(new ContainerBatch(currentBatch, currentBatchSize));
+            }
+
+            return batches;
+        }
+
+        /// <summary>
+        /// A batch of adjacent field containers loaded in a single request.
+        /// </summary>
+        private sealed class ContainerBatch
+        {
+            public IReadOnlyList<FieldContainer> Containers { get; }
+            public int TotalSize { get; }
+            public string Path { get; }
+
+            public ContainerBatch(IReadOnlyList<FieldContainer> containers, int totalSize)
+            {
+                Containers = containers;
+                TotalSize = totalSize;
+                Path = containers.Count == 1
+                    ? containers[0].Path
+                    : $"{containers[0].Path} (+{containers.Count - 1} more)";
+            }
         }
 
         public async Task SetInstrumentAsync(int kit, int trigger, Instrument instrument, CancellationToken cancellationToken)

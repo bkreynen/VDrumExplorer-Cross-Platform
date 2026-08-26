@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>Enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <Version>1.0.0-alpha17</Version>
+    <AssemblyVersion>1.0.0.17</AssemblyVersion>
+    <!-- Disable Central Package Management for this project, since the Avalonia packages
+         are not (yet) listed in Directory.Packages.props. -->
+    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="12.1.1" />
+    <PackageReference Include="Avalonia.Desktop" Version="12.1.1" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="12.1.1" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="12.1.1" />
+    <PackageReference Include="Avalonia.Controls.DataGrid" Version="12.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\VDrumExplorer.Midi.ManagedMidi\VDrumExplorer.Midi.ManagedMidi.csproj" />
+    <ProjectReference Include="..\VDrumExplorer.ViewModel\VDrumExplorer.ViewModel.csproj" />
+  </ItemGroup>
+
+</Project>
