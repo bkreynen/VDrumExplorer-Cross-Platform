@@ -77,7 +77,7 @@ public static class JsonIo
             {
                 throw new InvalidDataException($"Missing or invalid'{DefaultKitNumberProperty}'.");
             }
-            return ReadKitData(kitObj, schema, (int) defaultKitNumber, logger);
+            return ReadKitData(kitObj, schema, (int)defaultKitNumber, logger);
         }
         else if (moduleData is JObject moduleObj)
         {
@@ -205,7 +205,7 @@ public static class JsonIo
                     logger.LogWarning("Invalid property type for property '{property.Name}'");
                     continue;
                 }
-                pairs.Add((property.Name, (string) property.Value!));
+                pairs.Add((property.Name, (string)property.Value!));
             }
             data.MergeTextValues(fc, pairs, logger);
         }

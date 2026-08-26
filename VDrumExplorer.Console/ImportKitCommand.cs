@@ -34,7 +34,7 @@ namespace VDrumExplorer.Console
                 // Allow up to 30 seconds in total.
                 var token = new CancellationTokenSource(TimeSpan.FromSeconds(30)).Token;
                 var kit = await device.LoadKitAsync(kitNumber, null, token);
-                console.WriteLine($"Finished loading in {(int) sw.Elapsed.TotalSeconds} seconds");
+                console.WriteLine($"Finished loading in {(int)sw.Elapsed.TotalSeconds} seconds");
                 using (var stream = File.Create(file))
                 {
                     kit.Save(stream);

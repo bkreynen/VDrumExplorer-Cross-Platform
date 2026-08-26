@@ -28,7 +28,7 @@ namespace VDrumExplorer.Proto
             var file = ReadDrumFile(stream);
             return file.FileCase switch
             {
-                DrumFile.FileOneofCase.Kit => (object) file.Kit.ToModel(logger),
+                DrumFile.FileOneofCase.Kit => (object)file.Kit.ToModel(logger),
                 DrumFile.FileOneofCase.Module => file.Module.ToModel(logger),
                 DrumFile.FileOneofCase.ModuleAudio => file.ModuleAudio.ToModel(logger),
                 _ => throw new InvalidDataException($"Unknown file case {file.FileCase}")
@@ -84,6 +84,6 @@ namespace VDrumExplorer.Proto
             }
 
             return DrumFile.Parser.ParseFrom(stream);
-        }        
+        }
     }
 }

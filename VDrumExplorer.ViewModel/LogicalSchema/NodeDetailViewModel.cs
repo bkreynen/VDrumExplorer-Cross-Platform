@@ -26,7 +26,7 @@ namespace VDrumExplorer.ViewModel.LogicalSchema
 
     public abstract class NodeDetailViewModel<TModel> : NodeDetailViewModel where TModel : INodeDetail
     {
-        public new TModel Model => (TModel) base.Model;
+        public new TModel Model => (TModel)base.Model;
 
         public NodeDetailViewModel(TModel model) : base(model)
         {

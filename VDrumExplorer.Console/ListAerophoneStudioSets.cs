@@ -27,7 +27,7 @@ namespace VDrumExplorer.Console
         {
             var schema = ModuleSchema.KnownSchemas[ModuleIdentifier.AE10].Value;
             var instrumentField = schema.PhysicalRoot.ResolveField("TemporaryStudioSet/Part[1]/Instrument");
-            var instrumentDataField = new EnumDataField((EnumField) instrumentField);
+            var instrumentDataField = new EnumDataField((EnumField)instrumentField);
 
             // Presets
             client.SendData(0x01_00_00_05, new byte[] { 64 });

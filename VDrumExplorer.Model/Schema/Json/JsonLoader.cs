@@ -90,8 +90,8 @@ namespace VDrumExplorer.Model.Schema.Json
             {
                 throw new InvalidOperationException($"Resource {resourceName} is not an object");
             }
-            RevisionFilter.VisitObject((JObject) token, revision);
-            return (JObject) token;
+            RevisionFilter.VisitObject((JObject)token, revision);
+            return (JObject)token;
         }
 
         private JToken LoadResourceToken(string resourceName, Stack<string> loadedResources)
@@ -121,7 +121,7 @@ namespace VDrumExplorer.Model.Schema.Json
                         }
                         return array;
                     case JValue value when value.Type == JTokenType.String:
-                        string valueText = (string) value.Value!;
+                        string valueText = (string)value.Value!;
                         if (!valueText.StartsWith(ResourcePrefix))
                         {
                             return value;

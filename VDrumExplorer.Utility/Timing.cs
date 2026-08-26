@@ -18,7 +18,7 @@ namespace VDrumExplorer.Utility
             var stopwatch = Stopwatch.StartNew();
             action();
             stopwatch.Stop();
-            logger.LogDebug($"{description} in {(int) stopwatch.ElapsedMilliseconds}ms");
+            logger.LogDebug($"{description} in {(int)stopwatch.ElapsedMilliseconds}ms");
         }
 
         public static T LogTiming<T>(ILogger logger, string description, Func<T> func)
@@ -26,7 +26,7 @@ namespace VDrumExplorer.Utility
             var stopwatch = Stopwatch.StartNew();
             var result = func();
             stopwatch.Stop();
-            logger.LogDebug($"{description} in {(int) stopwatch.ElapsedMilliseconds}ms");
+            logger.LogDebug($"{description} in {(int)stopwatch.ElapsedMilliseconds}ms");
             return result;
         }
 
@@ -35,8 +35,8 @@ namespace VDrumExplorer.Utility
             var stopwatch = Stopwatch.StartNew();
             action();
             stopwatch.Stop();
-            Console.WriteLine($"{description} in {(int) stopwatch.ElapsedMilliseconds}ms");
-            Debug.WriteLine($"{description} in {(int) stopwatch.ElapsedMilliseconds}ms");
+            Console.WriteLine($"{description} in {(int)stopwatch.ElapsedMilliseconds}ms");
+            Debug.WriteLine($"{description} in {(int)stopwatch.ElapsedMilliseconds}ms");
         }
 
         public static T DebugConsoleLogTiming<T>(string description, Func<T> func)
@@ -44,8 +44,8 @@ namespace VDrumExplorer.Utility
             var stopwatch = Stopwatch.StartNew();
             var result = func();
             stopwatch.Stop();
-            Console.WriteLine($"{description} in {(int) stopwatch.ElapsedMilliseconds}ms");
-            Debug.WriteLine($"{description} in {(int) stopwatch.ElapsedMilliseconds}ms");
+            Console.WriteLine($"{description} in {(int)stopwatch.ElapsedMilliseconds}ms");
+            Debug.WriteLine($"{description} in {(int)stopwatch.ElapsedMilliseconds}ms");
             return result;
         }
     }

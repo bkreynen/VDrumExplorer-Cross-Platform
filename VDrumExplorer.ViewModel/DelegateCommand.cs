@@ -61,7 +61,7 @@ namespace VDrumExplorer.ViewModel
         public DelegateCommand(Action<T> action, bool enabled) =>
             (this.action, Enabled) = (action, enabled);
 
-        public override void Execute(object parameter) => action((T) parameter);
+        public override void Execute(object parameter) => action((T)parameter);
     }
 
     /// <summary>
@@ -88,6 +88,6 @@ namespace VDrumExplorer.ViewModel
 
         public bool CanExecute(object parameter) => parameter is T param && enabled(param);
 
-        public void Execute(object parameter) => action((T) parameter);
+        public void Execute(object parameter) => action((T)parameter);
     }
 }

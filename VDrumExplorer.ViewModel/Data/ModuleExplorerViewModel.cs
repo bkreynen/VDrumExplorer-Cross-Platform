@@ -32,7 +32,7 @@ namespace VDrumExplorer.ViewModel.Data
             bool IsKitNode(DataTreeNodeViewModel node) => node?.IsKitRoot is true;
         }
 
-        protected override string ExplorerName =>  "Module Explorer";
+        protected override string ExplorerName => "Module Explorer";
         public override string SaveFileFilter => FileFilters.ModuleFiles;
 
         protected override void SaveToStream(Stream stream) => Module.Save(stream);

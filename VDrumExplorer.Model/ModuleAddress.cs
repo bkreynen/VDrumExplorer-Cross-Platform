@@ -52,7 +52,7 @@ namespace VDrumExplorer.Model
             {
                 throw new ArgumentException($"Invalid address display value: '{displayValue:x8}'");
             }
-            int logicalValue = 
+            int logicalValue =
                 ((displayValue & 0x7f_00_00_00) >> 3) |
                 ((displayValue & 0x00_7f_00_00) >> 2) |
                 ((displayValue & 0x00_00_7f_00) >> 1) |

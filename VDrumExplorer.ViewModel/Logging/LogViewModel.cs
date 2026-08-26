@@ -96,7 +96,7 @@ namespace VDrumExplorer.ViewModel.Logging
             internal LoggerImpl(LogViewModel viewModel, IClock clock) =>
                 (this.viewModel, this.clock) = (viewModel, clock);
 
-            public IDisposable BeginScope<TState>(TState state) => NoOpDisposable.Instance;
+            IDisposable ILogger.BeginScope<TState>(TState state) => NoOpDisposable.Instance;
 
             public bool IsEnabled(LogLevel logLevel) => true;
 

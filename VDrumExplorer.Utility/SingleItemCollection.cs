@@ -48,7 +48,7 @@ namespace VDrumExplorer.Utility
         private class Enumerator : IEnumerator<T>
         {
             private readonly SingleItemCollection<T> parent;
-            private int index = -1; 
+            private int index = -1;
 
             internal Enumerator(SingleItemCollection<T> parent) =>
                 this.parent = parent;

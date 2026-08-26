@@ -109,7 +109,7 @@ namespace VDrumExplorer.Model.Schema.Physical
             IContainer container = lastSlash == -1 ? this : ResolveContainer(span.Slice(0, lastSlash));
             string fieldNameText = fieldName.ToString();
             return container is FieldContainer fc
-                ? fc.GetFieldOrNull(fieldNameText)?? throw new ArgumentException($"No field '{fieldNameText}' within container '{fc.Path}'")
+                ? fc.GetFieldOrNull(fieldNameText) ?? throw new ArgumentException($"No field '{fieldNameText}' within container '{fc.Path}'")
                 : throw new ArgumentException($"Container '{container.Path}' is not a field container, so cannot contain field '{fieldNameText}'");
         }
     }

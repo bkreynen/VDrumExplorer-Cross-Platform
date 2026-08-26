@@ -39,7 +39,7 @@ namespace VDrumExplorer.Model.Data
         /// understood, e.g. the AE-10.)
         /// </summary>
         private readonly Dictionary<FieldContainer, DataSegment> originalSegmentsByFieldContainer;
-            
+
         private ModuleData(TreeNode logicalSchemaRoot)
         {
             var schema = logicalSchemaRoot.Container.Schema;
@@ -151,7 +151,7 @@ namespace VDrumExplorer.Model.Data
                 }
                 string afterDot = name.Substring(dotIndex + 1);
                 // We assume the controlling type has been set before the overlay fields appear...
-                var overlayFields = ((OverlayDataField) this.GetDataField(overlay)).CurrentFieldList;
+                var overlayFields = ((OverlayDataField)this.GetDataField(overlay)).CurrentFieldList;
                 return overlayFields.Fields.FirstOrDefault(f => f.SchemaField.Name == afterDot);
             }
         }

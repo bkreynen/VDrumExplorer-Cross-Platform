@@ -46,7 +46,7 @@ namespace VDrumExplorer.Model.Schema.Json
             ResolvedDescription = Description ?? Name;
         }
 
-        [return:NotNullIfNotNull("text")]
+        [return: NotNullIfNotNull("text")]
         private static string? ToPascalCase(string? text)
         {
             if (text is null)
