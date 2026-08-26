@@ -1,0 +1,32 @@
+# Lint workflow: verifies code formatting with dotnet format without making changes.
+name: lint
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+          dotnet-quality: preview
+
+      - name: Restore dependencies
+        run: dotnet restore Drums.sln
+
+      - name: Verify formatting
+        run: dotnet format Drums.sln --verify-no-changes --severity warn
