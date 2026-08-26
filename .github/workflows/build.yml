@@ -1,7 +1,4 @@
 # Build workflow: builds the solution on Linux, macOS, and Windows.
-# On Linux/macOS only the cross-platform projects are built because the
-# Windows-only projects (net48/WiX) cannot be built there. On Windows the
-# full solution is built.
 name: build
 
 permissions:
@@ -33,28 +30,6 @@ jobs:
           dotnet-version: 10.0.x
           dotnet-quality: preview
 
-      - name: Build cross-platform projects (Linux/macOS)
-        if: matrix.os != 'windows-latest'
-        shell: bash
-        run: |
-          for project in \
-            VDrumExplorer.Console/VDrumExplorer.Console.csproj \
-            VDrumExplorer.Gui.Avalonia/VDrumExplorer.Gui.Avalonia.csproj \
-            VDrumExplorer.Model/VDrumExplorer.Model.csproj \
-            VDrumExplorer.ViewModel/VDrumExplorer.ViewModel.csproj \
-            VDrumExplorer.Proto/VDrumExplorer.Proto.csproj \
-            VDrumExplorer.Utility/VDrumExplorer.Utility.csproj \
-            VDrumExplorer.Midi.ManagedMidi/VDrumExplorer.Midi.ManagedMidi.csproj \
-            VDrumExplorer.Blazor/VDrumExplorer.Blazor.csproj \
-            VDrumExplorer.Benchmarks/VDrumExplorer.Benchmarks.csproj \
-            VDrumExplorer.InstrumentParser/VDrumExplorer.InstrumentParser.csproj \
-            VDrumExplorer.Model.Test/VDrumExplorer.Model.Test.csproj \
-            VDrumExplorer.ViewModel.Test/VDrumExplorer.ViewModel.Test.csproj
-          do
-            dotnet build "$project" --configuration Release
-          done
-
-      - name: Build full solution (Windows)
-        if: matrix.os == 'windows-latest'
+      - name: Build solution
         shell: bash
         run: dotnet build Drums.sln --configuration Release
