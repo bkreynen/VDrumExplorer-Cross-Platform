@@ -32,14 +32,15 @@ jobs:
           dotnet-quality: preview
 
       - name: Build test projects
+        shell: bash
         run: |
-          dotnet build \
-            VDrumExplorer.Model.Test/VDrumExplorer.Model.Test.csproj \
-            VDrumExplorer.ViewModel.Test/VDrumExplorer.ViewModel.Test.csproj \
-            --configuration Release
+          dotnet build VDrumExplorer.Model.Test/VDrumExplorer.Model.Test.csproj --configuration Release
+          dotnet build VDrumExplorer.ViewModel.Test/VDrumExplorer.ViewModel.Test.csproj --configuration Release
 
       - name: Run Model tests
+        shell: bash
         run: dotnet test VDrumExplorer.Model.Test/VDrumExplorer.Model.Test.csproj --no-build --configuration Release
 
       - name: Run ViewModel tests
+        shell: bash
         run: dotnet test VDrumExplorer.ViewModel.Test/VDrumExplorer.ViewModel.Test.csproj --no-build --configuration Release

@@ -57,7 +57,7 @@ namespace VDrumExplorer.Model.Data.Fields
                     Span<byte> asciiBytes = stackalloc byte[SchemaField.Length];
                     for (int i = 0; i < SchemaField.Length; i++)
                     {
-                        asciiBytes[i] = (byte) ((buffer[i * 2] << 4) | buffer[i * 2 + 1]);
+                        asciiBytes[i] = (byte)((buffer[i * 2] << 4) | buffer[i * 2 + 1]);
                     }
                     Text = Encoding.ASCII.GetString(asciiBytes).Trim();
                     break;
@@ -90,8 +90,8 @@ namespace VDrumExplorer.Model.Data.Fields
                 case 2:
                     for (int i = 0; i < Length; i++)
                     {
-                        bytes[i * 2] = (byte) (padded[i] >> 4);
-                        bytes[i * 2 + 1] = (byte) (padded[i] & 0xf);
+                        bytes[i * 2] = (byte)(padded[i] >> 4);
+                        bytes[i * 2 + 1] = (byte)(padded[i] & 0xf);
                     }
                     break;
                 default:

@@ -19,9 +19,9 @@ namespace VDrumExplorer.Blazor.WebMidi
         public double Timestamp { get; set; }
 
         public static WebMidiMessage FromMidiMessage(MidiMessage message) =>
-            new WebMidiMessage { Data = message.Data, Timestamp = (double) message.Timestamp };
+            new WebMidiMessage { Data = message.Data, Timestamp = (double)message.Timestamp };
 
         public MidiMessage ToMidiMessage() =>
-            new MidiMessage(Data, (long) Timestamp);
+            new MidiMessage(Data, (long)Timestamp);
     }
 }

@@ -65,7 +65,7 @@ namespace VDrumExplorer.Console
 
                 await device.SetCurrentKitAsync(targetKit, CancellationToken.None);
 
-                var programChangeCommand = (byte) (0xc0 | (channel - 1));
+                var programChangeCommand = (byte)(0xc0 | (channel - 1));
 
                 // Now listen for the foot switch...
                 client.MessageReceived += async (sender, message) =>

@@ -17,7 +17,7 @@ public class StringDataFieldTest
     {
         Module module = TestData.LoadTD27();
         var field = module.Schema.PhysicalRoot.ResolveField("/Kit[12]/KitCommon/KitName");
-        return (StringDataField) module.Data.GetDataField(field);
+        return (StringDataField)module.Data.GetDataField(field);
     }
 
     [Test]
@@ -31,7 +31,7 @@ public class StringDataFieldTest
     public void SetText_TriggersChange()
     {
         var field = CreateField();
-        var recorder = new NotifyChangeRecorder(field);      
+        var recorder = new NotifyChangeRecorder(field);
         field.Text = "Some text";
         Assert.AreEqual(new[] { nameof(field.FormattedText) }, recorder.ChangedProperties);
     }

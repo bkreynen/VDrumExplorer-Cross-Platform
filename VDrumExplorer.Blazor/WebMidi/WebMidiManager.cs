@@ -53,9 +53,9 @@ namespace VDrumExplorer.Blazor.WebMidi
         public IEnumerable<MidiOutputDevice> ListOutputDevices() => outputs.Keys;
 
         public Task<IMidiInput> OpenInputAsync(MidiInputDevice input) =>
-            Task.FromResult((IMidiInput) new WebMidiInput(inputs[input]));
+            Task.FromResult((IMidiInput)new WebMidiInput(inputs[input]));
 
         public Task<IMidiOutput> OpenOutputAsync(MidiOutputDevice output) =>
-            Task.FromResult((IMidiOutput) outputs[output]);
+            Task.FromResult((IMidiOutput)outputs[output]);
     }
 }

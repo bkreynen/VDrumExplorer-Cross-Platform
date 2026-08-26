@@ -12,7 +12,7 @@ namespace VDrumExplorer.Gui
     /// </summary>
     public partial class DataExplorer : Window
     {
-        private DataExplorerViewModel ViewModel => (DataExplorerViewModel) DataContext;
+        private DataExplorerViewModel ViewModel => (DataExplorerViewModel)DataContext;
 
         public DataExplorer()
         {
@@ -20,6 +20,6 @@ namespace VDrumExplorer.Gui
         }
 
         private void TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e) =>
-            ViewModel.SelectedNode = (DataTreeNodeViewModel) treeView.SelectedItem;
+            ViewModel.SelectedNode = (DataTreeNodeViewModel)treeView.SelectedItem;
     }
 }

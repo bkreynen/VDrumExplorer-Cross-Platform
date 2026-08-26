@@ -3,6 +3,6 @@
 // as found in the LICENSE.txt file.
 
 using System.Runtime.CompilerServices;
-[assembly:InternalsVisibleTo("VDrumExplorer.Model.Test")]
-[assembly:InternalsVisibleTo("VDrumExplorer.Console")]
-[assembly:InternalsVisibleTo("VDrumExplorer.NetFrameworkProfiling")]
+[assembly: InternalsVisibleTo("VDrumExplorer.Model.Test")]
+[assembly: InternalsVisibleTo("VDrumExplorer.Console")]
+[assembly: InternalsVisibleTo("VDrumExplorer.NetFrameworkProfiling")]

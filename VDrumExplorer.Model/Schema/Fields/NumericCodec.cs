@@ -35,10 +35,10 @@ namespace VDrumExplorer.Model.Schema.Fields
             data[0];
 
         private static int ReadRange16(ReadOnlySpan<byte> data) =>
-            (sbyte) ((data[0] << 4) | data[1]);
+            (sbyte)((data[0] << 4) | data[1]);
 
         private static int ReadURange16(ReadOnlySpan<byte> data) =>
-            (byte) ((data[0] << 4) | data[1]);
+            (byte)((data[0] << 4) | data[1]);
 
         private static int ReadFull24(ReadOnlySpan<byte> data) =>
             (data[0] << 14) |
@@ -54,35 +54,35 @@ namespace VDrumExplorer.Model.Schema.Fields
 
         private static void WriteRange8(Span<byte> data, int value)
         {
-            data[0] = (byte) value;
+            data[0] = (byte)value;
         }
 
         private static void WriteRange16(Span<byte> data, int value)
         {
-            data[0] = (byte) ((value >> 4) & 0xf);
-            data[1] = (byte) ((value >> 0) & 0xf);
+            data[0] = (byte)((value >> 4) & 0xf);
+            data[1] = (byte)((value >> 0) & 0xf);
         }
 
         // Same implementation as WriteRange16, but a separate method for consistency.
         private static void WriteURange16(Span<byte> data, int value)
         {
-            data[0] = (byte) ((value >> 4) & 0xf);
-            data[1] = (byte) ((value >> 0) & 0xf);
+            data[0] = (byte)((value >> 4) & 0xf);
+            data[1] = (byte)((value >> 0) & 0xf);
         }
 
         private static void WriteFull24(Span<byte> data, int value)
         {
-            data[0] = (byte) ((value >> 14) & 0x7f);
-            data[1] = (byte) ((value >> 7) & 0x7f);
-            data[2] = (byte) ((value >> 0) & 0x7f);
+            data[0] = (byte)((value >> 14) & 0x7f);
+            data[1] = (byte)((value >> 7) & 0x7f);
+            data[2] = (byte)((value >> 0) & 0x7f);
         }
 
         private static void WriteRange32(Span<byte> data, int value)
         {
-            data[0] = (byte) ((value >> 12) & 0xf);
-            data[1] = (byte) ((value >> 8) & 0xf);
-            data[2] = (byte) ((value >> 4) & 0xf);
-            data[3] = (byte) ((value >> 0) & 0xf);
+            data[0] = (byte)((value >> 12) & 0xf);
+            data[1] = (byte)((value >> 8) & 0xf);
+            data[2] = (byte)((value >> 4) & 0xf);
+            data[3] = (byte)((value >> 0) & 0xf);
         }
 
         // FIXME: I don't really understand these, but they're the reverb values on the AE-10
@@ -97,10 +97,10 @@ namespace VDrumExplorer.Model.Schema.Fields
         private static void WriteFixme32(Span<byte> data, int value)
         {
             value = value | 0x0800_0000;
-            data[0] = (byte) ((value >> 12) & 0xf);
-            data[1] = (byte) ((value >> 8) & 0xf);
-            data[2] = (byte) ((value >> 4) & 0xf);
-            data[3] = (byte) ((value >> 0) & 0xf);
+            data[0] = (byte)((value >> 12) & 0xf);
+            data[1] = (byte)((value >> 8) & 0xf);
+            data[2] = (byte)((value >> 4) & 0xf);
+            data[3] = (byte)((value >> 0) & 0xf);
         }
     }
 }

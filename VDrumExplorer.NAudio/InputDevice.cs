@@ -29,7 +29,7 @@ namespace VDrumExplorer.NAudio
         /// </summary>
         public async Task<byte[]> RecordAudioAsync(TimeSpan duration, CancellationToken cancellationToken)
         {
-            int expectedBytes = (int) (AudioFormat.BytesPerSecond * duration.TotalSeconds);
+            int expectedBytes = (int)(AudioFormat.BytesPerSecond * duration.TotalSeconds);
             var stream = new MemoryStream();
             var tcs = new TaskCompletionSource<int>();
             using (var input = new WaveIn())

@@ -27,7 +27,7 @@ namespace VDrumExplorer.Gui.Dialogs
 
         private void SetCheckedForAllCandidates(bool value)
         {
-            var vm = (MultiPasteViewModel) DataContext;
+            var vm = (MultiPasteViewModel)DataContext;
             foreach (var item in vm.Candidates)
             {
                 item.Checked = value;

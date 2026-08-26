@@ -14,7 +14,7 @@ namespace VDrumExplorer.Model.Data
     public sealed class DataValidationError
     {
         public static IEnumerable<DataValidationError> None { get; } = new EmptyErrorCollection();
-        
+
         public IDataField Field { get; }
         public string Message { get; }
 

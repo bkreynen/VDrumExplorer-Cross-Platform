@@ -29,5 +29,5 @@ public partial class DataTransferDialog : Window
     /// after the transfer completes.
     /// </summary>
     private void HandleClosing(object? sender, WindowClosingEventArgs e) =>
-        ((DataTransferViewModel) DataContext!).CancelCommand.Execute(null);
+        ((DataTransferViewModel)DataContext!).CancelCommand.Execute(null);
 }

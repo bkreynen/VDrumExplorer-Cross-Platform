@@ -19,7 +19,7 @@ namespace VDrumExplorer.Model.Data
 
         public IEnumerable<DataSegment> Segments => segmentsByAddress.Values;
 
-        public ModuleDataSnapshot()        
+        public ModuleDataSnapshot()
         {
             segmentsByAddress = new SortedDictionary<ModuleAddress, DataSegment>();
         }

@@ -35,8 +35,9 @@ jobs:
 
       - name: Build cross-platform projects (Linux/macOS)
         if: matrix.os != 'windows-latest'
+        shell: bash
         run: |
-          dotnet build \
+          for project in \
             VDrumExplorer.Console/VDrumExplorer.Console.csproj \
             VDrumExplorer.Gui.Avalonia/VDrumExplorer.Gui.Avalonia.csproj \
             VDrumExplorer.Model/VDrumExplorer.Model.csproj \
@@ -48,9 +49,12 @@ jobs:
             VDrumExplorer.Benchmarks/VDrumExplorer.Benchmarks.csproj \
             VDrumExplorer.InstrumentParser/VDrumExplorer.InstrumentParser.csproj \
             VDrumExplorer.Model.Test/VDrumExplorer.Model.Test.csproj \
-            VDrumExplorer.ViewModel.Test/VDrumExplorer.ViewModel.Test.csproj \
-            --configuration Release
+            VDrumExplorer.ViewModel.Test/VDrumExplorer.ViewModel.Test.csproj
+          do
+            dotnet build "$project" --configuration Release
+          done
 
       - name: Build full solution (Windows)
         if: matrix.os == 'windows-latest'
+        shell: bash
         run: dotnet build Drums.sln --configuration Release

@@ -18,6 +18,6 @@ namespace VDrumExplorer.Gui
         }
 
         private void TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e) =>
-            ((ModuleSchemaViewModel) DataContext).SelectedNode = (TreeNodeViewModel) treeView.SelectedItem;
+            ((ModuleSchemaViewModel)DataContext).SelectedNode = (TreeNodeViewModel)treeView.SelectedItem;
     }
 }

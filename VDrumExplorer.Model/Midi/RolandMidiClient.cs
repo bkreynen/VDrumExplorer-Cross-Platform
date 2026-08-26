@@ -240,7 +240,7 @@ namespace VDrumExplorer.Model.Midi
         {
             byte[] ret = new byte[dataLength + Identifier.ModelIdLength + 6];
             ret[0] = 0xf0; // System Exclusive
-            ret[1] = (byte) ManufacturerId.Roland;
+            ret[1] = (byte)ManufacturerId.Roland;
             ret[2] = rawDeviceId;
             // Assume the first byte of the model ID will be 0.
             WriteBigEndianInt32(ret, Identifier.ModelIdLength - 1, Identifier.ModelId);
@@ -267,7 +267,7 @@ namespace VDrumExplorer.Model.Midi
             {
                 sum += message[i];
             }
-            message[message.Length - 2] = (byte) ((0x80 - (sum & 0x7f)) & 0x7f);
+            message[message.Length - 2] = (byte)((0x80 - (sum & 0x7f)) & 0x7f);
         }
 
         public void Dispose()
@@ -280,10 +280,10 @@ namespace VDrumExplorer.Model.Midi
         {
             unchecked
             {
-                data[offset++] = (byte) (value >> 24);
-                data[offset++] = (byte) (value >> 16);
-                data[offset++] = (byte) (value >> 8);
-                data[offset++] = (byte) (value >> 0);
+                data[offset++] = (byte)(value >> 24);
+                data[offset++] = (byte)(value >> 16);
+                data[offset++] = (byte)(value >> 8);
+                data[offset++] = (byte)(value >> 0);
             }
         }
 
@@ -295,10 +295,10 @@ namespace VDrumExplorer.Model.Midi
         {
             unchecked
             {
-                data[offset++] = (byte) ((value >> 21) & 0x7f);
-                data[offset++] = (byte) ((value >> 14) & 0x7f);
-                data[offset++] = (byte) ((value >> 7) & 0x7f);
-                data[offset++] = (byte) ((value >> 0) & 0x7f);
+                data[offset++] = (byte)((value >> 21) & 0x7f);
+                data[offset++] = (byte)((value >> 14) & 0x7f);
+                data[offset++] = (byte)((value >> 7) & 0x7f);
+                data[offset++] = (byte)((value >> 0) & 0x7f);
             }
         }
     }

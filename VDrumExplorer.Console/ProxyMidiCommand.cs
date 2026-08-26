@@ -65,7 +65,7 @@ namespace VDrumExplorer.Console
                     case 0b1110_0000: // Pitch bend change
                         if ((message.Status & 0xf) == inputChannel)
                         {
-                            message.Data[0] = (byte) (type | outputChannel);
+                            message.Data[0] = (byte)(type | outputChannel);
                         }
                         output.Send(message);
                         break;

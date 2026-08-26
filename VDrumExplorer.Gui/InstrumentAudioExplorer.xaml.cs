@@ -13,7 +13,7 @@ namespace VDrumExplorer.Gui
     /// </summary>
     public partial class InstrumentAudioExplorer : Window
     {
-        private InstrumentAudioExplorerViewModel ViewModel => (InstrumentAudioExplorerViewModel) DataContext;
+        private InstrumentAudioExplorerViewModel ViewModel => (InstrumentAudioExplorerViewModel)DataContext;
 
         public InstrumentAudioExplorer()
         {

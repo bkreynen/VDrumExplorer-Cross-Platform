@@ -12,7 +12,7 @@ namespace VDrumExplorer.Gui.Dialogs
     /// </summary>
     public partial class InstrumentAudioRecorderDialog : Window
     {
-        private InstrumentAudioRecorderViewModel ViewModel => (InstrumentAudioRecorderViewModel) DataContext;
+        private InstrumentAudioRecorderViewModel ViewModel => (InstrumentAudioRecorderViewModel)DataContext;
 
         public InstrumentAudioRecorderDialog()
         {

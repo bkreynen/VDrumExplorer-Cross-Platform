@@ -35,7 +35,7 @@ namespace VDrumExplorer.Model.Data.Fields
             var indexValue = segment.ReadInt32(Offset, NumericCodec.Range32);
             var bankValue = SchemaField.BankOffset is null
                 ? InstrumentBank.Preset
-                : (InstrumentBank) segment.ReadInt32(SchemaField.BankOffset.Value, NumericCodec.Range8);
+                : (InstrumentBank)segment.ReadInt32(SchemaField.BankOffset.Value, NumericCodec.Range8);
 
             if (bankValue == InstrumentBank.Preset && indexValue >= 0 && indexValue < Schema.PresetInstruments.Count)
             {
@@ -58,7 +58,7 @@ namespace VDrumExplorer.Model.Data.Fields
             segment.WriteInt32(Offset, NumericCodec.Range32, index);
             if (SchemaField.BankOffset is ModuleOffset offset)
             {
-                segment.WriteInt32(offset, NumericCodec.Range8, (int) bank);
+                segment.WriteInt32(offset, NumericCodec.Range8, (int)bank);
             }
         }
 

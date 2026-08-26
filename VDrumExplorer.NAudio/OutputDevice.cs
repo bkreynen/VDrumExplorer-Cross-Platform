@@ -24,7 +24,7 @@ namespace VDrumExplorer.NAudio
         /// </summary>
         public async Task PlayAudioAsync(AudioFormat format, byte[] bytes, CancellationToken cancellationToken)
         {
-            double seconds = bytes.Length / (double) format.BytesPerSecond;
+            double seconds = bytes.Length / (double)format.BytesPerSecond;
             // I've failed to get NAudio to tell me accurately when the sample has finished playing.
             // Instead, let's just pause for long enough - with half a second of added leeway, just
             // in case.

@@ -44,7 +44,7 @@ namespace VDrumExplorer.Model.Midi
             output.Send(new MidiMessage(new byte[] { 0xf0, 0x7e, 0x7f, 0x06, 0x01, 0xf7 }));
             await Task.Delay(timeout);
             return identities.AsReadOnly();
-            
+
             void HandleMessage(object sender, MidiMessage message)
             {
                 // TODO: Handle 17-byte messages for "long" manufacturer IDs
@@ -56,7 +56,7 @@ namespace VDrumExplorer.Model.Midi
                     data[4] == 0x02) // Identity reply
                 {
                     byte rawDeviceId = data[2];
-                    var manufacturerId = (ManufacturerId) data[5];
+                    var manufacturerId = (ManufacturerId)data[5];
                     // Note: we treat the family code and family number code as little-endian just for
                     // backwards compatibility with existing files.
                     int familyCode = data[6] + (data[7] << 8);

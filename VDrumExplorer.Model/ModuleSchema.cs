@@ -128,7 +128,7 @@ namespace VDrumExplorer.Model
                 kitRoots[i - 1] = root;
                 root.KitNumber = i;
             }
-            
+
             mainInstrumentPathFormat = json.MainInstrumentPathFormat!;
             KitNamePath = json.KitNamePath!;
             KitSubNamePath = json.KitSubNamePath;
@@ -147,7 +147,7 @@ namespace VDrumExplorer.Model
         {
             var kitRoot = GetKitRoot(kitNumber);
             var field = kitRoot.Container.ResolveField(string.Format(mainInstrumentPathFormat, trigger));
-            return (InstrumentField) field;
+            return (InstrumentField)field;
         }
 
         private static Lazy<ModuleSchema> LazyFromAssemblyResources(string resourceBase, string resourceName, int softwareRevision) =>

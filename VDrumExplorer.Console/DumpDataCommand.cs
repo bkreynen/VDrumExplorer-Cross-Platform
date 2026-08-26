@@ -56,7 +56,7 @@ namespace VDrumExplorer.Console
                     for (int i = 0; i < 16 && index < message.Length; i++)
                     {
                         byte b = message.Data[index];
-                        textBuilder.Append(b >= 32 && b < 127 ? (char) b : ' ');
+                        textBuilder.Append(b >= 32 && b < 127 ? (char)b : ' ');
                         builder.Append(b.ToString("x2"));
                         builder.Append(" ");
                         index++;

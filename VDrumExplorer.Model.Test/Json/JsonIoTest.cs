@@ -18,11 +18,11 @@ public class JsonIoTest
     {
         var module = TestData.LoadTD27();
         string json = module.ToJson();
-        var newModule = (Module) JsonIo.ReadModel(json, NullLogger.Instance);
+        var newModule = (Module)JsonIo.ReadModel(json, NullLogger.Instance);
         var newJson = newModule.ToJson();
         Assert.AreEqual(json, newJson);
 
-        AssertDataEqual(module.Data, newModule.Data);        
+        AssertDataEqual(module.Data, newModule.Data);
     }
 
     [Test]
@@ -30,7 +30,7 @@ public class JsonIoTest
     {
         var kit = TestData.LoadTD27().ExportKit(24);
         string json = kit.ToJson();
-        var newKit = (Kit) JsonIo.ReadModel(json, NullLogger.Instance);
+        var newKit = (Kit)JsonIo.ReadModel(json, NullLogger.Instance);
         var newJson = newKit.ToJson();
         Assert.AreEqual(json, newJson);
         AssertDataEqual(kit.Data, newKit.Data);

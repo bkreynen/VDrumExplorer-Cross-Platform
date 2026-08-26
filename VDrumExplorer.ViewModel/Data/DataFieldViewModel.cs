@@ -17,7 +17,7 @@ namespace VDrumExplorer.ViewModel.Data
 
         internal static DataFieldViewModel CreateViewModel(IDataField field, bool readOnly) =>
             readOnly
-            ? (DataFieldViewModel) new ReadOnlyDataFieldViewModel(field)
+            ? (DataFieldViewModel)new ReadOnlyDataFieldViewModel(field)
             : field switch
             {
                 BooleanDataField model => new EditableBooleanDataFieldViewModel(model),
@@ -32,7 +32,7 @@ namespace VDrumExplorer.ViewModel.Data
 
     public abstract class DataFieldViewModel<TModel> : DataFieldViewModel where TModel : IDataField
     {
-        public new TModel Model => (TModel) base.Model;
+        public new TModel Model => (TModel)base.Model;
 
         public DataFieldViewModel(TModel model) : base(model)
         {

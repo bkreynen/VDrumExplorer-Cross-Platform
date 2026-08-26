@@ -29,7 +29,7 @@ namespace VDrumExplorer.Model.Schema.Json
         public LogicalTreeNodeJson? LogicalTree { get; set; }
 
         public Dictionary<string, int>? Counts { get; set; }
-        
+
         public Dictionary<string, List<string>>? Lookups { get; set; }
 
         public string? KitRootPathFormat { get; set; }
@@ -67,7 +67,7 @@ namespace VDrumExplorer.Model.Schema.Json
             LogicalTree!.ToTreeNodes(this, parentNodePath: null, parentContainer: physicalRoot).Single();
 
         internal ContainerContainer BuildPhysicalRoot(ModuleSchema schema) =>
-            (ContainerContainer) Containers!["Root"].ToContainer(
+            (ContainerContainer)Containers!["Root"].ToContainer(
                 schema, this, name: "Root", description: "Root",
                 ModuleAddress.FromLogicalValue(0), parentPath: null,
                 SchemaVariables.Empty);

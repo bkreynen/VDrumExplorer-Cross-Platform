@@ -73,7 +73,7 @@ namespace VDrumExplorer.Console
                     console.WriteLine($"{(capture.Preset ? "Preset" : "Sample")} {capture.InstrumentId}: {capture.AudioData}");
                 }
             }
-            
+
             void DumpIdentifier(ModuleIdentifier identifier)
             {
                 // JSON representation is fine here.

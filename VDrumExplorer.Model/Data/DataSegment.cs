@@ -28,7 +28,7 @@ namespace VDrumExplorer.Model.Data
         /// Creates a copy of the data in this container.
         /// </summary>
         /// <returns>A copy of the data.</returns>
-        public byte[] CopyData() => (byte[]) data.Clone();
+        public byte[] CopyData() => (byte[])data.Clone();
 
         /// <summary>
         /// Reads a 32-bit integer from the data, starting at the given offset.

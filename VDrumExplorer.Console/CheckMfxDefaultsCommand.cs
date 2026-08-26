@@ -36,19 +36,19 @@ namespace VDrumExplorer.Console
 
             var mfxNode = device.Schema.LogicalRoot.ResolveNode(path);
             var mfxContainer = mfxNode.Container;
-            var switchField = (EnumField) mfxContainer.ResolveField(switchFieldName);
-            var parametersField = (OverlayField) mfxContainer.ResolveField(parametersFieldName);
+            var switchField = (EnumField)mfxContainer.ResolveField(switchFieldName);
+            var parametersField = (OverlayField)mfxContainer.ResolveField(parametersFieldName);
 
             var deviceData = ModuleData.FromLogicalRootNode(mfxNode);
-            var deviceParametersField = (OverlayDataField) deviceData.GetDataField(parametersField);
+            var deviceParametersField = (OverlayDataField)deviceData.GetDataField(parametersField);
 
             console.WriteLine($"Loading original MFX data");
             await device.LoadDescendants(deviceData.LogicalRoot, null, null, default);
             var originalSnapshot = deviceData.CreateSnapshot();
 
             var modelData = ModuleData.FromLogicalRootNode(mfxNode);
-            var modelTypeField = (EnumDataField) modelData.GetDataField(switchField);
-            var modelParametersField = (OverlayDataField) modelData.GetDataField(parametersField);
+            var modelTypeField = (EnumDataField)modelData.GetDataField(switchField);
+            var modelParametersField = (OverlayDataField)modelData.GetDataField(parametersField);
 
             try
             {
@@ -99,7 +99,7 @@ namespace VDrumExplorer.Console
 
             async Task SetDeviceMfx(int type)
             {
-                var segment = new DataSegment(mfxContainer.Address + switchField.Offset, new[] { (byte) type });
+                var segment = new DataSegment(mfxContainer.Address + switchField.Offset, new[] { (byte)type });
                 await device.SaveSegment(segment, CancellationToken.None);
             }
 

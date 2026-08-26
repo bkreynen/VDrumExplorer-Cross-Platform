@@ -153,7 +153,7 @@ namespace VDrumExplorer.Model.Schema.Json
                 "enum16" => BuildEnumField(NumericCodec.Range16),
                 "enum24" => BuildEnumField(NumericCodec.Full24),
                 "enum32" => BuildEnumField(NumericCodec.Range32),
-                "instrument" => new InstrumentField(null, BuildCommon(4), BankOffset is null ? (ModuleOffset?) null : ModuleOffset.FromDisplayValue(BankOffset.Value)),
+                "instrument" => new InstrumentField(null, BuildCommon(4), BankOffset is null ? (ModuleOffset?)null : ModuleOffset.FromDisplayValue(BankOffset.Value)),
                 "midi32" => new NumericField(null, BuildCommon(4), 0, 128, Default ?? 0, NumericCodec.Range32, null, null, null, null, (128, "Off")),
                 "overlay" => BuildOverlay(),
                 "range8" => BuildNumericField(NumericCodec.Range8),
@@ -186,7 +186,7 @@ namespace VDrumExplorer.Model.Schema.Json
                     ValidateNotNull(ValuesByNumber, nameof(ValuesByNumber));
                     Validate(ValuesByNumber.All(array => array.Count == 2 && array[0] is JToken { Type: JTokenType.Integer } && array[1] is JToken { Type: JTokenType.String }),
                         "All arrays in {0} must be [number, value] pairs", nameof(ValuesByNumber));
-                    numberValuePairs = ValuesByNumber.ToReadOnlyList(array => ((int) array[0], (string) array[1]));
+                    numberValuePairs = ValuesByNumber.ToReadOnlyList(array => ((int)array[0], (string)array[1]));
                 }
                 return new EnumField(null, BuildCommon(codec.Size), numberValuePairs, GetDefaultValue(), codec);
             }

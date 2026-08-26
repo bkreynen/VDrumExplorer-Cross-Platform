@@ -62,6 +62,6 @@ namespace VDrumExplorer.Model.Schema.Fields
             (SwitchField, NumericField, MusicalNoteField) = (switchField, numericField, musicalNoteField);
 
         internal override FieldBase WithParent(FieldContainer parent) =>
-            new TempoField(parent, Parameters, (BooleanField) SwitchField.WithParent(parent), (NumericField) NumericField.WithParent(parent), (EnumField) MusicalNoteField.WithParent(parent));
+            new TempoField(parent, Parameters, (BooleanField)SwitchField.WithParent(parent), (NumericField)NumericField.WithParent(parent), (EnumField)MusicalNoteField.WithParent(parent));
     }
 }

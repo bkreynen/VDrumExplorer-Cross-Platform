@@ -19,6 +19,6 @@ namespace VDrumExplorer.Gui.Dialogs
         }
 
         private void HandleClosing(object sender, CancelEventArgs e) =>
-            ((DataTransferViewModel) DataContext).CancelCommand.Execute(null);
+            ((DataTransferViewModel)DataContext).CancelCommand.Execute(null);
     }
 }

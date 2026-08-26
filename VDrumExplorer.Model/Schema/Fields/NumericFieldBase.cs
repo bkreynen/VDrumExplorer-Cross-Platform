@@ -31,7 +31,7 @@ namespace VDrumExplorer.Model.Schema.Fields
             FieldParameters common,
             NumericFieldBaseParameters numericBaseParameters)
             : base(parent, common) =>
-            NumericBaseParameters = numericBaseParameters;            
+            NumericBaseParameters = numericBaseParameters;
 
         protected class NumericFieldBaseParameters
         {
