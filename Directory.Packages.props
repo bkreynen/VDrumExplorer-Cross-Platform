@@ -1,3 +1,4 @@
+<!-- This file was modified from the original at https://github.com/jskeet/DemoCode/tree/master/Drums -->
 <Project>
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>

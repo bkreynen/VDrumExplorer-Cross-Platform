@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿// Copyright 2021 Jon Skeet. All rights reserved.
+using Newtonsoft.Json;
 using System.Collections.Generic;
 
 namespace VDrumExplorer.InstrumentParser

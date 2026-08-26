@@ -1,4 +1,5 @@
 ﻿// Copyright 2020 Jon Skeet. All rights reserved.
+// This file was modified from the original at https://github.com/jskeet/DemoCode/tree/master/Drums
 // Use of this source code is governed by the Apache License 2.0,
 // as found in the LICENSE.txt file.
 
