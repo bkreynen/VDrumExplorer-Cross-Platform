@@ -21,7 +21,7 @@ namespace VDrumExplorer.Utility.Test
         }
 
         [Test]
-        public void LogTiming_DoesNotThrowForNullLogger()
+        public void LogTiming_DoesNotThrowForNullLoggerInstance()
         {
             Assert.DoesNotThrow(() => Timing.LogTiming(NullLogger.Instance, "test", () => { }));
         }
