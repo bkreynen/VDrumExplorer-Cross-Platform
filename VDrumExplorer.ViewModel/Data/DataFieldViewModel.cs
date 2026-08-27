@@ -16,7 +16,7 @@ namespace VDrumExplorer.ViewModel.Data
         public string Description => Model.SchemaField.Description;
 
         internal static DataFieldViewModel CreateViewModel(IDataField field, bool readOnly) =>
-            readOnly
+            readOnly || field is OverlayDataField
             ? (DataFieldViewModel)new ReadOnlyDataFieldViewModel(field)
             : field switch
             {
