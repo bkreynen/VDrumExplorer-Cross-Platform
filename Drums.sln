@@ -1,6 +1,6 @@
-﻿Microsoft Visual Studio Solution File, Format Version 12.00
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
-# This file was modified from the original at https://github.com/jskeet/DemoCode/tree/master/Drums
 VisualStudioVersion = 16.0.29102.190
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VDrumExplorer.Console", "VDrumExplorer.Console\VDrumExplorer.Console.csproj", "{2346D21D-F46F-4EEC-933E-5181993ADA67}"
@@ -28,6 +28,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VDrumExplorer.Gui.Avalonia", "VDrumExplorer.Gui.Avalonia\VDrumExplorer.Gui.Avalonia.csproj", "{CA1855CE-9C43-476F-A40B-90ACAFC79DD8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VDrumExplorer.Gui.Avalonia.Test", "VDrumExplorer.Gui.Avalonia.Test\VDrumExplorer.Gui.Avalonia.Test.csproj", "{04FFAFBE-1993-4AB1-A04A-6325102C23DD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VDrumExplorer.Utility.Test", "VDrumExplorer.Utility.Test\VDrumExplorer.Utility.Test.csproj", "{C3FE7903-FD3C-43D1-A5A3-26233E671BC2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -195,6 +197,18 @@ Global
 		{04FFAFBE-1993-4AB1-A04A-6325102C23DD}.Release|x64.Build.0 = Release|Any CPU
 		{04FFAFBE-1993-4AB1-A04A-6325102C23DD}.Release|x86.ActiveCfg = Release|Any CPU
 		{04FFAFBE-1993-4AB1-A04A-6325102C23DD}.Release|x86.Build.0 = Release|Any CPU
+		{C3FE7903-FD3C-43D1-A5A3-26233E671BC2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3FE7903-FD3C-43D1-A5A3-26233E671BC2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3FE7903-FD3C-43D1-A5A3-26233E671BC2}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{C3FE7903-FD3C-43D1-A5A3-26233E671BC2}.Debug|x64.Build.0 = Debug|Any CPU
+		{C3FE7903-FD3C-43D1-A5A3-26233E671BC2}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C3FE7903-FD3C-43D1-A5A3-26233E671BC2}.Debug|x86.Build.0 = Debug|Any CPU
+		{C3FE7903-FD3C-43D1-A5A3-26233E671BC2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C3FE7903-FD3C-43D1-A5A3-26233E671BC2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C3FE7903-FD3C-43D1-A5A3-26233E671BC2}.Release|x64.ActiveCfg = Release|Any CPU
+		{C3FE7903-FD3C-43D1-A5A3-26233E671BC2}.Release|x64.Build.0 = Release|Any CPU
+		{C3FE7903-FD3C-43D1-A5A3-26233E671BC2}.Release|x86.ActiveCfg = Release|Any CPU
+		{C3FE7903-FD3C-43D1-A5A3-26233E671BC2}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
