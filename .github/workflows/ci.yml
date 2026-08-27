@@ -1,4 +1,4 @@
-# CI workflow: builds the solution and runs all tests on Linux, macOS, and Windows.
+# CI workflow: builds the solution, runs all tests with code coverage on Linux/macOS/Windows, and publishes coverage to Coveralls from Linux.
 name: ci
 
 permissions:
@@ -35,6 +35,22 @@ jobs:
         shell: bash
         run: dotnet build Drums.sln --configuration Release
 
-      - name: Run tests
+      - name: Run tests with coverage
         shell: bash
-        run: dotnet test Drums.sln --no-build --configuration Release
+        run: dotnet test Drums.sln --no-build --configuration Release --collect:"XPlat Code Coverage" --results-directory ./TestResults --settings coverlet.runsettings
+
+      - name: Locate cobertura files
+        if: matrix.os == 'ubuntu-latest'
+        id: coverage
+        shell: bash
+        run: |
+          files=$(find ./TestResults -name 'coverage.cobertura.xml' | tr '\n' ' ' | sed 's/ $//')
+          echo "files=$files" >> "$GITHUB_OUTPUT"
+
+      - name: Upload coverage to Coveralls
+        if: matrix.os == 'ubuntu-latest'
+        uses: coverallsapp/github-action@v2
+        with:
+          files: ${{ steps.coverage.outputs.files }}
+          format: cobertura
+          fail-on-error: false
