@@ -39,7 +39,7 @@ namespace VDrumExplorer.ViewModel.Test
         [Fact]
         public void CommandBase_NotImplemented_ThrowsWhenExecuted()
         {
-            Assert.Throws<NotImplementedException>(() => CommandBase.NotImplemented.Execute(null));
+            Assert.Throws<NotImplementedException>(() => CommandBase.NotImplemented.Execute(null!));
         }
 
         [Fact]
@@ -51,7 +51,7 @@ namespace VDrumExplorer.ViewModel.Test
         [Fact]
         public void CommandBase_NotImplemented_CanExecuteReturnsEnabled()
         {
-            Assert.False(CommandBase.NotImplemented.CanExecute(null));
+            Assert.False(CommandBase.NotImplemented.CanExecute(null!));
         }
 
         [Fact]
@@ -59,7 +59,7 @@ namespace VDrumExplorer.ViewModel.Test
         {
             bool executed = false;
             var command = new DelegateCommand(() => executed = true, true);
-            command.Execute(null);
+            command.Execute(null!);
             Assert.True(executed);
         }
 
@@ -68,8 +68,8 @@ namespace VDrumExplorer.ViewModel.Test
         {
             var enabledCommand = new DelegateCommand(() => { }, true);
             var disabledCommand = new DelegateCommand(() => { }, false);
-            Assert.True(enabledCommand.CanExecute(null));
-            Assert.False(disabledCommand.CanExecute(null));
+            Assert.True(enabledCommand.CanExecute(null!));
+            Assert.False(disabledCommand.CanExecute(null!));
         }
 
         [Theory]
@@ -85,9 +85,9 @@ namespace VDrumExplorer.ViewModel.Test
         public void DelegateCommand_Enabled_CanBeChangedAfterConstruction()
         {
             var command = new DelegateCommand(() => { }, false);
-            Assert.False(command.CanExecute(null));
+            Assert.False(command.CanExecute(null!));
             command.Enabled = true;
-            Assert.True(command.CanExecute(null));
+            Assert.True(command.CanExecute(null!));
         }
 
         [Fact]
@@ -136,7 +136,7 @@ namespace VDrumExplorer.ViewModel.Test
         {
             var viewServices = new DummyViewServices();
             var command = new ConditionallyEnabledDelegateCommand<int>(viewServices, x => { }, x => true);
-            Assert.False(command.CanExecute(null));
+            Assert.False(command.CanExecute(null!));
         }
 
         [Fact]

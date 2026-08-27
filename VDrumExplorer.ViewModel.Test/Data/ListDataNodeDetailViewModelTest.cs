@@ -13,7 +13,7 @@ namespace VDrumExplorer.ViewModel.Test.Data
     {
         private readonly Model.Module module = TestData.LoadTD27Module();
 
-        private ListDataNodeDetail FindListDetail()
+        private ListDataNodeDetail? FindListDetail()
         {
             // Traverse the tree to find a node with a ListDataNodeDetail
             return FindListDetail(module.Data.LogicalRoot);
