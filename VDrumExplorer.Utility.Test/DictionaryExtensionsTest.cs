@@ -46,7 +46,7 @@ namespace VDrumExplorer.Utility.Test
         {
             var dictionary = new Dictionary<string, int> { ["a"] = 1 };
             var readOnly = dictionary.AsReadOnly();
-            Assert.Throws<NotSupportedException>(() => ((IDictionary) readOnly).Add("b", 2));
+            Assert.Throws<NotSupportedException>(() => ((IDictionary)readOnly).Add("b", 2));
         }
 
         [Test]
@@ -54,7 +54,7 @@ namespace VDrumExplorer.Utility.Test
         {
             var dictionary = new Dictionary<string, int> { ["a"] = 1 };
             var readOnly = dictionary.AsReadOnly();
-            Assert.Throws<NotSupportedException>(() => ((IDictionary) readOnly).Remove("a"));
+            Assert.Throws<NotSupportedException>(() => ((IDictionary)readOnly).Remove("a"));
         }
 
         [Test]
@@ -62,7 +62,7 @@ namespace VDrumExplorer.Utility.Test
         {
             var dictionary = new Dictionary<string, int> { ["a"] = 1 };
             var readOnly = dictionary.AsReadOnly();
-            Assert.Throws<NotSupportedException>(() => ((IDictionary) readOnly).Clear());
+            Assert.Throws<NotSupportedException>(() => ((IDictionary)readOnly).Clear());
         }
 
         [Test]
@@ -70,7 +70,7 @@ namespace VDrumExplorer.Utility.Test
         {
             var dictionary = new Dictionary<string, int> { ["a"] = 1 };
             var readOnly = dictionary.AsReadOnly();
-            Assert.Throws<NotSupportedException>(() => ((IDictionary) readOnly)["a"] = 5);
+            Assert.Throws<NotSupportedException>(() => ((IDictionary)readOnly)["a"] = 5);
         }
 
         [Test]

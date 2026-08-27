@@ -29,7 +29,7 @@ namespace VDrumExplorer.Utility.Test
         {
             var source = new List<int> { 1, 2, 3 };
             var result = source.ToReadOnlyList();
-            Assert.IsTrue(((System.Collections.IList) result).IsReadOnly);
+            Assert.IsTrue(((System.Collections.IList)result).IsReadOnly);
         }
 
         [Test]
@@ -45,7 +45,7 @@ namespace VDrumExplorer.Utility.Test
         {
             var source = new List<int> { 1, 2, 3 };
             var result = source.ToReadOnlyList();
-            Assert.Throws<NotSupportedException>(() => ((IList<int>) result).Add(4));
+            Assert.Throws<NotSupportedException>(() => ((IList<int>)result).Add(4));
         }
 
         [Test]
@@ -65,7 +65,7 @@ namespace VDrumExplorer.Utility.Test
             var source = new List<int> { 1, 2, 3 };
             var result = source.ToReadOnlyList(x => x * 10);
             Assert.IsInstanceOf<ReadOnlyCollection<int>>(result);
-            Assert.IsTrue(((System.Collections.IList) result).IsReadOnly);
+            Assert.IsTrue(((System.Collections.IList)result).IsReadOnly);
         }
 
         [Test]
@@ -92,7 +92,7 @@ namespace VDrumExplorer.Utility.Test
         {
             IEnumerable<int> source = Enumerable.Range(1, 3).Where(x => true);
             var result = source.ToReadOnlyList(x => x * 10);
-            Assert.IsTrue(((System.Collections.IList) result).IsReadOnly);
+            Assert.IsTrue(((System.Collections.IList)result).IsReadOnly);
         }
 
         [Test]
@@ -108,7 +108,7 @@ namespace VDrumExplorer.Utility.Test
         {
             var source = new List<int> { 1, 2, 3 };
             var result = source.ToReadOnlyList(x => x * 10);
-            Assert.Throws<NotSupportedException>(() => ((IList<int>) result).Add(40));
+            Assert.Throws<NotSupportedException>(() => ((IList<int>)result).Add(40));
         }
 
         [Test]
@@ -116,7 +116,7 @@ namespace VDrumExplorer.Utility.Test
         {
             IEnumerable<int> source = Enumerable.Range(1, 3).Where(x => true);
             var result = source.ToReadOnlyList(x => x * 10);
-            Assert.Throws<NotSupportedException>(() => ((IList<int>) result).Add(40));
+            Assert.Throws<NotSupportedException>(() => ((IList<int>)result).Add(40));
         }
 
         [Test]
