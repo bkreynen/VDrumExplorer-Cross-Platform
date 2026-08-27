@@ -57,6 +57,18 @@ namespace VDrumExplorer.Midi.ManagedMidi.Test.Fakes
         public void SimulateMessage(byte[] data, long timestamp) =>
             SimulateMessage(data, 0, data.Length, timestamp);
 
+        /// <summary>
+        /// Simulates a MIDI message where Start may be non-zero and Length may differ from Data.Length.
+        /// Explicit offset/length variant required to hit the else branch of MidiInput.OnMessageReceived:
+        /// <c>args.Length == args.Data.Length &amp;&amp; args.Start == 0 ? args.Data : args.Data.Skip(...).Take(...)</c>.
+        /// </summary>
+        /// <param name="data">The full data buffer.</param>
+        /// <param name="start">The start offset within the data.</param>
+        /// <param name="length">The number of bytes from the start.</param>
+        /// <param name="timestamp">Optional timestamp (defaults to 0).</param>
+        public void SimulateMessageWithOffset(byte[] data, int start, int length, long timestamp = 0) =>
+            SimulateMessage(data, start, length, timestamp);
+
         public Task CloseAsync()
         {
             CloseAsyncCalled = true;

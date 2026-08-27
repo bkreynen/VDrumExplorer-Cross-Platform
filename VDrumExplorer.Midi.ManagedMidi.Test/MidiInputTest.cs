@@ -61,6 +61,58 @@ namespace VDrumExplorer.Midi.ManagedMidi.Test
         }
 
         [Test]
+        public void MessageReceived_WithOffset_SlicesData()
+        {
+            var fake = new FakeManagedMidiInput();
+            var midiInput = new MidiInput(fake);
+            Model.Midi.MidiMessage? received = null;
+            midiInput.MessageReceived += (_, m) => received = m;
+
+            // Simulate a message where Start != 0 but Length == Data.Length (first condition true, second false).
+            // This hits the else branch via the second sub-condition (Start != 0), which is required for full condition coverage.
+            fake.SimulateMessageWithOffset(new byte[] { 0x00, 0xF0, 0x41, 0x10, 0xF7, 0x00 }, start: 1, length: 4);
+
+            Assert.NotNull(received);
+            Assert.AreEqual(new byte[] { 0xF0, 0x41, 0x10, 0xF7 }, received!.Data);
+        }
+
+        [Test]
+        public void MessageReceived_SameLengthNonZeroStart_SlicesCorrectly()
+        {
+            var fake = new FakeManagedMidiInput();
+            var input = new MidiInput(fake);
+            Model.Midi.MidiMessage? received = null;
+            input.MessageReceived += (_, msg) => received = msg;
+
+            // Data.Length == Length (3 == 3) but Start != 0, so condition is (true && false) => false => else branch.
+            // Covers the second sub-condition jump that was previously at 50% coverage.
+            var data = new byte[] { 0x90, 0x40, 0x7F };
+            fake.SimulateMessage(data, start: 1, length: 3, timestamp: 77L);
+
+            Assert.IsNotNull(received);
+            // Skip(1).Take(3) on a 3-element array yields 2 elements.
+            Assert.AreEqual(new byte[] { 0x40, 0x7F }, received!.Data);
+            Assert.AreEqual(77L, received.Timestamp);
+        }
+
+        [Test]
+        public void MessageReceived_StartZeroButShorterLength_SlicesCorrectly()
+        {
+            var fake = new FakeManagedMidiInput();
+            var input = new MidiInput(fake);
+            Model.Midi.MidiMessage? received = null;
+            input.MessageReceived += (_, msg) => received = msg;
+
+            // Start == 0 but Length != Data.Length (3 != 4) => first condition false => else branch via Skip/Take.
+            var data = new byte[] { 0x90, 0x40, 0x7F, 0x00 };
+            fake.SimulateMessage(data, start: 0, length: 3, timestamp: 55L);
+
+            Assert.IsNotNull(received);
+            Assert.AreEqual(new byte[] { 0x90, 0x40, 0x7F }, received!.Data);
+            Assert.AreEqual(55L, received.Timestamp);
+        }
+
+        [Test]
         public void MessageReceived_NoSubscriber_DoesNotThrow()
         {
             var fake = new FakeManagedMidiInput();

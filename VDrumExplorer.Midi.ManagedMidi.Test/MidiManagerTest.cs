@@ -10,6 +10,18 @@ using VDrumExplorer.Model.Midi;
 
 namespace VDrumExplorer.Midi.ManagedMidi.Test
 {
+    /// <remarks>
+    /// Coverage note: MidiManager.OpenInputAsync / OpenOutputAsync are intentionally not fully covered.
+    /// They delegate to the static singleton MidiAccessManager.Default which talks directly to OS MIDI hardware
+    /// (ALSA on Linux, WinMM on Windows, CoreMIDI on macOS). The retry loop in OpenInputAsync (3 retries with
+    /// Task.Delay(250) on Win32Exception) cannot be exercised without either real hardware or a mockable
+    /// abstraction over MidiAccessManager. That abstraction does not exist in the ManagedMidi library, so the
+    /// methods are fundamentally untestable in a unit-test context without hardware. ListInputDevices /
+    /// ListOutputDevices are the coverable surface and are tested here; they correctly project
+    /// IMidiPortDetails (Id, Name, Manufacturer) into Model.Midi.MidiInputDevice/MidiOutputDevice.
+    /// If stricter coverage gating is required, consider adding [ExcludeFromCodeCoverage] to the
+    /// OpenInputAsync/OpenOutputAsync state machines rather than introducing a test-only seam.
+    /// </remarks>
     public class MidiManagerTest
     {
         private MidiManager manager = null!;
