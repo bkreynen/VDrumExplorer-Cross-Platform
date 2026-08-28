@@ -51,9 +51,8 @@ internal class OverlayDataFieldTest
     {
         // The current field list key should match the switch field's current value.
         var switchValue = switchField.Value;
-        Assert.IsNotNull(overlayField.CurrentFieldList);
-        // The field list description should correspond to the switch value
-        Assert.IsNotNull(overlayField.CurrentFieldList.Description);
+        var expectedDescription = overlayField.SchemaField.FieldLists[switchValue].Description;
+        Assert.AreEqual(expectedDescription, overlayField.CurrentFieldList.Description);
     }
 
     [Test]

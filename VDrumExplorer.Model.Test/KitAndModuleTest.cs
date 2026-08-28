@@ -4,6 +4,7 @@
 
 using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
+using System;
 using System.Linq;
 using VDrumExplorer.Model.Data;
 
@@ -95,13 +96,14 @@ namespace VDrumExplorer.Model.Test
         [Test]
         public void ImportKit_WithMismatchedSchema_Throws()
         {
-            // We can't easily create a kit with a different schema without loading another module.
-            // Instead, test that importing a kit exported from a different module schema throws.
-            // For now, just verify the schema check exists by confirming the method validates.
-            // (This is a smoke test - the real mismatch test would require a second schema.)
-            var kit = module.ExportKit(1);
-            // Importing to the same module should work (same schema).
-            Assert.DoesNotThrow(() => module.ImportKit(kit, 3));
+            // Construct a kit from a different known schema and verify import throws.
+            var foreignSchema = ModuleSchema.KnownSchemas[ModuleIdentifier.TD17].Value;
+            // Ensure the foreign schema is actually different (reference inequality).
+            Assert.AreNotSame(module.Schema, foreignSchema);
+            var foreignModuleData = ModuleData.FromLogicalRootNode(foreignSchema.LogicalRoot);
+            var foreignModule = new Module(foreignModuleData);
+            var foreignKit = foreignModule.ExportKit(1);
+            Assert.Throws<ArgumentException>(() => module.ImportKit(foreignKit, 3));
         }
 
         [Test]

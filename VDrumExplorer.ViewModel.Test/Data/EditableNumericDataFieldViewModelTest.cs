@@ -98,10 +98,30 @@ namespace VDrumExplorer.ViewModel.Test.Data
         public void FormattedValue_SetValidText_UpdatesValue()
         {
             var vm = CreateViewModel();
+            var originalRaw = vm.Model.RawValue;
             var originalFormatted = vm.FormattedValue;
-            // Try setting to the same formatted text (which should be valid)
-            vm.FormattedValue = originalFormatted;
+
+            // Pick a different valid raw value within [MinValue, MaxValue]
+            var otherRaw = originalRaw == vm.MinValue
+                ? System.Math.Min(vm.MinValue + 1, vm.MaxValue)
+                : vm.MinValue;
+            if (otherRaw == originalRaw)
+            {
+                otherRaw = vm.MaxValue;
+            }
+
+            // Generate formatted text for the different raw value by temporarily setting RawValue and reading FormattedText
+            vm.Model.RawValue = otherRaw;
+            var formattedForOtherValue = vm.Model.FormattedText;
+
+            // Restore original value and ensure we are starting from the original text
+            vm.Model.RawValue = originalRaw;
             Assert.Equal(originalFormatted, vm.FormattedValue);
+
+            // Assign formatted text for otherRaw and verify the raw value changed
+            vm.FormattedValue = formattedForOtherValue;
+            Assert.Equal(otherRaw, vm.Model.RawValue);
+            Assert.Equal(formattedForOtherValue, vm.FormattedValue);
         }
 
         [Fact]

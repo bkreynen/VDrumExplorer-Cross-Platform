@@ -3,6 +3,7 @@
 // as found in the LICENSE.txt file.
 
 using System;
+using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
@@ -55,6 +56,40 @@ namespace VDrumExplorer.Utility.Test
         }
 
         [Test]
+        public void LogTiming_ActionOverload_LogsDebugMessageWithDescriptionAndElapsedTime()
+        {
+            var logger = new RecordingLogger();
+            var executed = false;
+
+            Timing.LogTiming(logger, "test", () => executed = true);
+
+            Assert.IsTrue(executed);
+            Assert.AreEqual(1, logger.Entries.Count);
+            var entry = logger.Entries[0];
+            Assert.AreEqual(LogLevel.Debug, entry.Level);
+            Assert.That(entry.Message, Does.Contain("test"));
+            // Timing.cs logs as $"{description} in {elapsed}ms" — verify elapsed-time part.
+            Assert.That(entry.Message, Does.Contain("ms"));
+            Assert.That(entry.Message, Does.Contain("in"));
+        }
+
+        [Test]
+        public void LogTiming_GenericOverload_LogsDebugMessageWithDescriptionAndElapsedTime()
+        {
+            var logger = new RecordingLogger();
+
+            var result = Timing.LogTiming(logger, "test", () => 42);
+
+            Assert.AreEqual(42, result);
+            Assert.AreEqual(1, logger.Entries.Count);
+            var entry = logger.Entries[0];
+            Assert.AreEqual(LogLevel.Debug, entry.Level);
+            Assert.That(entry.Message, Does.Contain("test"));
+            Assert.That(entry.Message, Does.Contain("ms"));
+            Assert.That(entry.Message, Does.Contain("in"));
+        }
+
+        [Test]
         public void DebugConsoleLogTiming_ExecutesAction()
         {
             var executed = false;
@@ -95,5 +130,32 @@ namespace VDrumExplorer.Utility.Test
             Assert.Throws<InvalidOperationException>(() =>
                 Timing.DebugConsoleLogTiming<int>("test", () => throw new InvalidOperationException("boom")));
         }
+
+        /// <summary>
+        /// Minimal <see cref="ILogger"/> that captures <see cref="ILogger.Log{TState}"/> calls
+        /// for assertion. Avoids taking dependency on Microsoft.Extensions.Logging.Testing.
+        /// </summary>
+        private sealed class RecordingLogger : ILogger
+        {
+            public List<LogEntry> Entries { get; } = new();
+
+            public IDisposable? BeginScope<TState>(TState state) where TState : notnull => NullScope.Instance;
+
+            public bool IsEnabled(LogLevel logLevel) => true;
+
+            public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
+            {
+                var message = formatter(state, exception);
+                Entries.Add(new LogEntry(logLevel, message));
+            }
+
+            private sealed class NullScope : IDisposable
+            {
+                public static readonly NullScope Instance = new();
+                public void Dispose() { }
+            }
+        }
+
+        private sealed record LogEntry(LogLevel Level, string Message);
     }
 }

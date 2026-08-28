@@ -2,6 +2,7 @@
 // Use of this source code is governed by the Apache License 2.0,
 // as found in the LICENSE.txt file.
 
+using System;
 using VDrumExplorer.Model.Data.Fields;
 using VDrumExplorer.ViewModel.Data;
 using Xunit;
@@ -109,19 +110,17 @@ namespace VDrumExplorer.ViewModel.Test.Data
         }
 
         [Fact]
-        public void CreateViewModel_OverlayField_NotReadOnly_ReturnsReadOnly()
+        public void CreateViewModel_OverlayField_NotReadOnly_ThrowsArgumentException()
         {
             var field = FieldFinder.FirstOf<OverlayDataField>(module.Data.LogicalRoot);
-            var vm = DataFieldViewModel.CreateViewModel(field, false);
-            Assert.IsType<ReadOnlyDataFieldViewModel>(vm);
+            Assert.Throws<ArgumentException>(() => DataFieldViewModel.CreateViewModel(field, false));
         }
 
         [Fact]
-        public void CreateViewModel_OverlayField_ReadOnly_ReturnsReadOnly()
+        public void CreateViewModel_OverlayField_ReadOnly_ThrowsArgumentException()
         {
             var field = FieldFinder.FirstOf<OverlayDataField>(module.Data.LogicalRoot);
-            var vm = DataFieldViewModel.CreateViewModel(field, true);
-            Assert.IsType<ReadOnlyDataFieldViewModel>(vm);
+            Assert.Throws<ArgumentException>(() => DataFieldViewModel.CreateViewModel(field, true));
         }
     }
 }

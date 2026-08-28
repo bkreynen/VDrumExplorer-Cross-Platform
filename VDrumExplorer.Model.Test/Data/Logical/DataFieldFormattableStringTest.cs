@@ -105,15 +105,46 @@ namespace VDrumExplorer.Model.Test.Data.Logical
         [Test]
         public void PropertyChanged_DoesNotFireBeforeSubscription()
         {
-            // Create a new formattable but don't subscribe to PropertyChanged yet.
-            var nodeWithFormatPaths = module.Data.LogicalRoot.SchemaNode.DescendantsAndSelf()
-                .First(n => n.Format.FormatPaths.Count > 0);
-            var newFormattable = new DataFieldFormattableString(module.Data, nodeWithFormatPaths.Format);
+            // Find a node whose first format path resolves to a changeable field so we can exercise forwarding.
+            var nodeWithChangeableFormat = module.Data.LogicalRoot.SchemaNode.DescendantsAndSelf()
+                .First(n => n.Format.FormatPaths.Count > 0 &&
+                            module.Data.GetDataField(n.Format.Container.ResolveField(n.Format.FormatPaths[0])) is StringDataField or NumericDataField);
+            var changeableSchemaFormattable = nodeWithChangeableFormat.Format;
+            var newFormattable = new DataFieldFormattableString(module.Data, changeableSchemaFormattable);
+
+            var formatPath = changeableSchemaFormattable.FormatPaths[0];
+            var field = changeableSchemaFormattable.Container.ResolveField(formatPath);
+            var dataField = module.Data.GetDataField(field);
+
+            void ChangeField(VDrumExplorer.Model.Data.Fields.IDataField f)
+            {
+                switch (f)
+                {
+                    case StringDataField stringField:
+                        var newText = stringField.FormattedText == "A" ? "B" : "A";
+                        if (!stringField.TrySetFormattedText(newText))
+                        {
+                            stringField.Reset();
+                        }
+                        break;
+                    case NumericDataField numericField:
+                        var newValue = numericField.RawValue == numericField.SchemaField.Min
+                            ? numericField.SchemaField.Min + 1
+                            : numericField.SchemaField.Min;
+                        numericField.RawValue = newValue;
+                        break;
+                }
+            }
+
+            // Change underlying field BEFORE subscribing — must not be observed.
+            ChangeField(dataField);
 
             var recorder = new NotifyChangeRecorder(newFormattable);
-            // The recorder subscribes, so now changes should fire. But before we subscribed,
-            // no events should have been recorded.
             Assert.IsEmpty(recorder.ChangedProperties);
+
+            // Change again AFTER subscribing — must now fire Text.
+            ChangeField(dataField);
+            CollectionAssert.Contains(recorder.ChangedProperties, nameof(newFormattable.Text));
         }
     }
 }
