@@ -19,6 +19,17 @@ namespace VDrumExplorer.Utility.Test
         }
 
         [Test]
+        public void CheckNotNull_NullParamName_ThrowsArgumentNullExceptionWithNullParamName()
+        {
+            string? value = null;
+            string? paramName = null;
+            // Preconditions.CheckNotNull translates null paramName via ArgumentNullException(null) — ParamName is null.
+            // This documents the edge case where caller passes null as paramName; production guards still throw.
+            var ex = Assert.Throws<ArgumentNullException>(() => Preconditions.CheckNotNull(value!, paramName!));
+            Assert.IsNull(ex!.ParamName);
+        }
+
+        [Test]
         public void CheckNotNull_NonNullValue_ReturnsSameValue()
         {
             var value = new object();

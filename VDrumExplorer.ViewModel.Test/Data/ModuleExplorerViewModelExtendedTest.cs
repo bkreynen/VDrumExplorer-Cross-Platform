@@ -18,6 +18,8 @@ namespace VDrumExplorer.ViewModel.Test.Data
     {
         private readonly Module module = TestData.LoadTD27Module();
 
+        // TODO: Duplicated ConfigurableViewServices — see DataExplorerViewModelExtendedTest for rationale.
+        // Centralize via Fakes/ConfigurableViewServices or ViewModelTestHelpers when test helper refactoring is revisited.
         private sealed class ConfigurableViewServices : IViewServices
         {
             public string? OpenFileResult { get; set; }

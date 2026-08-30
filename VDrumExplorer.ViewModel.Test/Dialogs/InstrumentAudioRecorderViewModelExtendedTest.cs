@@ -11,6 +11,7 @@ using VDrumExplorer.Model.Midi;
 using VDrumExplorer.ViewModel;
 using VDrumExplorer.ViewModel.Dialogs;
 using VDrumExplorer.ViewModel.Test.Fakes;
+using VDrumExplorer.ViewModel.Test.Helpers;
 using Xunit;
 
 namespace VDrumExplorer.ViewModel.Test.Dialogs
@@ -135,8 +136,8 @@ namespace VDrumExplorer.ViewModel.Test.Dialogs
                 // Execute async void via command
                 Assert.True(vm.StartRecordingCommand.Enabled);
                 vm.StartRecordingCommand.Execute(null!);
-                // Give it time to run: it will hit GetCurrentKit timeout after 100ms, then catch and finish
-                await Task.Delay(600);
+                // Wait until recording completes (CancelCommand reset) rather than fixed 600ms sleep; 100ms timeout + processing typically <400ms.
+                await ViewModelTestHelpers.WaitUntilAsync(() => !vm.CancelCommand.Enabled && vm.RecordedAudio == null, timeoutMs: 2000);
                 // After completion, RecordedAudio should be null (failed), and commands reset
                 Assert.Null(vm.RecordedAudio);
                 Assert.False(vm.CancelCommand.Enabled);
@@ -156,7 +157,7 @@ namespace VDrumExplorer.ViewModel.Test.Dialogs
             var vm = new InstrumentAudioRecorderSettingsViewModel(vs, new FakeAudioDeviceManager(), schema, "Test MIDI");
             Assert.Null(vm.OutputFile);
             vm.SelectOutputFileCommand.Execute(null!);
-            await Task.Delay(100);
+            await ViewModelTestHelpers.WaitUntilAsync(() => vm.OutputFile == temp);
             Assert.Equal(temp, vm.OutputFile);
         }
 
@@ -167,7 +168,7 @@ namespace VDrumExplorer.ViewModel.Test.Dialogs
             var schema = TestData.LoadTD27Schema();
             var vm = new InstrumentAudioRecorderSettingsViewModel(vs, new FakeAudioDeviceManager(), schema, "Test MIDI");
             vm.SelectOutputFileCommand.Execute(null!);
-            await Task.Delay(100);
+            await ViewModelTestHelpers.WaitUntilAsync(() => vm.OutputFile == null, 300);
             Assert.Null(vm.OutputFile);
         }
 

@@ -160,11 +160,22 @@ namespace VDrumExplorer.Utility.Test
         }
 
         [Test]
+        public void Enumerator_Reset_BeforeMoveNext_IsNoOp()
+        {
+            var collection = SingleItemCollection.Of("item");
+            using var enumerator = collection.GetEnumerator();
+            Assert.DoesNotThrow(() => enumerator.Reset());
+            // After Reset (no-op) the enumerator remains at initial state; first MoveNext still yields the item.
+            Assert.IsTrue(enumerator.MoveNext());
+            Assert.AreEqual("item", enumerator.Current);
+        }
+
+        [Test]
         public void Enumerator_Reset_IsNoOp_DoesNotAllowReEnumeration()
         {
             // The Reset method is intentionally a no-op in this implementation.
             // After enumeration is complete, Reset does not restore the enumerator
-            // to its initial state.
+            // to its initial state. This is documented on SingleItemCollection.Enumerator.Reset.
             var collection = SingleItemCollection.Of("item");
             using var enumerator = collection.GetEnumerator();
             enumerator.MoveNext();

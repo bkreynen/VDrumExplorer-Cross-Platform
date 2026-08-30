@@ -22,6 +22,8 @@ namespace VDrumExplorer.ViewModel.Test.Home
     [Collection("Clipboard")]
     public class ExplorerHomeViewModelExtendedTest
     {
+        // TODO: TrackingViewServices duplicates shape of ConfigurableViewServices from Data/ModuleExplorer tests.
+        // Kept separate for readability; evaluate shared FakeViewServices with configurable callbacks (see ViewModelTestHelpers) before collapsing.
         private sealed class TrackingViewServices : IViewServices
         {
             public string? OpenFileResult { get; set; }

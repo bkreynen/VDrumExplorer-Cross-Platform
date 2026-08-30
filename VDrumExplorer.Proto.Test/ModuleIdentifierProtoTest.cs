@@ -113,8 +113,10 @@ namespace VDrumExplorer.Proto.Test
         [Test]
         public void GetOrInferSchema_MultipleMatchingRevisions_PicksLatest()
         {
-            // TD-17 has two revisions: 0 and 0x01, 0x02
-            // Create an identifier with no software revision, and a validator that accepts all
+            // TD-17 has revisions 0, 0x01, 0x02 — compute max dynamically so test remains valid if a new revision is added
+            var expectedMaxRevision = Model.ModuleSchema.KnownSchemas.Keys
+                .Where(k => k.Name == "TD-17")
+                .Max(k => k.SoftwareRevision);
             var protoId = new ModuleIdentifier
             {
                 Name = "TD-17",
@@ -124,8 +126,7 @@ namespace VDrumExplorer.Proto.Test
             };
             Assert.IsFalse(protoId.HasSoftwareRevision);
             var schema = protoId.GetOrInferSchema(_ => true, NullLogger.Instance);
-            // Should pick the latest revision (0x02)
-            Assert.AreEqual(0x02, schema.Identifier.SoftwareRevision);
+            Assert.AreEqual(expectedMaxRevision, schema.Identifier.SoftwareRevision);
         }
 
         [Test]

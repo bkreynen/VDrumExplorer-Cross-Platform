@@ -22,6 +22,9 @@ namespace VDrumExplorer.ViewModel.Test.Data
     {
         private readonly Module module = TestData.LoadTD27Module();
 
+        // TODO: This inner ConfigurableViewServices is duplicated in ModuleExplorerViewModelExtendedTest and ExplorerHome variants.
+        // Consider consolidating to a shared test fake (e.g., FakeViewServices or a configurable variant in Fakes/) once ViewModelTestHelpers stabilizes.
+        // Kept local for now to preserve per-test configurability without enlarging shared surface.
         private sealed class ConfigurableViewServices : IViewServices
         {
             public string? OpenFileResult { get; set; }
