@@ -12,6 +12,7 @@ using Xunit;
 
 namespace VDrumExplorer.ViewModel.Test.Data
 {
+    [Collection("Clipboard")]
     public class ModuleExplorerViewModelTest
     {
         private readonly Module module = TestData.LoadTD27Module();

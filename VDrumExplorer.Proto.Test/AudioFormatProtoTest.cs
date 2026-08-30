@@ -70,7 +70,8 @@ namespace VDrumExplorer.Proto.Test
                 Bits = 16
             };
             var modelFormat = protoFormat.ToModel();
-            Assert.AreEqual(44100 * 2 * 16 / 8, modelFormat.BytesPerSecond);
+            // 44100 Hz * 2 channels * 16 bits / 8 = 176400 bytes/sec — literal avoids re-implementing formula.
+            Assert.AreEqual(176400, modelFormat.BytesPerSecond);
         }
     }
 }

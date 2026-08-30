@@ -52,10 +52,7 @@ namespace VDrumExplorer.ViewModel.Test.Home
             {
                 ShowSchemaExplorerCallCount++;
                 LastShownViewModel = viewModel;
-                // ModuleSchemaViewModel.Schema is protected (via ViewModelBase<ModuleSchema>.Model), so extract via Title or reflection
-                var prop = typeof(ViewModelBase<ModuleSchema>).GetProperty("Model", BindingFlags.Instance | BindingFlags.NonPublic);
-                var schema = (ModuleSchema)prop!.GetValue(viewModel)!;
-                LastSchemaExplorerIdentifier = schema.Identifier;
+                LastSchemaExplorerIdentifier = viewModel.ModelForTest.Identifier;
             }
             public void ShowKitExplorer(ViewModel.Data.KitExplorerViewModel viewModel) { }
             public void ShowModuleExplorer(ViewModel.Data.ModuleExplorerViewModel viewModel) { }

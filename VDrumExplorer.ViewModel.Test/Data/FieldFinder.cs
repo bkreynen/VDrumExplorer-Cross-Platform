@@ -54,5 +54,21 @@ namespace VDrumExplorer.ViewModel.Test.Data
 
         internal static T FirstOf<T>(DataTreeNode root) where T : class, IDataField =>
             CollectAllFields(root).OfType<T>().First();
+
+        /// <summary>
+        /// Finds the first field of type <typeparamref name="T"/> matching the given description,
+        /// providing deterministic pinning instead of blind <c>.First()</c> order sensitivity.
+        /// </summary>
+        internal static T FindByDescription<T>(DataTreeNode root, string description) where T : class, IDataField =>
+            CollectAllFields(root).OfType<T>().First(f => f.SchemaField.Description == description);
+
+        internal static NumericDataField FindNumericField(DataTreeNode root, string description) =>
+            FindByDescription<NumericDataField>(root, description);
+
+        internal static BooleanDataField FindBooleanField(DataTreeNode root, string description) =>
+            FindByDescription<BooleanDataField>(root, description);
+
+        internal static EnumDataField FindEnumField(DataTreeNode root, string description) =>
+            FindByDescription<EnumDataField>(root, description);
     }
 }

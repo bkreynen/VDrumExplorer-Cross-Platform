@@ -5,6 +5,7 @@
 using NUnit.Framework;
 using NUnit.Framework.Legacy;
 using VDrumExplorer.Model.Midi;
+using VDrumExplorer.Model.Test.Helpers;
 
 namespace VDrumExplorer.Model.Test.Midi
 {
@@ -237,55 +238,15 @@ namespace VDrumExplorer.Model.Test.Midi
             Assert.NotNull(result);
         }
 
-        private static byte ComputeChecksum(byte[] message, int modelIdLength)
-        {
-            // Roland checksum: (0x80 - (sum & 0x7f)) & 0x7f over bytes from dataStart to length-3.
-            int dataStart = 4 + modelIdLength;
-            byte sum = 0;
-            for (int i = dataStart; i < message.Length - 2; i++) sum += message[i];
-            return (byte)((0x80 - (sum & 0x7f)) & 0x7f);
-        }
+        private static byte ComputeChecksum(byte[] message, int modelIdLength) =>
+            MidiTestHelpers.ComputeChecksum(message, modelIdLength);
 
-        // Helper to build a valid DT1 (Data Set) SysEx message.
-        // Layout: F0 41 <devId> <modelId (modelIdLength bytes)> 12 <address (4 bytes)> <data> <checksum> F7
-        // The modelId parameter provides the 4 bytes of the actual model ID;
-        // for modelIdLength=5, a leading 0x00 byte is inserted before the model ID.
-        // NOTE: checksum is intentionally left as 0x00 placeholder — DataSetMessage.TryParse does not validate it.
-        private static byte[] BuildDataSetMessage(byte modelIdLength, byte[] modelId, byte[] address, byte[] data)
-        {
-            // Total length: 3 (F0, 41, devId) + modelIdLength + 1 (command) + 4 (address) + data.Length + 1 (checksum) + 1 (F7)
-            int length = 3 + modelIdLength + 1 + 4 + data.Length + 1 + 1;
-            var bytes = new byte[length];
-            int offset = 0;
-            bytes[offset++] = 0xF0; // SYSEX start
-            bytes[offset++] = 0x41; // Roland manufacturer ID
-            bytes[offset++] = 0x10; // Raw device ID (device 17)
-            // Model ID: for modelIdLength=5, first byte is 0x00, then the 4 modelId bytes.
-            // For modelIdLength=4, just the 4 modelId bytes.
-            if (modelIdLength == 5)
-            {
-                bytes[offset++] = 0x00; // Leading zero byte for TD-50X
-            }
-            foreach (var b in modelId)
-            {
-                bytes[offset++] = b;
-            }
-            bytes[offset++] = 0x12; // DT1 command
-            foreach (var b in address)
-            {
-                bytes[offset++] = b;
-            }
-            foreach (var b in data)
-            {
-                bytes[offset++] = b;
-            }
-            // Checksum placeholder (not validated by TryParse, but included for completeness)
-            bytes[offset++] = 0x00;
-            bytes[offset++] = 0xF7; // EOX
-            return bytes;
-        }
+        // Thin wrapper that delegates to the shared helper but preserves the historical
+        // placeholder-0x00 checksum (TryParse does not validate it). For valid-checksum
+        // messages use MidiTestHelpers.BuildDataSetMessage directly.
+        private static byte[] BuildDataSetMessage(byte modelIdLength, byte[] modelId, byte[] address, byte[] data) =>
+            MidiTestHelpers.BuildDataSetMessageWithPlaceholderChecksum(modelIdLength, modelId, address, data);
 
-        private static byte[] ToBigEndianBytes(int value) =>
-            new byte[] { (byte)(value >> 24), (byte)(value >> 16), (byte)(value >> 8), (byte)(value >> 0) };
+        private static byte[] ToBigEndianBytes(int value) => MidiTestHelpers.ToBigEndianBytes(value);
     }
 }

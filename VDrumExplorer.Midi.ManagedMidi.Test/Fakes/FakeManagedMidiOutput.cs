@@ -33,6 +33,13 @@ namespace VDrumExplorer.Midi.ManagedMidi.Test.Fakes
 
         public MidiPortConnectionState Connection => MidiPortConnectionState.Open;
 
+        /// <summary>
+        /// Records a sent message. Copies <paramref name="buffer"/> via <see cref="Array.Copy"/>
+        /// so the stored <see cref="SentMessage.Data"/> is immutable — later mutations of the
+        /// caller's buffer do not affect the recorded message (mirrors production
+        /// <see cref="VDrumExplorer.Midi.ManagedMidi.MidiOutput.Send"/> which slices via Skip/Take/ToArray).
+        /// Offset/Length are preserved as passed for assertion; Data is always a fresh defensive copy.
+        /// </summary>
         public void Send(byte[] buffer, int offset, int length, long timestamp)
         {
             var data = new byte[length];

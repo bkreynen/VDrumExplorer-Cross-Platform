@@ -102,6 +102,7 @@ namespace VDrumExplorer.Utility.Test
         {
             IEnumerable<int> source = Enumerable.Range(1, 3).Where(x => true);
             var result = source.ToReadOnlyList(x => x * 10);
+            Assert.IsInstanceOf<ReadOnlyCollection<int>>(result);
             Assert.IsTrue(((System.Collections.IList)result).IsReadOnly);
         }
 

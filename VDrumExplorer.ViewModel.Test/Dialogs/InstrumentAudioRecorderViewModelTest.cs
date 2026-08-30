@@ -231,21 +231,19 @@ namespace VDrumExplorer.ViewModel.Test.Dialogs
             // Initially no cancellation => SettingsEnabled true
             Assert.True(vm.SettingsEnabled);
             Assert.False(vm.ProgressEnabled);
-            // We cannot easily trigger cancellation without starting recording (which requires hardware),
-            // but we can verify the property logic via reflection: set private field cancellationTokenSource
-            var field = typeof(InstrumentAudioRecorderViewModel).GetField("cancellationTokenSource", BindingFlags.Instance | BindingFlags.NonPublic);
-            Assert.NotNull(field);
-            field!.SetValue(vm, new System.Threading.CancellationTokenSource());
-            // Need to trigger UpdateButtonStatus via private method
-            var method = typeof(InstrumentAudioRecorderViewModel).GetMethod("UpdateButtonStatus", BindingFlags.Instance | BindingFlags.NonPublic);
-            method!.Invoke(vm, null);
+            Assert.False(vm.IsRecording);
+            // Use internal accessor instead of reflection
+            vm.cancellationTokenSource = new System.Threading.CancellationTokenSource();
+            vm.UpdateButtonStatus();
+            Assert.True(vm.IsRecording);
             Assert.False(vm.SettingsEnabled);
             Assert.True(vm.ProgressEnabled);
             Assert.True(vm.CancelCommand.Enabled);
             Assert.False(vm.StartRecordingCommand.Enabled);
             // Clean up: reset
-            field.SetValue(vm, null);
-            method.Invoke(vm, null);
+            vm.cancellationTokenSource = null;
+            vm.UpdateButtonStatus();
+            Assert.False(vm.IsRecording);
             Assert.True(vm.SettingsEnabled);
         }
 

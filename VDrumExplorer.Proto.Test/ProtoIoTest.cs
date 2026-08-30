@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using VDrumExplorer.Model.Data;
+using VDrumExplorer.Proto.Test.Helpers;
 
 namespace VDrumExplorer.Proto.Test
 {
@@ -241,20 +242,7 @@ namespace VDrumExplorer.Proto.Test
             AssertDataEqual(firstLoad.Data, secondLoad.Data);
         }
 
-        private static void AssertDataEqual(ModuleData expectedData, ModuleData actualData)
-        {
-            var originalSegments = expectedData.CreateSnapshot().Segments.ToList();
-            var newSegments = actualData.CreateSnapshot().Segments.ToList();
-            Assert.AreEqual(originalSegments.Count, newSegments.Count);
-
-            for (int i = 0; i < originalSegments.Count; i++)
-            {
-                var originalSegment = originalSegments[i];
-                var newSegment = newSegments[i];
-                Assert.AreEqual(originalSegment.Address, newSegment.Address, $"Address of segment {i}");
-                Assert.AreEqual(originalSegment.Size, newSegment.Size, $"Size of segment {i}");
-                Assert.AreEqual(originalSegment.CopyData(), newSegment.CopyData(), $"Data in segment starting at {originalSegment.Address}");
-            }
-        }
+        private static void AssertDataEqual(ModuleData expectedData, ModuleData actualData) =>
+            ProtoTestHelpers.AssertDataEqual(expectedData, actualData);
     }
 }

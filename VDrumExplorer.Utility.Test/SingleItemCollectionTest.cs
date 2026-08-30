@@ -200,5 +200,35 @@ namespace VDrumExplorer.Utility.Test
             IEnumerator nonGeneric = enumerator;
             Assert.AreEqual("item", nonGeneric.Current);
         }
+
+        [Test]
+        public void GetEnumerator_TwoEnumerators_Independent()
+        {
+            var collection = SingleItemCollection.Of("item");
+            using var e1 = collection.GetEnumerator();
+            using var e2 = collection.GetEnumerator();
+            Assert.IsTrue(e1.MoveNext());
+            Assert.IsTrue(e2.MoveNext());
+            Assert.AreEqual("item", e1.Current);
+            Assert.AreEqual("item", e2.Current);
+            Assert.IsFalse(e1.MoveNext());
+            Assert.IsFalse(e2.MoveNext());
+            // Ensure e1 exhaustion did not affect e2's already-exhausted state and vice versa — independence proven by both having yielded.
+        }
+
+        [Test]
+        public void GetEnumerator_TwoEnumerators_Interleaved()
+        {
+            var collection = SingleItemCollection.Of(42);
+            using var e1 = collection.GetEnumerator();
+            using var e2 = collection.GetEnumerator();
+            // Interleave MoveNext calls to prove they don't share index.
+            Assert.IsTrue(e1.MoveNext());
+            Assert.AreEqual(42, e1.Current);
+            Assert.IsTrue(e2.MoveNext());
+            Assert.AreEqual(42, e2.Current);
+            Assert.IsFalse(e1.MoveNext());
+            Assert.IsFalse(e2.MoveNext());
+        }
     }
 }

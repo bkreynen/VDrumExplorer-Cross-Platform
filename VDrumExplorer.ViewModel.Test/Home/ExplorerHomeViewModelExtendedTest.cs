@@ -13,11 +13,13 @@ using VDrumExplorer.ViewModel.Dialogs;
 using VDrumExplorer.ViewModel.Home;
 using VDrumExplorer.ViewModel.Logging;
 using VDrumExplorer.ViewModel.Test.Fakes;
+using VDrumExplorer.ViewModel.Test.Helpers;
 using Xunit;
 using static VDrumExplorer.Proto.ModelExtensions;
 
 namespace VDrumExplorer.ViewModel.Test.Home
 {
+    [Collection("Clipboard")]
     public class ExplorerHomeViewModelExtendedTest
     {
         private sealed class TrackingViewServices : IViewServices
@@ -93,15 +95,6 @@ namespace VDrumExplorer.ViewModel.Test.Home
             return new ExplorerHomeViewModel(vs, lvm, dvm, adm);
         }
 
-        private static async Task WaitUntilAsync(Func<bool> condition, int timeoutMs = 1000)
-        {
-            for (int i = 0; i < timeoutMs / 20; i++)
-            {
-                if (condition()) return;
-                await Task.Delay(20);
-            }
-        }
-
         [Fact]
         public async Task LoadFile_Cancelled_DoesNotShowExplorer()
         {
@@ -120,7 +113,7 @@ namespace VDrumExplorer.ViewModel.Test.Home
             var lvm = new LogViewModel();
             var vm = CreateVm(vs, lvm: lvm);
             vm.LoadFileCommand.Execute(null!);
-            await WaitUntilAsync(() => lvm.LogEntries.Count > 0);
+            await ViewModelTestHelpers.WaitUntilAsync(() => lvm.LogEntries.Count > 0);
             Assert.Contains(lvm.LogEntries, e => e.Level == LogLevel.Error);
             Assert.Equal(0, vs.ShowKitExplorerCount + vs.ShowModuleExplorerCount + vs.ShowAudioExplorerCount);
         }
@@ -137,7 +130,7 @@ namespace VDrumExplorer.ViewModel.Test.Home
             try
             {
                 vm.LoadFileCommand.Execute(null!);
-                await WaitUntilAsync(() => vs.ShowKitExplorerCount > 0);
+                await ViewModelTestHelpers.WaitUntilAsync(() => vs.ShowKitExplorerCount > 0);
                 Assert.Equal(1, vs.ShowKitExplorerCount);
             }
             finally { if (File.Exists(temp)) File.Delete(temp); }
@@ -154,7 +147,7 @@ namespace VDrumExplorer.ViewModel.Test.Home
             try
             {
                 vm.LoadFileCommand.Execute(null!);
-                await WaitUntilAsync(() => vs.ShowModuleExplorerCount > 0);
+                await ViewModelTestHelpers.WaitUntilAsync(() => vs.ShowModuleExplorerCount > 0);
                 Assert.Equal(1, vs.ShowModuleExplorerCount);
             }
             finally { if (File.Exists(temp)) File.Delete(temp); }

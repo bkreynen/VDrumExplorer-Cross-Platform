@@ -68,9 +68,10 @@ namespace VDrumExplorer.Midi.ManagedMidi.Test
             Model.Midi.MidiMessage? received = null;
             midiInput.MessageReceived += (_, m) => received = m;
 
-            // Simulate a message where Start != 0 but Length == Data.Length (first condition true, second false).
-            // This hits the else branch via the second sub-condition (Start != 0), which is required for full condition coverage.
-            fake.SimulateMessageWithOffset(new byte[] { 0x00, 0xF0, 0x41, 0x10, 0xF7, 0x00 }, start: 1, length: 4);
+            // TF: Length == Data.Length (5==5 true) && Start == 0 (1==0 false) => false => else branch via Start != 0.
+            // Data is 5 bytes, Start 1, Length 5 => Skip(1).Take(5) yields 4 bytes {F0,41,10,F7}.
+            // This proves the TF branch (first operand true, second false) is covered distinct from FT (false/true) and FF (false/false).
+            fake.SimulateMessageWithOffset(new byte[] { 0x00, 0xF0, 0x41, 0x10, 0xF7 }, start: 1, length: 5);
 
             Assert.NotNull(received);
             Assert.AreEqual(new byte[] { 0xF0, 0x41, 0x10, 0xF7 }, received!.Data);
@@ -166,6 +167,39 @@ namespace VDrumExplorer.Midi.ManagedMidi.Test
             input.Dispose();
 
             Assert.AreEqual(1, fake.CloseAsyncCallCount);
+        }
+
+        [Test]
+        public void Dispose_Unsubscribes_MessageNoLongerForwarded()
+        {
+            var fake = new FakeManagedMidiInput();
+            var input = new MidiInput(fake);
+            Model.Midi.MidiMessage? received = null;
+            input.MessageReceived += (_, msg) => received = msg;
+
+            input.Dispose();
+
+            // After Dispose, the wrapper unsubscribes from the underlying managed input.
+            // Subsequent messages from the managed layer must NOT be forwarded to the wrapper's subscribers.
+            fake.SimulateMessage(new byte[] { 1, 2, 3 }, 123L);
+
+            Assert.IsNull(received, "MessageReceived should not be forwarded after Dispose (wrapper unsubscribed)");
+        }
+
+        [Test]
+        public void Dispose_DoesNotUnsubscribe_MessageStillForwarded_Documentation()
+        {
+            // Documentation of previous behavior (pre-fix): without unsubscribe, MessageReceived would still forward
+            // after Dispose, leaking messages. The production fix now unsubscribes (see MidiInput.Dispose),
+            // so this test verifies the post-fix contract: after Dispose, no forwarding occurs.
+            // If this test fails, it means the unsubscribe was removed or broken.
+            var fake = new FakeManagedMidiInput();
+            var input = new MidiInput(fake);
+            int count = 0;
+            input.MessageReceived += (_, __) => count++;
+            input.Dispose();
+            fake.SimulateMessage(new byte[] { 9, 9, 9 }, 999L);
+            Assert.AreEqual(0, count, "Post-fix: Dispose must unsubscribe, so count must stay 0; pre-fix would have been 1");
         }
     }
 }

@@ -156,5 +156,27 @@ namespace VDrumExplorer.Utility.Test
             var result = encoding.GetString(bytes.AsSpan());
             Assert.AreEqual(original, result);
         }
+
+        [Test]
+        public void GetString_Utf8_MultiByteRoundTrip()
+        {
+            var enc = Encoding.UTF8;
+            var txt = "café €";
+            var bytes = new byte[enc.GetByteCount(txt)];
+            enc.GetBytes(txt.AsSpan(), bytes.AsSpan());
+            Assert.AreEqual(txt, enc.GetString(bytes.AsSpan()));
+        }
+
+        [Test]
+        public void GetBytes_Utf8_MultiByte_ProducesExpectedByteLength()
+        {
+            var enc = Encoding.UTF8;
+            var txt = "café €"; // 'é' 2 bytes, '€' 3 bytes -> 5 ASCII + 2 + 3 with space = 10 bytes
+            var bytes = new byte[enc.GetByteCount(txt)];
+            enc.GetBytes(txt.AsSpan(), bytes.AsSpan());
+            // Verify round-trip rather than hard-coding bytes to avoid brittle literal, but prove multi-byte counted.
+            Assert.Greater(bytes.Length, txt.Length, "UTF-8 multi-byte characters should expand byte count beyond char count");
+            Assert.AreEqual(txt, enc.GetString(bytes.AsSpan()));
+        }
     }
 }

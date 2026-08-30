@@ -9,6 +9,7 @@ using System.Linq;
 using VDrumExplorer.Model.Data.Fields;
 using VDrumExplorer.Model.Schema.Fields;
 using VDrumExplorer.Model.Schema.Physical;
+using VDrumExplorer.Model.Test.Helpers;
 
 namespace VDrumExplorer.Model.Test.Data.Fields;
 
@@ -21,17 +22,12 @@ internal class OverlayDataFieldTest
     [SetUp]
     public void SetUp()
     {
-        module = TestData.LoadTD27();
-        var schema = module.Schema;
-
-        // Find an OverlayField with an EnumField switch (like the MFX parameters).
-        // The TempoDataFieldTest uses KitMfx[1] with Type/Parameters.
-        var container = schema.Kit1Root.Container.ResolveContainer("KitMfx[1]");
-        var typeField = (EnumField)container.ResolveField("Type");
-        var parametersField = (OverlayField)container.ResolveField("Parameters");
-
-        switchField = (EnumDataField)module.Data.GetDataField(typeField);
-        overlayField = (OverlayDataField)module.Data.GetDataField(parametersField);
+        module = ModelTestHelpers.LoadTD27();
+        // Use shared helper to locate the canonical KitMfx[1] overlay fixture — avoids
+        // per-file inline ResolveContainer/ResolveField duplication.
+        var (overlay, sw) = ModelTestHelpers.FindOverlayKitMfx1(module);
+        switchField = (EnumDataField)module.Data.GetDataField(sw);
+        overlayField = (OverlayDataField)module.Data.GetDataField(overlay);
     }
 
     [Test]
@@ -60,13 +56,12 @@ internal class OverlayDataFieldTest
     {
         // Pin to named fields instead of relying on .First() ordering — if the schema
         // is reordered, this test will fail explicitly rather than silently switching fixtures.
-        var container = module.Schema.Kit1Root.Container.ResolveContainer("KitMfx[1]");
-        var typeField = container.ResolveField("Type");
-        var parametersField = container.ResolveField("Parameters");
-        Assert.AreEqual("Type", typeField.Name);
-        Assert.AreEqual("Parameters", parametersField.Name);
-        Assert.AreSame(typeField, switchField.SchemaField);
-        Assert.AreSame(parametersField, overlayField.SchemaField);
+        // Uses the shared helper to locate the same fields and verify identity.
+        var (expectedOverlay, expectedSwitch) = ModelTestHelpers.FindOverlayKitMfx1(module);
+        Assert.AreEqual("Type", expectedSwitch.Name);
+        Assert.AreEqual("Parameters", expectedOverlay.Name);
+        Assert.AreSame(expectedSwitch, switchField.SchemaField);
+        Assert.AreSame(expectedOverlay, overlayField.SchemaField);
     }
 
     [Test]

@@ -113,5 +113,45 @@ namespace VDrumExplorer.Proto.Test
             Assert.AreEqual(firstSegment.Address, result.Address);
             Assert.That(result.CopyData(), Is.EqualTo(firstSegment.CopyData()));
         }
+
+        [Test]
+        public void RoundTrip_MidAddress_LowBitTransition_0x01000080()
+        {
+            // 0x01000080 as a *logical* mid value exercises the 0x80 low-bit carry path:
+            // logical 0x01000080 has bit 7 set, but display encoding is 7-bit per byte, so
+            // ModuleAddress must compensate (operator+ adds 0x80/0x8000/0x800000 when crossing).
+            // Using FromLogicalValue avoids the invalid display 0x01000080 (whose low byte has 0x80 set,
+            // which FromDisplayValue rejects). The round-trip via FieldContainerData must preserve the address.
+            var address = Model.ModuleAddress.FromLogicalValue(0x01000080);
+            var data = new byte[] { 0xDE, 0xAD, 0xBE, 0xEF };
+            var segment = new DataSegment(address, data);
+            var proto = FieldContainerData.FromModel(segment);
+            Assert.AreEqual(address.DisplayValue, proto.Address, "Proto should preserve display encoding of logical 0x01000080");
+            var result = proto.ToModel();
+            Assert.AreEqual(address, result.Address, "Round-trip should preserve non-aligned mid address (logical 0x01000080)");
+            Assert.That(result.CopyData(), Is.EqualTo(data));
+            // Also verify the display value is valid (top bit clear in each byte) and is the expected 7-bit packing.
+            Assert.AreEqual(0, proto.Address & 0x80808080, "Display value must have top bit clear in each byte");
+        }
+
+        [Test]
+        public void FromModel_MidAddresses_RoundTrip()
+        {
+            var midAddresses = new[]
+            {
+                Model.ModuleAddress.FromLogicalValue(0x01000080),
+                Model.ModuleAddress.FromDisplayValue(0x02007F00), // high bit of middle byte transition — valid display
+                Model.ModuleAddress.FromDisplayValue(0x10000000),
+            };
+            var data = new byte[] { 1, 2, 3 };
+            foreach (var addr in midAddresses)
+            {
+                var segment = new DataSegment(addr, data);
+                var proto = FieldContainerData.FromModel(segment);
+                var result = proto.ToModel();
+                Assert.AreEqual(addr, result.Address, $"Mid address {addr.DisplayValue:x8} should round-trip");
+                Assert.That(result.CopyData(), Is.EqualTo(data));
+            }
+        }
     }
 }

@@ -5,6 +5,7 @@
 using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
 using System.Linq;
+using VDrumExplorer.Proto.Test.Helpers;
 
 namespace VDrumExplorer.Proto.Test
 {
@@ -66,17 +67,10 @@ namespace VDrumExplorer.Proto.Test
         {
             var protoModule = Module.FromModel(module);
             var result = protoModule.ToModel(NullLogger.Instance);
-
-            var originalSegments = module.Data.CreateSnapshot().Segments.ToList();
-            var resultSegments = result.Data.CreateSnapshot().Segments.ToList();
-            Assert.AreEqual(originalSegments.Count, resultSegments.Count);
-
-            for (int i = 0; i < originalSegments.Count; i++)
-            {
-                Assert.AreEqual(originalSegments[i].Address, resultSegments[i].Address, $"Address of segment {i}");
-                Assert.AreEqual(originalSegments[i].Size, resultSegments[i].Size, $"Size of segment {i}");
-                Assert.AreEqual(originalSegments[i].CopyData(), resultSegments[i].CopyData(), $"Data in segment {i}");
-            }
+            AssertDataEqual(module.Data, result.Data);
         }
+
+        private static void AssertDataEqual(Model.Data.ModuleData expected, Model.Data.ModuleData actual) =>
+            ProtoTestHelpers.AssertDataEqual(expected, actual);
     }
 }

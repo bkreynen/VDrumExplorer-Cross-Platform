@@ -93,9 +93,9 @@ namespace VDrumExplorer.ViewModel.Test.Data
             var changedProperties = new List<string?>();
             ((INotifyPropertyChanged)vm).PropertyChanged += (s, e) => changedProperties.Add(e.PropertyName);
 
-            // Subscribe to root's PropertyChanged to trigger the OnPropertyChangedHasSubscribers
-            // The FieldContainerDataNodeDetailViewModel subscribes to root.PropertyChanged when
-            // it has subscribers itself. So we need to subscribe to the VM first.
+            // FieldContainerDataNodeDetailViewModel only subscribes to root's PropertyChanged
+            // when it itself has subscribers (via OnPropertyChangedHasSubscribers), so we
+            // add a dummy subscriber to the VM to trigger that subscription.
             ((INotifyPropertyChanged)vm).PropertyChanged += (s, e) => { };
 
             // Enter edit mode to change ReadOnly from true to false

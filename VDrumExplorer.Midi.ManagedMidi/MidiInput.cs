@@ -42,6 +42,10 @@ namespace VDrumExplorer.Midi.ManagedMidi
                 return;
             }
             disposed = true;
+            // Unsubscribe from the underlying managed input to prevent message forwarding after disposal
+            // and to allow GC of this wrapper if the managed input outlives it. This was previously
+            // a leak: MessageReceived would still forward after Dispose because no unsubscribe occurred.
+            managedInput.MessageReceived -= OnMessageReceived;
 
             // Calling CloseAsync is significantly faster than calling Dispose.
             // This is slightly odd, as the implementation for desktop seems to call

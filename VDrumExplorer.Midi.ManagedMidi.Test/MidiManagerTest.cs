@@ -83,10 +83,19 @@ namespace VDrumExplorer.Midi.ManagedMidi.Test
                 return;
             }
 
-            foreach (var device in devices)
+            var list = devices.ToList();
+            if (list.Count == 0)
+            {
+                Assert.Inconclusive("No MIDI input ports exposed on this system — loop would vacuously pass; cannot verify projection");
+                return;
+            }
+            foreach (var device in list)
             {
                 Assert.IsNotNull(device.SystemDeviceId, "SystemDeviceId should not be null");
                 Assert.IsNotNull(device.Name, "Name should not be null");
+                // SystemDeviceId and Name are projected from IMidiPortDetails via MidiManager.Select; Manufacturer also available but not asserted here.
+                Assert.IsNotEmpty(device.SystemDeviceId, "SystemDeviceId should be non-empty");
+                Assert.IsNotEmpty(device.Name, "Name should be non-empty");
             }
         }
 
@@ -104,10 +113,18 @@ namespace VDrumExplorer.Midi.ManagedMidi.Test
                 return;
             }
 
-            foreach (var device in devices)
+            var list = devices.ToList();
+            if (list.Count == 0)
+            {
+                Assert.Inconclusive("No MIDI output ports exposed on this system — loop would vacuously pass; cannot verify projection");
+                return;
+            }
+            foreach (var device in list)
             {
                 Assert.IsNotNull(device.SystemDeviceId, "SystemDeviceId should not be null");
                 Assert.IsNotNull(device.Name, "Name should not be null");
+                Assert.IsNotEmpty(device.SystemDeviceId, "SystemDeviceId should be non-empty");
+                Assert.IsNotEmpty(device.Name, "Name should be non-empty");
             }
         }
 
@@ -125,8 +142,9 @@ namespace VDrumExplorer.Midi.ManagedMidi.Test
                 return;
             }
 
-            var first = devices.Count();
-            var second = devices.Count();
+            // Snapshot via ToList().Count to avoid double Count() re-querying OS (hot-plug race); each ToList enumerates once and freezes count.
+            var first = devices.ToList().Count;
+            var second = devices.ToList().Count;
             Assert.AreEqual(first, second, "Enumerating the same device list twice should yield the same count");
         }
 
@@ -144,9 +162,22 @@ namespace VDrumExplorer.Midi.ManagedMidi.Test
                 return;
             }
 
-            var first = devices.Count();
-            var second = devices.Count();
+            var first = devices.ToList().Count;
+            var second = devices.ToList().Count;
             Assert.AreEqual(first, second, "Enumerating the same device list twice should yield the same count");
+        }
+
+        // Hardware integration note: OpenInputAsync / OpenOutputAsync are intentionally not unit-tested here.
+        // They call MidiAccessManager.Default.OpenInputAsync / OpenOutputAsync which require OS MIDI hardware
+        // (ALSA/WinMM/CoreMIDI). Add [ExcludeFromCodeCoverage] to those production methods if strict gating
+        // is desired, rather than mocking the static singleton. See class <remarks> above for rationale.
+        [Test]
+        public void OpenInputAsync_HardwareIntegration_IsExcludedFromCoverage()
+        {
+            // This test documents the coverage gap; it does not attempt to open hardware.
+            // If MidiManager.OpenInputAsync / OpenOutputAsync were to gain an IMidiAccessManager seam,
+            // a fake could exercise the retry-loop (Win32Exception 3× Delay 250) without hardware.
+            Assert.Inconclusive("OpenInputAsync/OpenOutputAsync require real MIDI hardware — intentionally excluded from unit coverage; see remarks");
         }
     }
 }

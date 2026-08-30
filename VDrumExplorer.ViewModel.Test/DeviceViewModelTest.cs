@@ -11,17 +11,13 @@ namespace VDrumExplorer.ViewModel.Test
     public class DeviceViewModelTest
     {
         [Fact]
-        public void DeviceConnected_NoDevice_ReturnsFalse()
+        public void InitialState_WithoutDevice_HasExpectedDefaults()
         {
+            // Collapsed duplicate initial-state checks (DeviceConnected, ConnectedDeviceName, ConnectedDevice).
             var vm = new DeviceViewModel();
             Assert.False(vm.DeviceConnected);
-        }
-
-        [Fact]
-        public void ConnectedDeviceName_NoDevice_ReturnsNone()
-        {
-            var vm = new DeviceViewModel();
             Assert.Equal("(None)", vm.ConnectedDeviceName);
+            Assert.Null(vm.ConnectedDevice);
         }
 
         [Fact]
@@ -32,28 +28,6 @@ namespace VDrumExplorer.ViewModel.Test
             ((INotifyPropertyChanged)vm).PropertyChanged += (s, e) => changedProperties.Add(e.PropertyName);
             vm.ConnectedDevice = null; // Already null, no change
             Assert.Empty(changedProperties);
-        }
-
-        [Fact]
-        public void ConnectedDevice_InitialState_IsDisconnectedAndNameNone()
-        {
-            var vm = new DeviceViewModel();
-            Assert.False(vm.DeviceConnected);
-            Assert.Equal("(None)", vm.ConnectedDeviceName);
-        }
-
-        [Fact]
-        public void DeviceConnected_InitiallyFalse()
-        {
-            var vm = new DeviceViewModel();
-            Assert.False(vm.DeviceConnected);
-        }
-
-        [Fact]
-        public void ConnectedDevice_InitiallyNull()
-        {
-            var vm = new DeviceViewModel();
-            Assert.Null(vm.ConnectedDevice);
         }
     }
 }

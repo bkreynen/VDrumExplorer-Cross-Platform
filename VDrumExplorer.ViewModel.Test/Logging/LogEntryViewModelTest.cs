@@ -76,16 +76,10 @@ namespace VDrumExplorer.ViewModel.Test.Logging
         [Fact]
         public void Timestamp_FormattedCorrectly()
         {
-            // Use a fixed UTC instant; the formatting uses the system timezone, so we just
-            // verify the format pattern (HH:mm:ss.fff) is present.
             var entry = new LogEntry(Instant.FromUtc(2023, 1, 15, 10, 30, 45) + Duration.FromMilliseconds(123), "msg", LogLevel.Information, null);
             var vm = new LogEntryViewModel(entry);
-            // The timestamp should match the pattern HH:mm:ss.fff in the local timezone.
-            // We verify it has the right length (12 chars: HH:mm:ss.fff).
-            Assert.Equal(12, vm.Timestamp.Length);
-            Assert.Equal(':', vm.Timestamp[2]);
-            Assert.Equal(':', vm.Timestamp[5]);
-            Assert.Equal('.', vm.Timestamp[8]);
+            // Use regex instead of fixed length/colons to avoid culture/timezone brittleness.
+            Assert.Matches(@"^\d{2}:\d{2}:\d{2}\.\d{3}$", vm.Timestamp);
         }
     }
 }

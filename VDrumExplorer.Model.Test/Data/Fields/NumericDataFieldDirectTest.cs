@@ -9,6 +9,7 @@ using System.Linq;
 using VDrumExplorer.Model.Data.Fields;
 using VDrumExplorer.Model.Schema.Fields;
 using VDrumExplorer.Model.Schema.Physical;
+using VDrumExplorer.Model.Test.Helpers;
 
 namespace VDrumExplorer.Model.Test.Data.Fields;
 
@@ -23,13 +24,8 @@ internal class NumericDataFieldDirectTest
     [SetUp]
     public void SetUp()
     {
-        var module = TestData.LoadTD27();
-        var schemaField = module.Schema.PhysicalRoot.DescendantsAndSelf()
-            .OfType<FieldContainer>()
-            .SelectMany(fc => fc.Fields)
-            .OfType<NumericField>()
-            .First();
-        field = (NumericDataField)module.Data.GetDataField(schemaField);
+        var module = ModelTestHelpers.LoadTD27();
+        field = ModelTestHelpers.FindNumericDataField(module);
     }
 
     [Test]

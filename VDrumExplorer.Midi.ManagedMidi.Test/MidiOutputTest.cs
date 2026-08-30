@@ -24,8 +24,11 @@ namespace VDrumExplorer.Midi.ManagedMidi.Test
             Assert.AreEqual(1, fake.SentMessages.Count);
             var sent = fake.SentMessages[0];
             Assert.AreEqual(data, sent.Data);
+            // FakeManagedMidiOutput.Send defensively copies the buffer — mutating the original must not affect the stored copy.
+            data[0] = 0xFF;
+            Assert.AreEqual(0x90, sent.Data[0], "Fake should have copied buffer; mutation of original must not leak into SentMessage.Data");
             Assert.AreEqual(0, sent.Offset);
-            Assert.AreEqual(data.Length, sent.Length);
+            Assert.AreEqual(3, sent.Length);
             Assert.AreEqual(12345L, sent.Timestamp);
         }
 

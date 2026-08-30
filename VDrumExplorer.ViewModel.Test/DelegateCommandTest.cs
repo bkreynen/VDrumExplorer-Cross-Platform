@@ -37,21 +37,12 @@ namespace VDrumExplorer.ViewModel.Test
         }
 
         [Fact]
-        public void CommandBase_NotImplemented_ThrowsWhenExecuted()
+        public void CommandBase_NotImplemented_BehavesAsDisabledAndThrows()
         {
-            Assert.Throws<NotImplementedException>(() => CommandBase.NotImplemented.Execute(null!));
-        }
-
-        [Fact]
-        public void CommandBase_NotImplemented_IsNotEnabled()
-        {
+            // Collapsed duplicate checks: all three properties of NotImplemented are verified together.
             Assert.False(CommandBase.NotImplemented.Enabled);
-        }
-
-        [Fact]
-        public void CommandBase_NotImplemented_CanExecuteReturnsEnabled()
-        {
             Assert.False(CommandBase.NotImplemented.CanExecute(null!));
+            Assert.Throws<NotImplementedException>(() => CommandBase.NotImplemented.Execute(null!));
         }
 
         [Fact]

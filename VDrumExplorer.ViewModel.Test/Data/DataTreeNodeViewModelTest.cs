@@ -28,21 +28,15 @@ namespace VDrumExplorer.ViewModel.Test.Data
 
         private DataTreeNodeViewModel ChildOfKitRoot => KitRootNode.Children[0];
 
-        private static DataTreeNodeViewModel FindKitRoot(DataTreeNodeViewModel node)
+        private static DataTreeNodeViewModel FindKitRoot(DataTreeNodeViewModel node) =>
+            DescendantsAndSelf(node).First(n => n.IsKitRoot);
+
+        private static System.Collections.Generic.IEnumerable<DataTreeNodeViewModel> DescendantsAndSelf(DataTreeNodeViewModel node)
         {
-            if (node.IsKitRoot)
-            {
-                return node;
-            }
+            yield return node;
             foreach (var child in node.Children)
-            {
-                var result = FindKitRoot(child);
-                if (result != null)
-                {
-                    return result;
-                }
-            }
-            return null!;
+                foreach (var d in DescendantsAndSelf(child))
+                    yield return d;
         }
 
         [Fact]

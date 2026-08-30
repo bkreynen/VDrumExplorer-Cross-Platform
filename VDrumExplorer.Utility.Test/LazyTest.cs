@@ -92,5 +92,28 @@ namespace VDrumExplorer.Utility.Test
             Assert.AreEqual(1, factoryCallCount);
             Assert.AreSame(first, second);
         }
+
+        [Test]
+        public void Create_FactoryThrows_CachesException()
+        {
+            int callCount = 0;
+            var lazy = Lazy.Create<int>(() => { callCount++; throw new InvalidOperationException("boom"); });
+            Assert.Throws<InvalidOperationException>(() => { var _ = lazy.Value; });
+            Assert.Throws<InvalidOperationException>(() => { var _ = lazy.Value; });
+            // System.Lazy<T> with ExecutionAndPublication caches the exception and does not re-invoke the factory.
+            Assert.AreEqual(1, callCount, "Factory should be invoked only once; exception is cached");
+        }
+
+        [Test]
+        public void Create_NullFactory_ThrowsArgumentNullException()
+        {
+            Assert.Throws<ArgumentNullException>(() => Lazy.Create<int>(null!));
+        }
+
+        [Test]
+        public void Initialize_NullFactory_ThrowsArgumentNullException()
+        {
+            Assert.Throws<ArgumentNullException>(() => Lazy.Initialize(out Lazy<int> field, null!));
+        }
     }
 }

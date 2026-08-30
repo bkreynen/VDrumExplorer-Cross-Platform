@@ -8,10 +8,12 @@ using VDrumExplorer.ViewModel;
 using VDrumExplorer.ViewModel.Data;
 using VDrumExplorer.ViewModel.Dialogs;
 using VDrumExplorer.Proto;
+using VDrumExplorer.ViewModel.Test.Helpers;
 using Xunit;
 
 namespace VDrumExplorer.ViewModel.Test.Data
 {
+    [Collection("Clipboard")]
     public class ModuleExplorerViewModelExtendedTest
     {
         private readonly Module module = TestData.LoadTD27Module();
@@ -51,15 +53,6 @@ namespace VDrumExplorer.ViewModel.Test.Data
             return null!;
         }
 
-        private static async Task WaitUntilAsync(Func<bool> condition, int timeoutMs = 1000)
-        {
-            for (int i = 0; i < timeoutMs / 20; i++)
-            {
-                if (condition()) return;
-                await Task.Delay(20);
-            }
-        }
-
         [Fact]
         public async Task CopyKit_WithCancelledDialog_DoesNotEnableUndo()
         {
@@ -80,7 +73,7 @@ namespace VDrumExplorer.ViewModel.Test.Data
             var kitNode = FindKitRoot(vm.Root[0]);
             // Ensure kit 1 and 2 distinct? Just run
             vm.CopyKitCommand.Execute(kitNode);
-            await WaitUntilAsync(() => vm.CanUndo);
+            await ViewModelTestHelpers.WaitUntilAsync(() => vm.CanUndo);
             Assert.True(vm.CanUndo);
         }
 

@@ -13,6 +13,7 @@ using Xunit;
 
 namespace VDrumExplorer.ViewModel.Test.Data
 {
+    [Collection("Clipboard")]
     public class DataExplorerViewModelTest
     {
         // DataExplorerViewModel is abstract; we test via KitExplorerViewModel and ModuleExplorerViewModel.

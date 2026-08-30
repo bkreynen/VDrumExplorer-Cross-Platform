@@ -16,7 +16,8 @@ namespace VDrumExplorer.ViewModel.Test.Data
 
         private EditableNumericDataFieldViewModel CreateViewModel()
         {
-            var field = FieldFinder.FirstOf<NumericDataField>(module.Data.LogicalRoot);
+            // Pin to named field to avoid fixture order sensitivity (was .First()).
+            var field = FieldFinder.FindNumericField(module.Data.LogicalRoot, "Kit volume");
             return new EditableNumericDataFieldViewModel(field);
         }
 
@@ -35,18 +36,13 @@ namespace VDrumExplorer.ViewModel.Test.Data
         }
 
         [Fact]
-        public void LargeChange_IsAtLeastOne()
-        {
-            var vm = CreateViewModel();
-            Assert.True(vm.LargeChange >= 1);
-        }
-
-        [Fact]
         public void LargeChange_IsMaxOfRangeDivTenOrOne()
         {
+            // Subsumes IsAtLeastOne: Math.Max(...,1) guarantees >=1.
             var vm = CreateViewModel();
             var expected = System.Math.Max((vm.MaxValue - vm.MinValue) / 10, 1);
             Assert.Equal(expected, vm.LargeChange);
+            Assert.True(vm.LargeChange >= 1);
         }
 
         [Fact]

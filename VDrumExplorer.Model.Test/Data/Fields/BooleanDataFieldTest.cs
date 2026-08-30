@@ -8,6 +8,7 @@ using System.Linq;
 using VDrumExplorer.Model.Data.Fields;
 using VDrumExplorer.Model.Schema.Fields;
 using VDrumExplorer.Model.Schema.Physical;
+using VDrumExplorer.Model.Test.Helpers;
 
 namespace VDrumExplorer.Model.Test.Data.Fields;
 
@@ -18,13 +19,9 @@ internal class BooleanDataFieldTest
     [SetUp]
     public void SetUp()
     {
-        var module = TestData.LoadTD27();
-        var schemaField = module.Schema.PhysicalRoot.DescendantsAndSelf()
-            .OfType<FieldContainer>()
-            .SelectMany(fc => fc.Fields)
-            .OfType<BooleanField>()
-            .First();
-        field = (BooleanDataField)module.Data.GetDataField(schemaField);
+        var module = ModelTestHelpers.LoadTD27();
+        // Use shared helper to avoid per-file DescendantsAndSelf().OfType<>().First() duplication.
+        field = ModelTestHelpers.FindBooleanDataField(module);
     }
 
     [Test]

@@ -72,7 +72,7 @@ namespace VDrumExplorer.ViewModel.Test.Audio
             var vm = new InstrumentAudioExplorerViewModel(new FakeAudioDeviceManager(), audio, null);
             Assert.Contains(schema.Identifier.Name, vm.Title);
             Assert.Contains("Instrument Audio Explorer", vm.Title);
-            Assert.DoesNotContain(" - ", vm.Title.Split(')').Last()); // No file suffix when null
+            Assert.DoesNotContain(" - ", vm.Title); // No file suffix when null; Title format is "Instrument Audio Explorer (TD-27 rev 0x...)"
         }
 
         [Fact]

@@ -15,6 +15,7 @@ using static VDrumExplorer.Proto.ModelExtensions;
 
 namespace VDrumExplorer.ViewModel.Test.Data
 {
+    [Collection("Clipboard")]
     public class KitExplorerViewModelTest
     {
         private readonly Module module = TestData.LoadTD27Module();

@@ -20,7 +20,7 @@ namespace VDrumExplorer.ViewModel.Dialogs
 {
     public class InstrumentAudioRecorderViewModel : ViewModelBase
     {
-        private CancellationTokenSource? cancellationTokenSource;
+        internal CancellationTokenSource? cancellationTokenSource;
         private readonly ModuleSchema schema;
         private readonly DeviceController device;
         private ILogger logger;
@@ -47,6 +47,8 @@ namespace VDrumExplorer.ViewModel.Dialogs
         public bool SettingsEnabled => !CancelCommand.Enabled;
         public bool ProgressEnabled => CancelCommand.Enabled;
 
+        internal bool IsRecording => cancellationTokenSource != null;
+
         private ModuleAudio? recordedAudio;
         public ModuleAudio? RecordedAudio
         {
@@ -54,7 +56,7 @@ namespace VDrumExplorer.ViewModel.Dialogs
             private set => SetProperty(ref recordedAudio, value);
         }
 
-        private void UpdateButtonStatus()
+        internal void UpdateButtonStatus()
         {
             CancelCommand.Enabled = cancellationTokenSource is object;
             StartRecordingCommand.Enabled = cancellationTokenSource is null && Settings.OutputFile is object && Settings.SelectedInputDevice is object;

@@ -83,6 +83,9 @@ namespace VDrumExplorer.ViewModel
     {
         protected TModel Model { get; }
 
+        // Internal accessor for tests (InternalsVisibleTo) to avoid reflection brittleness.
+        internal TModel ModelForTest => Model;
+
         private protected ViewModelBase(TModel model) =>
             Model = model;
 

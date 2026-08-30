@@ -6,6 +6,7 @@ using NUnit.Framework;
 using System.Threading;
 using System.Threading.Tasks;
 using VDrumExplorer.Model.Midi;
+using VDrumExplorer.Model.Test.Helpers;
 
 namespace VDrumExplorer.Model.Test.Midi
 {
@@ -276,23 +277,12 @@ namespace VDrumExplorer.Model.Test.Midi
             return (client, input, output);
         }
 
-        // Computes the Roland checksum for a SysEx message.
-        // The checksum covers bytes from index (4 + modelIdLength) to length - 3 (inclusive),
-        // and is stored at length - 2 as (0x80 - (sum & 0x7f)) & 0x7f.
-        // modelIdLength is derived from the identifier under test (id.ModelIdLength), not by
-        // scanning for 0x12/0x11 in the payload — scanning is fragile if data contains those bytes.
-        private static byte ComputeExpectedChecksum(byte[] message, int modelIdLength)
-        {
-            int dataStart = 4 + modelIdLength;
-            byte sum = 0;
-            for (int i = dataStart; i < message.Length - 2; i++)
-            {
-                sum += message[i];
-            }
-            return (byte)((0x80 - (sum & 0x7f)) & 0x7f);
-        }
+        // Delegates to the shared MIDI helper — preserves the modelIdLength fix that avoids
+        // scanning for 0x12 in the payload.
+        private static byte ComputeExpectedChecksum(byte[] message, int modelIdLength) =>
+            MidiTestHelpers.ComputeExpectedChecksum(message, modelIdLength);
 
         // Backwards-compatible overload for any legacy callers (should not be used in new code).
-        private static byte ComputeExpectedChecksum(byte[] message) => ComputeExpectedChecksum(message, 4);
+        private static byte ComputeExpectedChecksum(byte[] message) => MidiTestHelpers.ComputeExpectedChecksum(message, 4);
     }
 }

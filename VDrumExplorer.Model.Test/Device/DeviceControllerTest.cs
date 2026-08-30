@@ -10,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using VDrumExplorer.Model.Device;
 using VDrumExplorer.Model.Midi;
+using VDrumExplorer.Model.Test.Helpers;
 using VDrumExplorer.Model.Test.Midi;
 
 namespace VDrumExplorer.Model.Test.Device
@@ -143,55 +144,9 @@ namespace VDrumExplorer.Model.Test.Device
             return (controller, input, output);
         }
 
-        // Builds a Roland DataSet (DT1) response message for a given module identifier.
-        // Format: F0 41 10 [modelId bytes] 12 [address 4 bytes] [data bytes] [checksum] F7
-        // Simplified to mirror RolandMidiClient.CreateMessage without the dead-write that previously
-        // wrote 0x00 at index 3 and immediately overwrote it for 4-byte IDs.
-        private static byte[] BuildDataSetResponse(ModuleIdentifier id, int address, byte[] data)
-        {
-            int modelIdLength = id.ModelIdLength;
-            int totalLength = 3 + modelIdLength + 1 + 4 + data.Length + 1 + 1;
-            var message = new byte[totalLength];
-            message[0] = 0xF0; // SysEx
-            message[1] = 0x41; // Roland
-            message[2] = 0x10; // Device ID
-            // Model ID — written big-endian at offset (modelIdLength - 1) exactly as
-            // RolandMidiClient.WriteBigEndianInt32 does. For 5-byte IDs (TD-50X) the extra
-            // leading byte at index 3 stays 0x00 because the array is zero-initialized.
-            WriteBigEndianInt32(message, modelIdLength - 1, id.ModelId);
-            int index = modelIdLength + 3;
-            message[index++] = 0x12; // DT1 (Data Set)
-            // Address: big-endian 4 bytes
-            message[index++] = (byte)(address >> 24);
-            message[index++] = (byte)(address >> 16);
-            message[index++] = (byte)(address >> 8);
-            message[index++] = (byte)(address >> 0);
-            // Data
-            foreach (var b in data)
-            {
-                message[index++] = b;
-            }
-            // Checksum: sum of bytes from (4 + modelIdLength) to (length - 3)
-            int dataStart = 4 + modelIdLength;
-            byte sum = 0;
-            for (int i = dataStart; i < message.Length - 2; i++)
-            {
-                sum += message[i];
-            }
-            message[message.Length - 2] = (byte)((0x80 - (sum & 0x7f)) & 0x7f);
-            message[message.Length - 1] = 0xF7; // EOX
-            return message;
-        }
-
-        private static void WriteBigEndianInt32(byte[] data, int offset, int value)
-        {
-            unchecked
-            {
-                data[offset++] = (byte)(value >> 24);
-                data[offset++] = (byte)(value >> 16);
-                data[offset++] = (byte)(value >> 8);
-                data[offset++] = (byte)(value >> 0);
-            }
-        }
+        // Thin wrapper over the shared helper — preserves the dead-write fix (writing
+        // model id at offset modelIdLength-1 so index 3 stays 0x00 for 5-byte ids).
+        private static byte[] BuildDataSetResponse(ModuleIdentifier id, int address, byte[] data) =>
+            MidiTestHelpers.BuildDataSetResponse(id, address, data);
     }
 }

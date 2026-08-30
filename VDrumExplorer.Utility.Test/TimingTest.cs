@@ -86,9 +86,8 @@ namespace VDrumExplorer.Utility.Test
             var entry = logger.Entries[0];
             Assert.AreEqual(LogLevel.Debug, entry.Level);
             Assert.That(entry.Message, Does.Contain("test"));
-            // Timing.cs logs as $"{description} in {elapsed}ms" — verify elapsed-time part.
-            Assert.That(entry.Message, Does.Contain("ms"));
-            Assert.That(entry.Message, Does.Contain("in"));
+            // Timing.cs logs as $"{description} in {elapsed}ms" — strict format check, not just lenient Contain("ms").
+            Assert.That(entry.Message, Does.Match(@"test in \d+ms"), "Message should be '<description> in <elapsed>ms' with numeric elapsed");
         }
 
         [Test]
@@ -103,8 +102,7 @@ namespace VDrumExplorer.Utility.Test
             var entry = logger.Entries[0];
             Assert.AreEqual(LogLevel.Debug, entry.Level);
             Assert.That(entry.Message, Does.Contain("test"));
-            Assert.That(entry.Message, Does.Contain("ms"));
-            Assert.That(entry.Message, Does.Contain("in"));
+            Assert.That(entry.Message, Does.Match(@"test in \d+ms"), "Message should be '<description> in <elapsed>ms' with numeric elapsed");
         }
 
         [Test]

@@ -7,6 +7,7 @@ using NUnit.Framework;
 using System;
 using System.Linq;
 using VDrumExplorer.Model.Data;
+using VDrumExplorer.Model.Test.Helpers;
 
 namespace VDrumExplorer.Model.Test
 {
@@ -142,20 +143,7 @@ namespace VDrumExplorer.Model.Test
             Assert.AreSame(module.Schema.Kit1Root, kit.KitRoot);
         }
 
-        private static void AssertSnapshotsEqual(ModuleData expectedData, ModuleData actualData)
-        {
-            var originalSegments = expectedData.CreateSnapshot().Segments.ToList();
-            var newSegments = actualData.CreateSnapshot().Segments.ToList();
-            Assert.AreEqual(originalSegments.Count, newSegments.Count);
-
-            for (int i = 0; i < originalSegments.Count; i++)
-            {
-                var originalSegment = originalSegments[i];
-                var newSegment = newSegments[i];
-                Assert.AreEqual(originalSegment.Address, newSegment.Address, $"Address of segment {i}");
-                Assert.AreEqual(originalSegment.Size, newSegment.Size, $"Size of segment {i}");
-                Assert.AreEqual(originalSegment.CopyData(), newSegment.CopyData(), $"Data in segment starting at {originalSegment.Address}");
-            }
-        }
+        private static void AssertSnapshotsEqual(ModuleData expectedData, ModuleData actualData) =>
+            ProtoTestHelpers.AssertSnapshotsEqual(expectedData, actualData);
     }
 }
