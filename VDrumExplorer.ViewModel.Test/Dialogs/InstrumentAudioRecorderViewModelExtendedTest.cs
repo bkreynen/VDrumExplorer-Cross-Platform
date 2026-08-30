@@ -99,10 +99,10 @@ namespace VDrumExplorer.ViewModel.Test.Dialogs
                 var result = await vm.StartRecording(cts.Token);
                 Assert.Null(result);
             }
-            catch (OperationCanceledException)
+            catch (OperationCanceledException ex)
             {
-                // Expected when token already cancelled
-                Assert.True(true);
+                // Expected when token already cancelled — verify exception type (TaskCanceledException is subtype)
+                Assert.IsAssignableFrom<OperationCanceledException>(ex);
             }
         }
 

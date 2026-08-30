@@ -267,9 +267,10 @@ namespace VDrumExplorer.ViewModel.Test.Data
             // Execute play note; it should attempt kit switch + play
             vm.PlayNoteCommand.Execute(null!);
             await Task.Delay(300);
-            // At least one midi message should have been sent (program change + note on/off) OR it may have been swallowed due to exception handling
-            // We just verify no throw and output may have messages
-            Assert.True(true);
+            Assert.True(output.Sent.Count > 0, "PlayNote should send ProgramChange + NoteOn/Off");
+            Assert.Contains(output.Sent, m => (m.Data[0] & 0xF0) == 0xC0);
+            Assert.Contains(output.Sent, m => (m.Data[0] & 0xF0) == 0x90);
+            Assert.Contains(output.Sent, m => (m.Data[0] & 0xF0) == 0x80);
         }
 
         [Fact]

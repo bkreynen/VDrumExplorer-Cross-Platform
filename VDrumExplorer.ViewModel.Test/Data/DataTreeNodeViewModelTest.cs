@@ -160,12 +160,10 @@ namespace VDrumExplorer.ViewModel.Test.Data
         [Fact]
         public void GetMidiNote_NodeWithoutMidiNotePath_ReturnsNull()
         {
-            // The module root node typically has no MIDI note path
+            // The module root node has no MIDI note path — enforce premise so test fails if schema changes
             var node = NonKitRootNode;
-            if (node.MidiNotePath is null)
-            {
-                Assert.Null(node.GetMidiNote());
-            }
+            Assert.Null(node.MidiNotePath);
+            Assert.Null(node.GetMidiNote());
         }
 
         [Fact]
@@ -186,10 +184,8 @@ namespace VDrumExplorer.ViewModel.Test.Data
         public void MidiNotePath_NodeWithoutMidiNotePath_ReturnsNull()
         {
             var node = NonKitRootNode;
-            if (node.Model.SchemaNode.MidiNotePath is null)
-            {
-                Assert.Null(node.MidiNotePath);
-            }
+            Assert.Null(node.Model.SchemaNode.MidiNotePath);
+            Assert.Null(node.MidiNotePath);
         }
 
         [Fact]
