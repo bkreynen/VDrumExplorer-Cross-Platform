@@ -154,15 +154,17 @@ namespace VDrumExplorer.Model.Test
         [Test]
         public void OperatorPlus_CarryCompensation_SecondByte()
         {
-            // Address 0x7f00 (display) + offset 0x100 (display) should trigger carry in the second byte.
+            // Address 0x7f00 (display) + offset 0x0100 (display) should trigger carry in the second byte.
+            // 0x7f00 + 0x0100 = 0x8000 before compensation, which has the 0x80 bit set in the second byte,
+            // so the operator adds 0x8000, yielding display 0x10000.
             var address = ModuleAddress.FromDisplayValue(0x7f00);
             var offset = ModuleOffset.FromDisplayValue(0x0100);
             var result = address + offset;
-            // Logical of 0x7f00 is 0x7f << 7 = 0x3f80; logical of 0x0100 is 1 << 7 = 0x80.
-            // Sum of logicals = 0x4000, but with carry compensation the display becomes 0x8000 -> +0x8000 = 0x10000
-            // which has logical value 0x8000 (bit 15 set, which is the 3rd 7-bit chunk).
-            // Let's just verify it doesn't throw and produces a valid address.
-            Assert.IsTrue(result.LogicalValue > 0);
+            Assert.AreEqual(0x10000, result.DisplayValue);
+            Assert.AreEqual(0x4000, result.LogicalValue);
+            // Cross-check via FromDisplayValue
+            Assert.AreEqual(ModuleAddress.FromDisplayValue(0x10000).LogicalValue, result.LogicalValue);
+            Assert.AreEqual(ModuleAddress.FromDisplayValue(0x10000).DisplayValue, result.DisplayValue);
         }
 
         [Test]

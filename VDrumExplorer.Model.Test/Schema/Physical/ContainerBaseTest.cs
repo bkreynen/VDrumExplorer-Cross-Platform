@@ -236,17 +236,31 @@ internal class ContainerBaseTest
     [Test]
     public void DescendantsAndSelf_ReturnsAllNodes()
     {
-        // Every descendant should have the root as an ancestor (transitively).
         var descendants = root.DescendantsAndSelf().ToList();
+
+        // Count via independent recursive traversal — should equal BFS count.
+        // This makes the test non-tautological: previously the ancestor walk was structurally guaranteed.
+        int expectedCount = CountRecursive(root);
+        Assert.AreEqual(expectedCount, descendants.Count,
+            $"DescendantsAndSelf should return {expectedCount} containers for TD-27");
+
+        // No duplicates / no cycles
+        Assert.AreEqual(descendants.Count, descendants.Distinct().Count(),
+            "DescendantsAndSelf should not contain duplicates (cycle check)");
+
+        // Structural invariant: every node ultimately reaches root via Parent.
         foreach (var node in descendants)
         {
             var current = node;
             while (current.Parent != null)
             {
-                current = current.Parent;
+                current = current.Parent!;
             }
             Assert.AreSame(root, current);
         }
+
+        static int CountRecursive(IContainer container) =>
+            1 + (container is ContainerContainer cc ? cc.Containers.Sum(CountRecursive) : 0);
     }
 
     // --- ToString ---

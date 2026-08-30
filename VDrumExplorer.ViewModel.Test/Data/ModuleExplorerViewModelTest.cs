@@ -146,6 +146,10 @@ namespace VDrumExplorer.ViewModel.Test.Data
             Assert.NotNull(viewModel.MultiPasteCommand);
         }
 
+        // Theatre smoke tests — validate wiring, not behavior. Kept as single architectural smoke but
+        // retained individually for backwards compatibility; they inflate coverage without proving logic.
+        // See ConvertCommand_HasConvertibleReflectsIdentifiers for meaningful command behavior test.
+
         [Fact]
         public void SaveFileCommand_NotNull()
         {
@@ -173,6 +177,7 @@ namespace VDrumExplorer.ViewModel.Test.Data
         [Fact]
         public void ConvertCommand_NotNull()
         {
+            // Single smoke for ConvertCommand wiring; meaningful test is ConvertCommand_HasConvertibleReflectsIdentifiers below.
             Assert.NotNull(viewModel.ConvertCommand);
         }
 
@@ -204,6 +209,32 @@ namespace VDrumExplorer.ViewModel.Test.Data
         public void CopyMultipleKitsCommand_NotNull()
         {
             Assert.NotNull(viewModel.CopyMultipleKitsCommand);
+        }
+
+        [Fact]
+        public void ConvertCommand_HasConvertibleReflectsIdentifiers()
+        {
+            // Meaningful behavior test: HasConvertibleModuleIdentifiers must agree with ConvertibleModuleIdentifiers.Any()
+            Assert.Equal(viewModel.ConvertibleModuleIdentifiers.Any(), viewModel.HasConvertibleModuleIdentifiers);
+            // For TD-27 (current fixture) there is at least one alternative revision (0x02), so convertible is non-empty.
+            // Validate that conversion candidates share module name but differ in revision — proves schema lookup logic, not just wiring.
+            if (module.Schema.Identifier.Name == "TD-27")
+            {
+                Assert.NotEmpty(viewModel.ConvertibleModuleIdentifiers);
+                Assert.All(viewModel.ConvertibleModuleIdentifiers, id =>
+                {
+                    Assert.Equal(module.Schema.Identifier.Name, id.Identifier.Name);
+                    Assert.NotEqual(module.Schema.Identifier.SoftwareRevision, id.Identifier.SoftwareRevision);
+                });
+            }
+            // ConvertCommand is always enabled in current impl (DelegateCommand true); prove it can execute when convertible exists.
+            Assert.True(viewModel.ConvertCommand.CanExecute(null!));
+        }
+
+        [Fact]
+        public void ConvertibleModuleIdentifiers_ExcludesCurrentIdentifier()
+        {
+            Assert.DoesNotContain(viewModel.ConvertibleModuleIdentifiers, id => id.Identifier.Equals(module.Schema.Identifier));
         }
 
         [Fact]

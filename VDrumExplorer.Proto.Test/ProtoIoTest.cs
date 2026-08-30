@@ -87,6 +87,27 @@ namespace VDrumExplorer.Proto.Test
         }
 
         [Test]
+        public void ReadModel_NoFileCase_ThrowsInvalidDataException()
+        {
+            // DrumFile with no oneof set has FileCase == None; craft magic + empty protobuf.
+            var magic = Encoding.UTF8.GetBytes("JLSVDRUM1");
+            using var stream = new MemoryStream(magic);
+            // No additional bytes — DrumFile.Parser.ParseFrom will return default instance with FileCase None.
+            var ex = Assert.Throws<InvalidDataException>(() => ProtoIo.ReadModel(stream, NullLogger.Instance));
+            Assert.That(ex!.Message, Does.Contain("Unknown file case"));
+            Assert.That(ex.Message, Does.Contain("None"));
+        }
+
+        [Test]
+        public void ReadDrumFile_InvalidMagicAtLastByte_ThrowsInvalidDataException_ReportsIndex8()
+        {
+            var bad = Encoding.UTF8.GetBytes("JLSVDRUM0");
+            using var stream = new MemoryStream(bad);
+            var ex = Assert.Throws<InvalidDataException>(() => ProtoIo.ReadModel(stream, Logger));
+            Assert.That(ex!.Message, Does.Contain("Index=8"));
+        }
+
+        [Test]
         public void ReadDrumFile_EmptyStream_ThrowsEndOfStreamException()
         {
             using var stream = new MemoryStream();

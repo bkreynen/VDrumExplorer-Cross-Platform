@@ -130,5 +130,17 @@ namespace VDrumExplorer.Utility.Test
             Assert.That(keys, Is.EquivalentTo(new[] { "a", "b" }));
             Assert.That(values, Is.EquivalentTo(new[] { 1, 2 }));
         }
+
+        [Test]
+        public void AsReadOnly_GenericAdd_Throws()
+        {
+            var readOnly = new Dictionary<string, int> { ["a"] = 1 }.AsReadOnly();
+            Assert.Throws<NotSupportedException>(() => ((IDictionary<string, int>)readOnly).Add("b", 2));
+            Assert.Throws<NotSupportedException>(() => ((IDictionary<string, int>)readOnly)["a"] = 5);
+            Assert.Throws<NotSupportedException>(() => ((IDictionary<string, int>)readOnly).Remove("a"));
+            Assert.Throws<NotSupportedException>(() => ((ICollection<KeyValuePair<string, int>>)readOnly).Clear());
+            Assert.Throws<NotSupportedException>(() => ((ICollection<KeyValuePair<string, int>>)readOnly).Add(new KeyValuePair<string, int>("b", 2)));
+            Assert.Throws<NotSupportedException>(() => ((ICollection<KeyValuePair<string, int>>)readOnly).Remove(new KeyValuePair<string, int>("a", 1)));
+        }
     }
 }

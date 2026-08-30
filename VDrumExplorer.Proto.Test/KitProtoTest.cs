@@ -102,5 +102,15 @@ namespace VDrumExplorer.Proto.Test
             var result = protoKit.ToModel(NullLogger.Instance);
             Assert.AreEqual(originalKit.DefaultKitNumber, result.DefaultKitNumber);
         }
+
+        [Test]
+        public void ToModel_DefaultKitNumberZero_MapsToOne()
+        {
+            var kit = TestData.LoadTD27Module().ExportKit(1);
+            var proto = Kit.FromModel(kit);
+            proto.DefaultKitNumber = 0;
+            var result = proto.ToModel(NullLogger.Instance);
+            Assert.AreEqual(1, result.DefaultKitNumber);
+        }
     }
 }

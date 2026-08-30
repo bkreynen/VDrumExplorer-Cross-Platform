@@ -2,6 +2,8 @@
 // Use of this source code is governed by the Apache License 2.0,
 // as found in the LICENSE.txt file.
 
+using System.Linq;
+using System.Reflection;
 using NUnit.Framework;
 
 namespace VDrumExplorer.Model.Test
@@ -214,19 +216,25 @@ namespace VDrumExplorer.Model.Test
         [Test]
         public void Equals_IgnoresModelIdLength()
         {
-            // ModelIdLength is not part of equality. Two identifiers with the same
-            // Name, ModelId, FamilyCode, FamilyNumberCode, and SoftwareRevision but
-            // different ModelIdLength should be equal. While ModelIdLength is set
-            // automatically by the constructor based on the name (so we can't create
-            // two with the same name but different lengths via the constructor),
-            // we verify that the equality contract does not depend on ModelIdLength
-            // by confirming that TD50X (ModelIdLength=5) and a manually-constructed
-            // identifier with the same other fields (which will also have ModelIdLength=5)
-            // are equal.
-            var id1 = ModuleIdentifier.TD50X;
-            var id2 = new ModuleIdentifier("TD-50X", id1.ModelId, id1.FamilyCode, id1.FamilyNumberCode, id1.SoftwareRevision);
-            Assert.AreEqual(id1.ModelIdLength, id2.ModelIdLength);
-            Assert.IsTrue(id1.Equals(id2));
+            // ModelIdLength is not part of equality. To prove this we create two
+            // identifiers with identical Name/ModelId/FamilyCode/FamilyNumberCode/SoftwareRevision
+            // but forcibly give them different ModelIdLength via reflection (which bypasses the
+            // constructor's DetermineModelIdLength). They should still be equal and have equal
+            // hash codes despite differing lengths.
+            var id1 = new ModuleIdentifier("TD-27", 0x63, 0x363, 0, 0);
+            var id2 = new ModuleIdentifier("TD-27", 0x63, 0x363, 0, 0);
+            var field = typeof(ModuleIdentifier)
+                .GetFields(BindingFlags.Instance | BindingFlags.NonPublic)
+                .FirstOrDefault(f => f.Name.Contains("ModelIdLength"));
+            Assert.IsNotNull(field, "ModelIdLength backing field not found");
+            field!.SetValue(id1, 4);
+            field.SetValue(id2, 5);
+            Assert.AreEqual(4, id1.ModelIdLength);
+            Assert.AreEqual(5, id2.ModelIdLength);
+            Assert.AreNotEqual(id1.ModelIdLength, id2.ModelIdLength);
+            Assert.IsTrue(id1.Equals(id2), "Equals should ignore ModelIdLength");
+            Assert.IsTrue(id1.Equals((object)id2), "Equals(object) should ignore ModelIdLength");
+            Assert.AreEqual(id1.GetHashCode(), id2.GetHashCode(), "GetHashCode should ignore ModelIdLength");
         }
     }
 }

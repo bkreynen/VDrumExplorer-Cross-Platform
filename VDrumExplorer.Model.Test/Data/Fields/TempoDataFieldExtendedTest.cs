@@ -27,6 +27,8 @@ internal class TempoDataFieldExtendedTest
         var schema = module.Schema;
 
         // Follow the pattern from TempoDataFieldTest to find a TempoDataField.
+        // Uses named field resolution (KitMfx[1]/Type and Parameters) so the test
+        // is not brittle to schema ordering.
         var container = schema.Kit1Root.Container.ResolveContainer("KitMfx[1]");
         var typeField = (EnumField)container.ResolveField("Type");
         var parametersField = (OverlayField)container.ResolveField("Parameters");
@@ -35,7 +37,11 @@ internal class TempoDataFieldExtendedTest
         var overlayDataField = (OverlayDataField)module.Data.GetDataField(parametersField);
         typeDataField.RawValue = 0; // Delay is the first MFX option.
 
-        field = (TempoDataField)overlayDataField.CurrentFieldList.Fields[0];
+        // Pin to a TempoDataField by type rather than by index — Fields[0] is fragile
+        // if the overlay's field order changes.
+        var tempoField = overlayDataField.CurrentFieldList.Fields.OfType<TempoDataField>().FirstOrDefault();
+        Assume.That(tempoField, Is.Not.Null, "Overlay field list should contain a TempoDataField");
+        field = tempoField!;
     }
 
     [Test]
@@ -135,16 +141,40 @@ internal class TempoDataFieldExtendedTest
     [Test]
     public void Reset_ResetsAllSubFields()
     {
-        // Modify all sub-fields
-        field.TempoSync = !field.TempoSync;
-        field.RawNumericValue = field.RawNumericValue == field.SchemaField.NumericField.Min
-            ? field.SchemaField.NumericField.Max
-            : field.SchemaField.NumericField.Min;
+        // Capture the defaults so the post-reset assertions are meaningful (not tautological).
+        var switchDefault = field.SchemaField.SwitchField.Default;
+        var numericDefault = field.SchemaField.NumericField.Default;
+        var noteDefault = field.SchemaField.MusicalNoteField.Default;
+        // Enum default string for MusicalNote (Value is string, Default is int raw number)
+        var noteDefaultString = field.SchemaField.MusicalNoteField.NameByRawNumber[noteDefault];
+
+        // Set each sub-field to a non-default value to make the reset observable.
+        // For the boolean switch, flip to the opposite of the default.
+        field.TempoSync = !switchDefault.Equals(1);
+        Assume.That(field.TempoSync ? 1 : 0, Is.Not.EqualTo(switchDefault),
+            "Precondition: TempoSync should be non-default before reset");
+        // For the numeric sub-field, choose Max (or Min if Max == Default) to guarantee non-default.
+        field.RawNumericValue = numericDefault == field.SchemaField.NumericField.Max
+            ? field.SchemaField.NumericField.Min
+            : field.SchemaField.NumericField.Max;
+        Assume.That(field.RawNumericValue, Is.Not.EqualTo(numericDefault),
+            "Precondition: RawNumericValue should be non-default before reset");
+        // For the musical note, pick a different value from the default.
+        var nonDefaultNote = field.SchemaField.MusicalNoteField.Values.First(v => v != noteDefaultString);
+        field.MusicalNote = nonDefaultNote;
+        Assume.That(field.MusicalNote, Is.Not.EqualTo(noteDefaultString),
+            "Precondition: MusicalNote should be non-default before reset");
 
         field.Reset();
 
-        // After reset, all sub-fields should be at their defaults
-        Assert.AreEqual(field.SchemaField.SwitchField.Default, field.TempoSync ? 1 : 0);
+        // After reset, all sub-fields should be at their defaults — each assertion now
+        // verifies that Reset restored a previously non-default value.
+        Assert.AreEqual(switchDefault, field.TempoSync ? 1 : 0,
+            "TempoSync should be reset to SwitchField.Default");
+        Assert.AreEqual(numericDefault, field.RawNumericValue,
+            "RawNumericValue should be reset to NumericField.Default");
+        Assert.AreEqual(noteDefaultString, field.MusicalNote,
+            "MusicalNote should be reset to MusicalNoteField.Default");
     }
 
     [Test]

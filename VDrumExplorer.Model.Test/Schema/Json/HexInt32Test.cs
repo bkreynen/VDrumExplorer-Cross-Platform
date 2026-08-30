@@ -211,4 +211,68 @@ internal class HexInt32Test
         var b = HexInt32.Parse("0x200");
         Assert.AreNotEqual(a.GetHashCode(), b.GetHashCode());
     }
+
+    // --- Additional coverage: case and underscore edge cases ---
+
+    [Test]
+    public void Parse_LowercaseAndUppercase_ProduceSameValue()
+    {
+        var lower = HexInt32.Parse("0xff");
+        var upper = HexInt32.Parse("0xFF");
+        var mixed = HexInt32.Parse("0xFf");
+        Assert.AreEqual(255, lower.Value);
+        Assert.AreEqual(255, upper.Value);
+        Assert.AreEqual(255, mixed.Value);
+        Assert.IsTrue(lower.Equals(upper));
+        Assert.IsTrue(upper.Equals(mixed));
+        // Also verify hex digits A-F in longer value
+        var lowerAbcd = HexInt32.Parse("0xabcd");
+        var upperAbcd = HexInt32.Parse("0xABCD");
+        Assert.AreEqual(lowerAbcd.Value, upperAbcd.Value);
+        Assert.AreEqual(0xABCD, upperAbcd.Value);
+    }
+
+    [Test]
+    public void Parse_TrailingUnderscore_IsAllowedAndIgnored()
+    {
+        // Production just strips all underscores, so trailing underscore is treated as no-op.
+        // Documents current behavior; if stricter validation is added, this should throw.
+        var withTrailing = HexInt32.Parse("0x100_");
+        var without = HexInt32.Parse("0x100");
+        Assert.AreEqual(without.Value, withTrailing.Value);
+        Assert.AreEqual(256, withTrailing.Value);
+        Assert.AreEqual("0x100_", withTrailing.Text);
+    }
+
+    [Test]
+    public void Parse_LeadingUnderscoreAfterPrefix_IsAllowedAndIgnored()
+    {
+        // "0x_100" -> substring "_100" -> Replace "_" -> "100" -> 256. Documents permissive underscore handling.
+        var withLeading = HexInt32.Parse("0x_100");
+        Assert.AreEqual(256, withLeading.Value);
+        Assert.AreEqual("0x_100", withLeading.Text);
+    }
+
+    [Test]
+    public void Parse_MultipleTrailingUnderscores_IsAllowed()
+    {
+        var hex = HexInt32.Parse("0x1__");
+        Assert.AreEqual(1, hex.Value);
+    }
+
+    [Test]
+    public void Parse_UnderscoreOnlyAfterPrefix_Throws()
+    {
+        // "0x_" -> reduced "_" -> Replace -> "" -> int.TryParse fails -> FormatException
+        Assert.Throws<FormatException>(() => HexInt32.Parse("0x_"));
+    }
+
+    [Test]
+    public void Parse_NegativeLowercase_ProducesSameValueAsUppercase()
+    {
+        var lower = HexInt32.Parse("-0xff");
+        var upper = HexInt32.Parse("-0xFF");
+        Assert.AreEqual(-255, lower.Value);
+        Assert.IsTrue(lower.Equals(upper));
+    }
 }

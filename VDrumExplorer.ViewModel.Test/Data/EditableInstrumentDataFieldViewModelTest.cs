@@ -122,6 +122,60 @@ namespace VDrumExplorer.ViewModel.Test.Data
         }
 
         [Fact]
+        public void Group_SetToUserSample_MakesIsUserSampleTrue()
+        {
+            var vm = CreateViewModel();
+            // TD-27 schema must have user samples; ensure premise explicitly fails if not.
+            Assert.True(vm.Model.Schema.UserSampleInstruments.Count > 0, "TD27 must have user samples for this test");
+            var userGroup = vm.InstrumentGroups.FirstOrDefault(g => !g.Preset);
+            Assert.NotNull(userGroup);
+            // Initially preset instrument
+            Assert.True(vm.IsPreset);
+            Assert.False(vm.IsUserSample);
+
+            vm.Group = userGroup!;
+
+            Assert.False(vm.IsPreset);
+            Assert.True(vm.IsUserSample);
+            Assert.NotNull(vm.UserSample);
+            Assert.Equal(1, vm.UserSample);
+            // Group property reflects new group
+            Assert.Same(userGroup, vm.Group);
+            // Instrument should be first user sample instrument
+            Assert.Same(vm.Model.Schema.UserSampleInstruments[0], vm.Instrument);
+        }
+
+        [Fact]
+        public void IsUserSample_AfterSwitchToPreset_ReturnsFalse()
+        {
+            var vm = CreateViewModel();
+            Assert.True(vm.Model.Schema.UserSampleInstruments.Count > 0, "TD27 must have user samples");
+            var userGroup = vm.InstrumentGroups.First(g => !g.Preset);
+            var presetGroup = vm.InstrumentGroups.First(g => g.Preset);
+            vm.Group = userGroup;
+            Assert.True(vm.IsUserSample);
+            vm.Group = presetGroup;
+            Assert.True(vm.IsPreset);
+            Assert.False(vm.IsUserSample);
+            Assert.Null(vm.UserSample);
+        }
+
+        [Fact]
+        public void InstrumentGroups_ContainsUserSampleGroupWhenAvailable()
+        {
+            var vm = CreateViewModel();
+            if (vm.Model.Schema.UserSamples > 0)
+            {
+                Assert.Contains(vm.InstrumentGroups, g => !g.Preset);
+                Assert.Equal("User samples", vm.InstrumentGroups.First(g => !g.Preset).Description);
+            }
+            else
+            {
+                Assert.DoesNotContain(vm.InstrumentGroups, g => !g.Preset);
+            }
+        }
+
+        [Fact]
         public void Description_ReturnsFieldDescription()
         {
             var vm = CreateViewModel();

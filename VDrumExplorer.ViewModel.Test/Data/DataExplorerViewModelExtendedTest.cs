@@ -107,6 +107,15 @@ namespace VDrumExplorer.ViewModel.Test.Data
             return null;
         }
 
+        private static async Task WaitUntilAsync(Func<bool> condition, int timeoutMs = 1000)
+        {
+            for (int i = 0; i < timeoutMs / 20; i++)
+            {
+                if (condition()) return;
+                await Task.Delay(20);
+            }
+        }
+
         [Fact]
         public async Task SaveFile_WithExistingFileName_WritesFileWithoutDialog()
         {
@@ -119,7 +128,7 @@ namespace VDrumExplorer.ViewModel.Test.Data
             {
                 vm.FileName = temp;
                 vm.SaveFileCommand.Execute(null!);
-                await Task.Delay(150);
+                await WaitUntilAsync(() => File.Exists(temp));
                 Assert.True(File.Exists(temp));
                 Assert.True(new FileInfo(temp).Length > 0);
             }
@@ -154,7 +163,7 @@ namespace VDrumExplorer.ViewModel.Test.Data
             try
             {
                 vm.SaveFileAsCommand.Execute(null!);
-                await Task.Delay(150);
+                await WaitUntilAsync(() => File.Exists(temp));
                 Assert.True(File.Exists(temp));
                 Assert.Equal(temp, vm.FileName);
             }
@@ -377,13 +386,16 @@ namespace VDrumExplorer.ViewModel.Test.Data
                 // First save via dialog
                 vs.SaveFileResult = temp;
                 vm.SaveFileAsCommand.Execute(null!);
-                await Task.Delay(150);
+                await WaitUntilAsync(() => File.Exists(temp));
                 Assert.True(File.Exists(temp));
                 var firstLen = new FileInfo(temp).Length;
                 // Modify kit and save again via SaveFileCommand (uses existing FileName)
                 vm.DefaultKitNumber = vm.DefaultKitNumber == 1 ? 2 : 1;
+                var beforeWrite = File.GetLastWriteTimeUtc(temp);
                 vm.SaveFileCommand.Execute(null!);
-                await Task.Delay(150);
+                await WaitUntilAsync(() => File.GetLastWriteTimeUtc(temp) != beforeWrite || new FileInfo(temp).Length != firstLen, 1000);
+                // Fallback to short delay if timestamp granularity coarse, but file must exist
+                await WaitUntilAsync(() => File.Exists(temp));
                 Assert.True(File.Exists(temp));
                 Assert.True(new FileInfo(temp).Length > 0);
             }

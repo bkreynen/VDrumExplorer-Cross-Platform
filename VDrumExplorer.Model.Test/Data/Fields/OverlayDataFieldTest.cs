@@ -56,19 +56,34 @@ internal class OverlayDataFieldTest
     }
 
     [Test]
+    public void Setup_UsesNamedFieldResolution()
+    {
+        // Pin to named fields instead of relying on .First() ordering — if the schema
+        // is reordered, this test will fail explicitly rather than silently switching fixtures.
+        var container = module.Schema.Kit1Root.Container.ResolveContainer("KitMfx[1]");
+        var typeField = container.ResolveField("Type");
+        var parametersField = container.ResolveField("Parameters");
+        Assert.AreEqual("Type", typeField.Name);
+        Assert.AreEqual("Parameters", parametersField.Name);
+        Assert.AreSame(typeField, switchField.SchemaField);
+        Assert.AreSame(parametersField, overlayField.SchemaField);
+    }
+
+    [Test]
     public void CurrentFieldList_ChangesWhenSwitchFieldChanges()
     {
+        // Fail (inconclusive) if the fixture does not have at least two switch values —
+        // previously this silently passed with zero asserts.
+        Assume.That(switchField.SchemaField.Values.Count, Is.GreaterThan(1),
+            "Requires at least 2 switch values to test switching");
         // Set the switch to the first value
         switchField.Value = switchField.SchemaField.Values[0];
         var firstFieldList = overlayField.CurrentFieldList;
 
-        // Change to a different value (if there are multiple)
-        if (switchField.SchemaField.Values.Count > 1)
-        {
-            switchField.Value = switchField.SchemaField.Values[1];
-            var secondFieldList = overlayField.CurrentFieldList;
-            Assert.AreNotSame(firstFieldList, secondFieldList);
-        }
+        // Change to a different value
+        switchField.Value = switchField.SchemaField.Values[1];
+        var secondFieldList = overlayField.CurrentFieldList;
+        Assert.AreNotSame(firstFieldList, secondFieldList);
     }
 
     [Test]
@@ -86,39 +101,42 @@ internal class OverlayDataFieldTest
     [Test]
     public void Reset_ResetsAllFieldsInCurrentList()
     {
-        // Modify a field in the current list
+        // Find a numeric field in the current list — previously used fields[0] is NumericDataFieldBase
+        // which could silently skip the assertion if the first field was not numeric.
         var fields = overlayField.CurrentFieldList.Fields;
-        if (fields.Count > 0 && fields[0] is NumericDataFieldBase numericField)
+        var numericField = fields.OfType<NumericDataFieldBase>().FirstOrDefault();
+        Assume.That(numericField, Is.Not.Null,
+            "Current overlay field list should contain a NumericDataFieldBase to test reset");
+        // Set to a non-default value to make the reset observable
+        if (numericField!.SchemaField.Default != numericField.SchemaField.Min)
         {
-            // Set to a non-default value
-            if (numericField.SchemaField.Default != numericField.SchemaField.Min)
-            {
-                numericField.RawValue = numericField.SchemaField.Min;
-            }
-            else
-            {
-                numericField.RawValue = numericField.SchemaField.Max;
-            }
-
-            overlayField.Reset();
-
-            // After reset, the field should be back to its default
-            Assert.AreEqual(numericField.SchemaField.Default, numericField.RawValue);
+            numericField.RawValue = numericField.SchemaField.Min;
         }
+        else
+        {
+            numericField.RawValue = numericField.SchemaField.Max;
+        }
+
+        Assume.That(numericField.RawValue, Is.Not.EqualTo(numericField.SchemaField.Default),
+            "Precondition: value should be non-default before reset");
+
+        overlayField.Reset();
+
+        // After reset, the field should be back to its default
+        Assert.AreEqual(numericField.SchemaField.Default, numericField.RawValue);
     }
 
     [Test]
     public void CurrentFieldList_Change_TriggersPropertyChange()
     {
+        Assume.That(switchField.SchemaField.Values.Count, Is.GreaterThan(1),
+            "Requires at least 2 switch values to test property change");
         var recorder = new NotifyChangeRecorder(overlayField);
         // Change the switch field to trigger a CurrentFieldList change
-        if (switchField.SchemaField.Values.Count > 1)
-        {
-            var current = switchField.Value;
-            var newValue = switchField.SchemaField.Values.First(v => v != current);
-            switchField.Value = newValue;
-            // The overlay field should raise CurrentFieldList change
-            CollectionAssert.Contains(recorder.ChangedProperties, nameof(overlayField.CurrentFieldList));
-        }
+        var current = switchField.Value;
+        var newValue = switchField.SchemaField.Values.First(v => v != current);
+        switchField.Value = newValue;
+        // The overlay field should raise CurrentFieldList change
+        CollectionAssert.Contains(recorder.ChangedProperties, nameof(overlayField.CurrentFieldList));
     }
 }

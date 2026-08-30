@@ -22,9 +22,27 @@ namespace VDrumExplorer.Utility.Test
         }
 
         [Test]
-        public void LogTiming_DoesNotThrowForNullLoggerInstance()
+        public void LogTiming_DoesNotThrowForNoOpLogger()
         {
+            // NullLogger.Instance is a non-null no-op ILogger, not a null reference.
+            // This test verifies the no-op logger does not throw, distinct from a null logger.
             Assert.DoesNotThrow(() => Timing.LogTiming(NullLogger.Instance, "test", () => { }));
+        }
+
+        [Test]
+        public void LogTiming_NullLogger_ThrowsArgumentNullException()
+        {
+            // Timing.LogTiming does not guard against null; passing null throws via LoggerExtensions.Log.
+            // In .NET 8+ LoggerExtensions does ThrowIfNull(logger) -> ArgumentNullException(paramName: "logger").
+            var ex = Assert.Throws<ArgumentNullException>(() => Timing.LogTiming(null!, "test", () => { }));
+            Assert.That(ex!.ParamName, Is.EqualTo("logger"));
+        }
+
+        [Test]
+        public void LogTiming_Generic_NullLogger_ThrowsArgumentNullException()
+        {
+            var ex = Assert.Throws<ArgumentNullException>(() => Timing.LogTiming<int>(null!, "test", () => 42));
+            Assert.That(ex!.ParamName, Is.EqualTo("logger"));
         }
 
         [Test]

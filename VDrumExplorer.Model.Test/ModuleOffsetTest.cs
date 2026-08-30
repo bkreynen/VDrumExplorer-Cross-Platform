@@ -153,6 +153,15 @@ namespace VDrumExplorer.Model.Test
         }
 
         [Test]
+        public void Equals_Object_ModuleAddress_ReturnsFalse()
+        {
+            var offset = ModuleOffset.FromDisplayValue(0x10);
+            var addr = ModuleAddress.FromLogicalValue(0x10);
+            Assert.IsFalse(offset.Equals((object)addr));
+            Assert.IsFalse(addr.Equals((object)offset));
+        }
+
+        [Test]
         public void EqualityOperator_Equal()
         {
             var o1 = ModuleOffset.FromDisplayValue(0x10);

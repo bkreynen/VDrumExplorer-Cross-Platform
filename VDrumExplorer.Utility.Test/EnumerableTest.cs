@@ -33,6 +33,16 @@ namespace VDrumExplorer.Utility.Test
         }
 
         [Test]
+        public void ToReadOnlyList_NoSelector_IsSnapshot()
+        {
+            var source = new List<int> { 1, 2 };
+            var readOnly = source.ToReadOnlyList();
+            source.Add(3);
+            Assert.AreEqual(2, readOnly.Count);
+            Assert.That(readOnly, Is.EqualTo(new[] { 1, 2 }));
+        }
+
+        [Test]
         public void ToReadOnlyList_NoSelector_EmptySequence()
         {
             var source = new List<int>();

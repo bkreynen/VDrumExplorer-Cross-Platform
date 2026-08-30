@@ -187,4 +187,26 @@ internal class NumericCodecTest
         Assert.AreEqual(new byte[] { 0x08, 0x00, 0x00, 0x00 }, buffer);
         Assert.AreEqual(short.MinValue, NumericCodec.Range32.ReadInt32(buffer));
     }
+
+    [Test]
+    public void Fixme32_WritesWithFlagBit()
+    {
+        var buf = new byte[4];
+        NumericCodec.Fixme32.WriteInt32(buf, 16383);
+        Assert.AreEqual(new byte[] { 0x03, 0x0F, 0x0F, 0x0F }, buf);
+    }
+
+    [Test]
+    public void Fixme32_HighNibbleRead()
+    {
+        var buf = new byte[] { 0x08, 0x00, 0x00, 0x00 };
+        Assert.AreEqual(-32768, NumericCodec.Fixme32.ReadInt32(buf));
+    }
+
+    [Test]
+    public void Fixme32_ReadEqualsRange32_ForSameBytes()
+    {
+        var bytes = new byte[] { 0x02, 0x03, 0x04, 0x05 };
+        Assert.AreEqual(NumericCodec.Range32.ReadInt32(bytes), NumericCodec.Fixme32.ReadInt32(bytes));
+    }
 }

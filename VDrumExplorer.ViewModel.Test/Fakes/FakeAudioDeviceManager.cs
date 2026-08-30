@@ -51,8 +51,20 @@ namespace VDrumExplorer.ViewModel.Test.Fakes
             AudioFormat = format;
         }
 
-        public Task<byte[]> RecordAudioAsync(System.TimeSpan duration, CancellationToken cancellationToken) =>
-            Task.FromResult(System.Array.Empty<byte>());
+        public async Task<byte[]> RecordAudioAsync(System.TimeSpan duration, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            // Simulate recording time so that cancellation and timing branches can be exercised.
+            // Use BytesPerSecond to produce a realistically sized buffer.
+            await Task.Delay(duration, cancellationToken).ConfigureAwait(false);
+            var byteCount = (int)(duration.TotalSeconds * AudioFormat.BytesPerSecond);
+            // Ensure at least one byte per millisecond for trivial durations used in tests (e.g. 10ms)
+            if (byteCount == 0 && duration.TotalMilliseconds > 0)
+            {
+                byteCount = (int)duration.TotalMilliseconds;
+            }
+            return new byte[byteCount];
+        }
     }
 
     /// <summary>

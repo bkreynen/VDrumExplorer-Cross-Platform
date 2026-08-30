@@ -152,12 +152,9 @@ namespace VDrumExplorer.ViewModel.Test.Dialogs
         public void UserSamples_SetValidValue_UpdatesProperty()
         {
             var vm = CreateViewModel();
-            // Only test if the schema has user samples
-            if (schema.UserSampleInstruments.Count > 0)
-            {
-                vm.UserSamples = 1;
-                Assert.Equal(1, vm.UserSamples);
-            }
+            Assert.True(schema.UserSampleInstruments.Count > 0, "TD27 must have user samples — test premise requires at least one user sample instrument");
+            vm.UserSamples = 1;
+            Assert.Equal(1, vm.UserSamples);
         }
 
         [Theory]

@@ -188,8 +188,19 @@ internal class TreeNodeTest
     [Test]
     public void DescendantsAndSelf_ReturnsAllNodes()
     {
-        // Every descendant should have the root as an ancestor (transitively).
         var descendants = root.DescendantsAndSelf().ToList();
+
+        // Count via independent recursive traversal (DFS) — should equal BFS count.
+        // This ensures no node is missed or duplicated and documents the expected schema size.
+        int expectedCount = CountRecursive(root);
+        Assert.AreEqual(expectedCount, descendants.Count,
+            $"DescendantsAndSelf should return {expectedCount} nodes for TD-27 (no missing or extra nodes)");
+
+        // No duplicates / no cycles
+        Assert.AreEqual(descendants.Count, descendants.Distinct().Count(),
+            "DescendantsAndSelf should not contain duplicates (cycle check)");
+
+        // Every descendant should have the root as an ancestor (transitively) — kept as structural invariant.
         foreach (var node in descendants)
         {
             var current = node;
@@ -199,6 +210,11 @@ internal class TreeNodeTest
             }
             Assert.AreSame(root, current);
         }
+
+        // BFS invariant is also proven in DescendantsAndSelf_ReturnsBfsOrder; here we just verify count.
+
+        static int CountRecursive(TreeNode node) =>
+            1 + node.Children.Sum(CountRecursive);
     }
 
     // --- DescendantFieldContainers ---

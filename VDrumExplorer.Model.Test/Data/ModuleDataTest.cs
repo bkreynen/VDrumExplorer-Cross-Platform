@@ -58,17 +58,25 @@ internal class ModuleDataTest
     }
 
     [Test]
-    public void CreatePartialSnapshot_InvalidSchema_Throws()
+    public void CreatePartialSnapshot_ValidRoot_Succeeds()
     {
-        var otherModule = TestData.LoadTD27();
-        // Use a kit root from a different schema instance (same schema, different object)
-        // Actually, the schema is the same object since KnownSchemas caches. Let's test with wrong schema.
-        // The check is root.Container.Schema != Schema, so we need a different schema.
-        // Since all TD-27 schemas are the same instance, we can't easily test this.
-        // Instead, test that a valid kit root works.
+        // Previously misnamed CreatePartialSnapshot_InvalidSchema_Throws but actually tested the happy path.
+        // This test documents the valid-root case explicitly.
         var kitRoot = module.Schema.GetKitRoot(1);
         var snapshot = data.CreatePartialSnapshot(kitRoot);
         Assert.Greater(snapshot.SegmentCount, 0);
+        Assert.Less(snapshot.SegmentCount, data.CreateSnapshot().SegmentCount);
+    }
+
+    [Test]
+    public void CreatePartialSnapshot_InvalidSchema_Throws()
+    {
+        // Use a synthetic schema mismatch via a different module identifier (TD-17 vs TD-27)
+        // to trigger the ArgumentException for an incorrect schema.
+        var td17Schema = ModuleSchema.KnownSchemas[ModuleIdentifier.TD17].Value;
+        var foreignRoot = td17Schema.GetKitRoot(1);
+        var ex = Assert.Throws<System.ArgumentException>(() => data.CreatePartialSnapshot(foreignRoot));
+        Assert.That(ex!.Message, Does.Contain("schema").IgnoreCase);
     }
 
     [Test]

@@ -145,34 +145,21 @@ namespace VDrumExplorer.Model.Test.Device
 
         // Builds a Roland DataSet (DT1) response message for a given module identifier.
         // Format: F0 41 10 [modelId bytes] 12 [address 4 bytes] [data bytes] [checksum] F7
+        // Simplified to mirror RolandMidiClient.CreateMessage without the dead-write that previously
+        // wrote 0x00 at index 3 and immediately overwrote it for 4-byte IDs.
         private static byte[] BuildDataSetResponse(ModuleIdentifier id, int address, byte[] data)
         {
             int modelIdLength = id.ModelIdLength;
-            // Message layout: F0, 41, 10, [modelId bytes], 12, [4 address bytes], [data], [checksum], F7
             int totalLength = 3 + modelIdLength + 1 + 4 + data.Length + 1 + 1;
             var message = new byte[totalLength];
-            int index = 0;
-            message[index++] = 0xF0; // SysEx
-            message[index++] = 0x41; // Roland
-            message[index++] = 0x10; // Device ID
-            // Model ID: written big-endian across modelIdLength bytes, with the first byte being 0.
-            // The RolandMidiClient writes it at offset (modelIdLength - 1) as a big-endian int32.
-            // For a 4-byte model ID, that's bytes 3-6. For 5-byte (TD-50X), bytes 3-7.
-            // We replicate that logic here.
-            message[index++] = 0x00; // leading 0 byte
-            // Write the remaining (modelIdLength - 1) bytes of the model ID big-endian.
-            // The model ID is stored as an int; we need to write it big-endian starting from the most significant byte.
-            // RolandMidiClient.WriteBigEndianInt32 writes at offset (modelIdLength - 1), so for 4-byte it writes at index 3.
-            // We've already written the leading 0 at index 3, so now write the rest.
-            // Actually, let's just replicate the exact logic: write big-endian int32 at offset (modelIdLength - 1).
-            int modelId = id.ModelId;
-            int modelIdOffset = modelIdLength - 1;
-            // Reset the modelIdOffset position (we wrote 0x00 there, but WriteBigEndianInt32 overwrites it)
-            message[modelIdOffset] = (byte)(modelId >> 24);
-            message[modelIdOffset + 1] = (byte)(modelId >> 16);
-            message[modelIdOffset + 2] = (byte)(modelId >> 8);
-            message[modelIdOffset + 3] = (byte)(modelId >> 0);
-            index = modelIdLength + 3;
+            message[0] = 0xF0; // SysEx
+            message[1] = 0x41; // Roland
+            message[2] = 0x10; // Device ID
+            // Model ID — written big-endian at offset (modelIdLength - 1) exactly as
+            // RolandMidiClient.WriteBigEndianInt32 does. For 5-byte IDs (TD-50X) the extra
+            // leading byte at index 3 stays 0x00 because the array is zero-initialized.
+            WriteBigEndianInt32(message, modelIdLength - 1, id.ModelId);
+            int index = modelIdLength + 3;
             message[index++] = 0x12; // DT1 (Data Set)
             // Address: big-endian 4 bytes
             message[index++] = (byte)(address >> 24);
@@ -184,7 +171,7 @@ namespace VDrumExplorer.Model.Test.Device
             {
                 message[index++] = b;
             }
-            // Checksum: sum of bytes from (4 + modelIdLength) to (length - 3), stored as (0x80 - (sum & 0x7f)) & 0x7f
+            // Checksum: sum of bytes from (4 + modelIdLength) to (length - 3)
             int dataStart = 4 + modelIdLength;
             byte sum = 0;
             for (int i = dataStart; i < message.Length - 2; i++)
@@ -194,6 +181,17 @@ namespace VDrumExplorer.Model.Test.Device
             message[message.Length - 2] = (byte)((0x80 - (sum & 0x7f)) & 0x7f);
             message[message.Length - 1] = 0xF7; // EOX
             return message;
+        }
+
+        private static void WriteBigEndianInt32(byte[] data, int offset, int value)
+        {
+            unchecked
+            {
+                data[offset++] = (byte)(value >> 24);
+                data[offset++] = (byte)(value >> 16);
+                data[offset++] = (byte)(value >> 8);
+                data[offset++] = (byte)(value >> 0);
+            }
         }
     }
 }

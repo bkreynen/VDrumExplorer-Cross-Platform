@@ -109,15 +109,23 @@ namespace VDrumExplorer.Proto.Test
         [Test]
         public void FromModel_UserSampleInstrument_SetsPresetToFalse()
         {
-            // TD-27 has user samples
-            if (schema.UserSampleInstruments.Count == 0)
-            {
-                Assert.Ignore("Module has no user sample instruments");
-            }
+            Assert.That(schema.UserSampleInstruments, Is.Not.Empty, "TD27 fixture must have user samples");
             var instrument = schema.UserSampleInstruments[0];
             var modelAudio = new Model.Audio.InstrumentAudio(instrument, new byte[] { 1 });
             var protoAudio = InstrumentAudio.FromModel(modelAudio);
             Assert.IsFalse(protoAudio.Preset);
+        }
+
+        [Test]
+        public void ToModel_UserSample_PreservesAudio()
+        {
+            Assert.That(schema.UserSampleInstruments, Is.Not.Empty, "TD27 fixture must have user samples");
+            var inst = schema.UserSampleInstruments[0];
+            var proto = new InstrumentAudio { InstrumentId = inst.Id, Preset = false, AudioData = ByteString.CopyFrom(new byte[] { 9, 9 }) };
+            var model = proto.ToModel(schema);
+            Assert.IsFalse(model.Instrument.Group.Preset);
+            Assert.AreEqual(inst.Id, model.Instrument.Id);
+            Assert.That(model.Audio, Is.EqualTo(new byte[] { 9, 9 }));
         }
     }
 }

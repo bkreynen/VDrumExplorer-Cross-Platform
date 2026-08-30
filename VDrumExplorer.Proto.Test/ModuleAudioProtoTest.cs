@@ -6,6 +6,7 @@ using Google.Protobuf.WellKnownTypes;
 using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
 using System;
+using System.IO;
 using System.Linq;
 
 namespace VDrumExplorer.Proto.Test
@@ -118,6 +119,26 @@ namespace VDrumExplorer.Proto.Test
                 Assert.AreEqual(audio.Captures[i].Instrument.Id, result.Captures[i].Instrument.Id);
                 Assert.That(result.Captures[i].Audio, Is.EqualTo(audio.Captures[i].Audio));
             }
+        }
+
+        [Test]
+        public void ToModel_InvalidInstrumentId_ThrowsInvalidDataException()
+        {
+            // IsValidInstrument predicate must be false for all known schemas when instrument id is out of range.
+            // Clear SoftwareRevision so GetOrInferSchema evaluates the predicate against every known schema.
+            var protoIdentifier = ModuleIdentifier.FromModel(schema.Identifier);
+            protoIdentifier.ClearSoftwareRevision();
+            var bad = new ModuleAudio
+            {
+                Identifier = protoIdentifier,
+                Format = new AudioFormat { Frequency = 44100, Channels = 2, Bits = 16 },
+                DurationPerInstrument = Duration.FromTimeSpan(TimeSpan.FromSeconds(2)),
+                InstrumentCaptures =
+                {
+                    new InstrumentAudio { InstrumentId = 9999, Preset = true, AudioData = Google.Protobuf.ByteString.Empty }
+                }
+            };
+            Assert.Throws<InvalidDataException>(() => bad.ToModel(NullLogger.Instance));
         }
 
         [Test]

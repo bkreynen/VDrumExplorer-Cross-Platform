@@ -136,8 +136,8 @@ namespace VDrumExplorer.Model.Test.Midi
             // Ends with EOX (0xF7)
             Assert.AreEqual(0xF7, message[message.Length - 1]);
 
-            // Checksum is correct
-            Assert.AreEqual(ComputeExpectedChecksum(message), message[message.Length - 2]);
+            // Checksum is correct — derive modelIdLength from the identifier under test, not by scanning for 0x12.
+            Assert.AreEqual(ComputeExpectedChecksum(message, ModuleIdentifier.TD17.ModelIdLength), message[message.Length - 2]);
         }
 
         [Test]
@@ -179,8 +179,8 @@ namespace VDrumExplorer.Model.Test.Midi
             // Ends with EOX
             Assert.AreEqual(0xF7, message[message.Length - 1]);
 
-            // Checksum is correct
-            Assert.AreEqual(ComputeExpectedChecksum(message), message[message.Length - 2]);
+            // Checksum is correct — use id.ModelIdLength directly.
+            Assert.AreEqual(ComputeExpectedChecksum(message, ModuleIdentifier.TD50X.ModelIdLength), message[message.Length - 2]);
         }
 
         [Test]
@@ -193,8 +193,24 @@ namespace VDrumExplorer.Model.Test.Midi
 
             var message = output.Messages[0].Data;
             // Manually compute checksum: sum of bytes from dataStart to length-3, then (0x80 - (sum & 0x7f)) & 0x7f
-            var expectedChecksum = ComputeExpectedChecksum(message);
+            var expectedChecksum = ComputeExpectedChecksum(message, ModuleIdentifier.TD17.ModelIdLength);
             Assert.AreEqual(expectedChecksum, message[message.Length - 2]);
+        }
+
+        [Test]
+        public void SendData_WithPayloadContainingCommandByte_DoesNotConfuseChecksum()
+        {
+            // Guard against the previous scan fragility: payload containing 0x12 should not
+            // be mistaken for the command byte when computing the checksum.
+            var (client, input, output) = CreateClient(ModuleIdentifier.TD17);
+            var data = new byte[] { 0x12, 0x11, 0x12 }; // contains command-like bytes
+            client.SendData(0x00001000, data);
+            var message = output.Messages[0].Data;
+            var expected = ComputeExpectedChecksum(message, ModuleIdentifier.TD17.ModelIdLength);
+            Assert.AreEqual(expected, message[message.Length - 2],
+                "Checksum should be derived from modelIdLength, not by scanning for 0x12 in payload");
+            // Also verify command byte is still at the correct fixed offset
+            Assert.AreEqual(0x12, message[ModuleIdentifier.TD17.ModelIdLength + 3]);
         }
 
         [Test]
@@ -263,18 +279,10 @@ namespace VDrumExplorer.Model.Test.Midi
         // Computes the Roland checksum for a SysEx message.
         // The checksum covers bytes from index (4 + modelIdLength) to length - 3 (inclusive),
         // and is stored at length - 2 as (0x80 - (sum & 0x7f)) & 0x7f.
-        private static byte ComputeExpectedChecksum(byte[] message)
+        // modelIdLength is derived from the identifier under test (id.ModelIdLength), not by
+        // scanning for 0x12/0x11 in the payload — scanning is fragile if data contains those bytes.
+        private static byte ComputeExpectedChecksum(byte[] message, int modelIdLength)
         {
-            // Determine model ID length from the message: the command byte (0x12) is at modelIdLength + 3.
-            int modelIdLength = 0;
-            for (int i = 4; i < message.Length; i++)
-            {
-                if (message[i] == 0x12 || message[i] == 0x11)
-                {
-                    modelIdLength = i - 3;
-                    break;
-                }
-            }
             int dataStart = 4 + modelIdLength;
             byte sum = 0;
             for (int i = dataStart; i < message.Length - 2; i++)
@@ -283,5 +291,8 @@ namespace VDrumExplorer.Model.Test.Midi
             }
             return (byte)((0x80 - (sum & 0x7f)) & 0x7f);
         }
+
+        // Backwards-compatible overload for any legacy callers (should not be used in new code).
+        private static byte ComputeExpectedChecksum(byte[] message) => ComputeExpectedChecksum(message, 4);
     }
 }
