@@ -22,45 +22,8 @@ namespace VDrumExplorer.ViewModel.Test.Data
     {
         private readonly Module module = TestData.LoadTD27Module();
 
-        // TODO: This inner ConfigurableViewServices is duplicated in ModuleExplorerViewModelExtendedTest and ExplorerHome variants.
-        // Consider consolidating to a shared test fake (e.g., FakeViewServices or a configurable variant in Fakes/) once ViewModelTestHelpers stabilizes.
-        // Kept local for now to preserve per-test configurability without enlarging shared surface.
-        private sealed class ConfigurableViewServices : IViewServices
-        {
-            public string? OpenFileResult { get; set; }
-            public string? SaveFileResult { get; set; }
-            public int? CopyKitResult { get; set; }
-            public bool CopyKitsResult { get; set; }
-            public bool MultiPasteResult { get; set; }
-            public bool DataTransferShouldExecute { get; set; } = false;
-            public Func<MultiPasteViewModel, bool>? MultiPasteCallback { get; set; }
-
-            public Task<string?> ShowOpenFileDialogAsync(string filter) => Task.FromResult(OpenFileResult);
-            public Task<string?> ShowSaveFileDialogAsync(string filter) => Task.FromResult(SaveFileResult);
-            public Task<int?> ChooseCopyKitTargetAsync(CopyKitViewModel viewModel) => Task.FromResult(CopyKitResult);
-            public Task<bool> ChooseCopyKitsTargetAsync(CopyKitsViewModel viewModel) => Task.FromResult(CopyKitsResult);
-            public Task<bool> ChooseMultiPasteTargetsAsync(MultiPasteViewModel viewModel)
-            {
-                if (MultiPasteCallback != null) return Task.FromResult(MultiPasteCallback(viewModel));
-                return Task.FromResult(MultiPasteResult);
-            }
-            public void ShowSchemaExplorer(ViewModel.LogicalSchema.ModuleSchemaViewModel viewModel) { }
-            public void ShowKitExplorer(KitExplorerViewModel viewModel) { }
-            public void ShowModuleExplorer(ModuleExplorerViewModel viewModel) { }
-            public void ShowInstrumentAudioExplorer(ViewModel.Audio.InstrumentAudioExplorerViewModel viewModel) { }
-            public void ShowInstrumentRecorderDialog(InstrumentAudioRecorderViewModel viewModel) { }
-            public async Task<T?> ShowDataTransferDialog<T>(DataTransferViewModel<T> viewModel) where T : class
-            {
-                if (DataTransferShouldExecute)
-                {
-                    try { return await viewModel.TransferAsync(); } catch { return null; }
-                }
-                return null;
-            }
-            public void AddRequerySuggestion(EventHandler handler) { }
-            public void RemoveRequerySuggestion(EventHandler handler) { }
-        }
-
+        // Migrated to shared helper: use Helpers.ConfigurableViewServices instead of inner duplicate.
+        // Alias keeps call sites `new ConfigurableViewServices()` readable while proving centralization.
         private sealed class FakeMidiInput : IMidiInput
         {
             public event EventHandler<MidiMessage>? MessageReceived;
@@ -78,26 +41,12 @@ namespace VDrumExplorer.ViewModel.Test.Data
             public void Dispose() { }
         }
 
-        private static RolandMidiClient CreateRolandMidiClient(IMidiInput input, IMidiOutput output, string name, byte id, ModuleIdentifier identifier)
-        {
-            var t = typeof(RolandMidiClient);
-            var ctor = t.GetConstructor(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic, null,
-                new[] { typeof(IMidiInput), typeof(IMidiOutput), typeof(string), typeof(string), typeof(byte), typeof(ModuleIdentifier) }, null)!;
-            return (RolandMidiClient)ctor.Invoke(new object[] { input, output, name, name, id, identifier });
-        }
-        private static DeviceController CreateDeviceController(RolandMidiClient client)
-        {
-            var t = typeof(DeviceController);
-            var ctor = t.GetConstructor(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic, null,
-                new[] { typeof(RolandMidiClient), typeof(Microsoft.Extensions.Logging.ILogger), typeof(TimeSpan) }, null)!;
-            return (DeviceController)ctor.Invoke(new object[] { client, NullLogger.Instance, TimeSpan.FromSeconds(1) });
-        }
         private static DeviceViewModel CreateDeviceViewModelWithFakeDevice(IMidiOutput? output = null)
         {
             var input = new FakeMidiInput();
             var outp = output ?? new FakeMidiOutput();
-            var client = CreateRolandMidiClient(input, outp, "Test MIDI", 0x10, ModuleIdentifier.TD27);
-            var controller = CreateDeviceController(client);
+            var client = ViewModelTestHelpers.CreateFakeRolandClient(input, outp, "Test MIDI", 0x10, ModuleIdentifier.TD27);
+            var controller = ViewModelTestHelpers.CreateDeviceController(client);
             return new DeviceViewModel { ConnectedDevice = controller };
         }
 
@@ -142,7 +91,7 @@ namespace VDrumExplorer.ViewModel.Test.Data
             var vm = new KitExplorerViewModel(vs, NullLogger.Instance, new DeviceViewModel(), kit);
             vm.CopiedSnapshot = null;
             vm.SaveFileAsCommand.Execute(null!);
-            await Task.Delay(100);
+            await ViewModelTestHelpers.WaitUntilAsync(() => vm.FileName != null, 200);
             // No exception means success; FileName should stay null
             Assert.Null(vm.FileName);
         }
@@ -180,7 +129,7 @@ namespace VDrumExplorer.ViewModel.Test.Data
             try
             {
                 vm.SaveFileAsCommand.Execute(null!);
-                await Task.Delay(150);
+                await ViewModelTestHelpers.WaitUntilAsync(() => File.Exists(temp));
                 Assert.True(File.Exists(temp));
             }
             finally
@@ -197,7 +146,7 @@ namespace VDrumExplorer.ViewModel.Test.Data
             var vm = new KitExplorerViewModel(vs, NullLogger.Instance, new DeviceViewModel(), kit);
             vm.CopiedSnapshot = null;
             vm.ExportJsonCommand.Execute(null!);
-            await Task.Delay(100);
+            await ViewModelTestHelpers.WaitUntilAsync(() => false, 100); // deterministic: cancelled dialog, no file expected
         }
 
         [Fact]
@@ -211,7 +160,7 @@ namespace VDrumExplorer.ViewModel.Test.Data
             try
             {
                 vm.ExportJsonCommand.Execute(null!);
-                await Task.Delay(150);
+                await ViewModelTestHelpers.WaitUntilAsync(() => File.Exists(temp));
                 Assert.True(File.Exists(temp));
                 var json = File.ReadAllText(temp);
                 Assert.NotEmpty(json);
@@ -232,7 +181,7 @@ namespace VDrumExplorer.ViewModel.Test.Data
             try
             {
                 vm.ExportJsonCommand.Execute(null!);
-                await Task.Delay(150);
+                await ViewModelTestHelpers.WaitUntilAsync(() => File.Exists(temp));
                 Assert.True(File.Exists(temp));
             }
             finally
@@ -252,7 +201,7 @@ namespace VDrumExplorer.ViewModel.Test.Data
             var midiNode = FindMidiNode(vm.Root[0]);
             if (midiNode != null) vm.SelectedNode = midiNode;
             vm.PlayNoteCommand.Execute(null!);
-            await Task.Delay(150);
+            await ViewModelTestHelpers.WaitUntilAsync(() => false, 100); // deterministic: no hardware, no side-effect
         }
 
         [Fact]
@@ -271,7 +220,7 @@ namespace VDrumExplorer.ViewModel.Test.Data
             // For KitExplorer, IsMatchingDeviceConnected is evaluated at ctor: device schema == data schema -> true, so PlayNoteCommand enabled
             // Execute play note; it should attempt kit switch + play
             vm.PlayNoteCommand.Execute(null!);
-            await Task.Delay(300);
+            await ViewModelTestHelpers.WaitUntilAsync(() => output.Sent.Count >= 3);
             Assert.True(output.Sent.Count > 0, "PlayNote should send ProgramChange + NoteOn/Off");
             Assert.Contains(output.Sent, m => (m.Data[0] & 0xF0) == 0xC0);
             Assert.Contains(output.Sent, m => (m.Data[0] & 0xF0) == 0x90);
@@ -292,7 +241,7 @@ namespace VDrumExplorer.ViewModel.Test.Data
             if (vm.SelectedNode.GetMidiNote() == null)
             {
                 vm.PlayNoteCommand.Execute(null!);
-                await Task.Delay(150);
+                await ViewModelTestHelpers.WaitUntilAsync(() => false, 100); // deterministic: no midi note, no side-effect
             }
         }
 
@@ -303,7 +252,7 @@ namespace VDrumExplorer.ViewModel.Test.Data
             var vm = new ModuleExplorerViewModel(vs, NullLogger.Instance, new DeviceViewModel(), module);
             vm.CopiedSnapshot = null;
             vm.CopyDataToDeviceCommand.Execute(null!);
-            await Task.Delay(100);
+            await ViewModelTestHelpers.WaitUntilAsync(() => vs.DataTransferExecuted, 200);
         }
 
         [Fact]
@@ -317,7 +266,7 @@ namespace VDrumExplorer.ViewModel.Test.Data
             var kitNode = FindKitRoot(vm.Root[0]);
             vm.SelectedNode = kitNode;
             vm.CopyDataToDeviceCommand.Execute(null!);
-            await Task.Delay(100);
+            await ViewModelTestHelpers.WaitUntilAsync(() => vs.DataTransferExecuted, 200);
         }
 
         [Fact]
@@ -329,7 +278,7 @@ namespace VDrumExplorer.ViewModel.Test.Data
             var vm = new KitExplorerViewModel(vs, NullLogger.Instance, deviceVm, kit);
             vm.CopiedSnapshot = null;
             vm.CopyDataToDeviceCommand.Execute(null!);
-            await Task.Delay(100);
+            await ViewModelTestHelpers.WaitUntilAsync(() => vs.DataTransferExecuted, 200);
         }
 
         [Fact]
@@ -342,7 +291,7 @@ namespace VDrumExplorer.ViewModel.Test.Data
             vm.CopyNodeCommand.Execute(null!);
             Assert.False(vm.CanUndo);
             vm.MultiPasteCommand.Execute(null!);
-            await Task.Delay(100);
+            await ViewModelTestHelpers.WaitUntilAsync(() => vm.CanUndo, 200);
             Assert.False(vm.CanUndo);
         }
 
@@ -365,7 +314,7 @@ namespace VDrumExplorer.ViewModel.Test.Data
             Assert.NotNull(vm.CopiedSnapshot);
             Assert.True(vm.MultiPasteCommand.Enabled);
             vm.MultiPasteCommand.Execute(null!);
-            await Task.Delay(150);
+            await ViewModelTestHelpers.WaitUntilAsync(() => vm.CanUndo);
             Assert.True(vm.CanUndo);
         }
 

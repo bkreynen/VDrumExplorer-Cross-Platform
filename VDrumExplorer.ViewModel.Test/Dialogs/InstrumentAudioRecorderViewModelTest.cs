@@ -34,31 +34,13 @@ namespace VDrumExplorer.ViewModel.Test.Dialogs
             public void Dispose() { }
         }
 
-        private static RolandMidiClient CreateRolandMidiClient(IMidiInput input, IMidiOutput output, string inName, string outName, byte id, ModuleIdentifier identifier)
-        {
-            var type = typeof(RolandMidiClient);
-            var ctor = type.GetConstructor(BindingFlags.Instance | BindingFlags.NonPublic, null,
-                new[] { typeof(IMidiInput), typeof(IMidiOutput), typeof(string), typeof(string), typeof(byte), typeof(ModuleIdentifier) }, null);
-            if (ctor is null) throw new InvalidOperationException("RolandMidiClient ctor not found");
-            return (RolandMidiClient)ctor.Invoke(new object[] { input, output, inName, outName, id, identifier });
-        }
-
-        private static DeviceController CreateDeviceController(RolandMidiClient client, ILogger logger)
-        {
-            var type = typeof(DeviceController);
-            var ctor = type.GetConstructor(BindingFlags.Instance | BindingFlags.NonPublic, null,
-                new[] { typeof(RolandMidiClient), typeof(ILogger), typeof(TimeSpan) }, null);
-            if (ctor is null) throw new InvalidOperationException("DeviceController ctor not found");
-            return (DeviceController)ctor.Invoke(new object[] { client, logger, TimeSpan.FromSeconds(1) });
-        }
-
         private static DeviceViewModel CreateDeviceViewModelWithFakeDevice(ModuleIdentifier? identifier = null, string midiName = "Test MIDI")
         {
             identifier ??= ModuleIdentifier.TD27;
             var input = new FakeMidiInput();
             var output = new FakeMidiOutput();
-            var client = CreateRolandMidiClient(input, output, midiName, midiName, 0x10, identifier);
-            var controller = CreateDeviceController(client, NullLogger.Instance);
+            var client = VDrumExplorer.ViewModel.Test.Helpers.ViewModelTestHelpers.CreateFakeRolandClient(input, output, midiName, 0x10, identifier);
+            var controller = VDrumExplorer.ViewModel.Test.Helpers.ViewModelTestHelpers.CreateDeviceController(client, NullLogger.Instance);
             return new DeviceViewModel { ConnectedDevice = controller };
         }
 

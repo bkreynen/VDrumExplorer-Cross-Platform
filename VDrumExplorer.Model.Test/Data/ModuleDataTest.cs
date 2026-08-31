@@ -10,6 +10,7 @@ using VDrumExplorer.Model.Data.Fields;
 using VDrumExplorer.Model.Schema.Fields;
 using VDrumExplorer.Model.Schema.Logical;
 using VDrumExplorer.Model.Schema.Physical;
+using VDrumExplorer.Model.Test.Helpers;
 
 namespace VDrumExplorer.Model.Test.Data;
 
@@ -82,11 +83,7 @@ internal class ModuleDataTest
     [Test]
     public void GetDataField_ForBooleanField_ReturnsBooleanDataField()
     {
-        var schemaField = module.Schema.PhysicalRoot.DescendantsAndSelf()
-            .OfType<FieldContainer>()
-            .SelectMany(fc => fc.Fields)
-            .OfType<BooleanField>()
-            .First();
+        var schemaField = ModelTestHelpers.FindBooleanField(module);
         var dataField = data.GetDataField(schemaField);
         Assert.IsInstanceOf<BooleanDataField>(dataField);
     }
@@ -94,11 +91,7 @@ internal class ModuleDataTest
     [Test]
     public void GetDataField_ForEnumField_ReturnsEnumDataField()
     {
-        var schemaField = module.Schema.PhysicalRoot.DescendantsAndSelf()
-            .OfType<FieldContainer>()
-            .SelectMany(fc => fc.Fields)
-            .OfType<EnumField>()
-            .First();
+        var schemaField = ModelTestHelpers.FindEnumField(module);
         var dataField = data.GetDataField(schemaField);
         Assert.IsInstanceOf<EnumDataField>(dataField);
     }
@@ -106,11 +99,7 @@ internal class ModuleDataTest
     [Test]
     public void GetDataField_ForNumericField_ReturnsNumericDataField()
     {
-        var schemaField = module.Schema.PhysicalRoot.DescendantsAndSelf()
-            .OfType<FieldContainer>()
-            .SelectMany(fc => fc.Fields)
-            .OfType<NumericField>()
-            .First();
+        var schemaField = ModelTestHelpers.FindNumericField(module);
         var dataField = data.GetDataField(schemaField);
         Assert.IsInstanceOf<NumericDataField>(dataField);
     }
@@ -118,11 +107,7 @@ internal class ModuleDataTest
     [Test]
     public void GetDataField_ForInstrumentField_ReturnsInstrumentDataField()
     {
-        var schemaField = module.Schema.PhysicalRoot.DescendantsAndSelf()
-            .OfType<FieldContainer>()
-            .SelectMany(fc => fc.Fields)
-            .OfType<InstrumentField>()
-            .First();
+        var schemaField = ModelTestHelpers.FindInstrumentField(module);
         var dataField = data.GetDataField(schemaField);
         Assert.IsInstanceOf<InstrumentDataField>(dataField);
     }
@@ -130,11 +115,7 @@ internal class ModuleDataTest
     [Test]
     public void GetDataField_ForOverlayField_ReturnsOverlayDataField()
     {
-        var schemaField = module.Schema.PhysicalRoot.DescendantsAndSelf()
-            .OfType<FieldContainer>()
-            .SelectMany(fc => fc.Fields)
-            .OfType<OverlayField>()
-            .First();
+        var schemaField = ModelTestHelpers.FindOverlayKitMfx1(module).Overlay;
         var dataField = data.GetDataField(schemaField);
         Assert.IsInstanceOf<OverlayDataField>(dataField);
     }

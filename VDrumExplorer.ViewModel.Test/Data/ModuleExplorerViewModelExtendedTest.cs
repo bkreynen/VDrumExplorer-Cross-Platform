@@ -18,31 +18,9 @@ namespace VDrumExplorer.ViewModel.Test.Data
     {
         private readonly Module module = TestData.LoadTD27Module();
 
-        // TODO: Duplicated ConfigurableViewServices — see DataExplorerViewModelExtendedTest for rationale.
-        // Centralize via Fakes/ConfigurableViewServices or ViewModelTestHelpers when test helper refactoring is revisited.
-        private sealed class ConfigurableViewServices : IViewServices
-        {
-            public string? OpenFileResult { get; set; }
-            public string? SaveFileResult { get; set; }
-            public int? CopyKitResult { get; set; }
-            public bool CopyKitsResult { get; set; }
-            public bool MultiPasteResult { get; set; }
-            public Task<string?> ShowOpenFileDialogAsync(string filter) => Task.FromResult(OpenFileResult);
-            public Task<string?> ShowSaveFileDialogAsync(string filter) => Task.FromResult(SaveFileResult);
-            public Task<int?> ChooseCopyKitTargetAsync(CopyKitViewModel viewModel) => Task.FromResult(CopyKitResult);
-            public Task<bool> ChooseCopyKitsTargetAsync(CopyKitsViewModel viewModel) => Task.FromResult(CopyKitsResult);
-            public Task<bool> ChooseMultiPasteTargetsAsync(MultiPasteViewModel viewModel) => Task.FromResult(MultiPasteResult);
-            public void ShowSchemaExplorer(ViewModel.LogicalSchema.ModuleSchemaViewModel viewModel) { }
-            public void ShowKitExplorer(KitExplorerViewModel viewModel) { ShowKitExplorerCount++; LastKit = viewModel; }
-            public void ShowModuleExplorer(ModuleExplorerViewModel viewModel) { }
-            public void ShowInstrumentAudioExplorer(ViewModel.Audio.InstrumentAudioExplorerViewModel viewModel) { }
-            public void ShowInstrumentRecorderDialog(InstrumentAudioRecorderViewModel viewModel) { }
-            public Task<T?> ShowDataTransferDialog<T>(DataTransferViewModel<T> viewModel) where T : class => Task.FromResult<T?>(null);
-            public void AddRequerySuggestion(EventHandler handler) { }
-            public void RemoveRequerySuggestion(EventHandler handler) { }
-            public int ShowKitExplorerCount { get; private set; }
-            public KitExplorerViewModel? LastKit { get; private set; }
-        }
+        // Migrated to shared helper: use Helpers.ConfigurableViewServices instead of inner duplicate.
+        // Alias keeps call sites `new ConfigurableViewServices()` readable while proving centralization.
+        // Shared adds DataTransferExecuted/ModuleToReturn etc but defaults keep tests green.
 
         private static DataTreeNodeViewModel FindKitRoot(DataTreeNodeViewModel node)
         {
@@ -63,7 +41,7 @@ namespace VDrumExplorer.ViewModel.Test.Data
             var kitNode = FindKitRoot(vm.Root[0]);
             // Use command
             vm.CopyKitCommand.Execute(kitNode);
-            await Task.Delay(100);
+            await ViewModelTestHelpers.WaitUntilAsync(() => vm.CanUndo, 200);
             Assert.False(vm.CanUndo);
         }
 
@@ -86,7 +64,7 @@ namespace VDrumExplorer.ViewModel.Test.Data
             var vm = new ModuleExplorerViewModel(vs, NullLogger.Instance, new DeviceViewModel(), module);
             var nonKit = vm.Root[0]; // root not kit
             vm.CopyKitCommand.Execute(nonKit);
-            await Task.Delay(100);
+            await ViewModelTestHelpers.WaitUntilAsync(() => vm.CanUndo, 200);
             Assert.False(vm.CanUndo);
         }
 
@@ -96,7 +74,7 @@ namespace VDrumExplorer.ViewModel.Test.Data
             var vs = new ConfigurableViewServices { CopyKitsResult = false };
             var vm = new ModuleExplorerViewModel(vs, NullLogger.Instance, new DeviceViewModel(), module);
             vm.CopyMultipleKitsCommand.Execute(null!);
-            await Task.Delay(100);
+            await ViewModelTestHelpers.WaitUntilAsync(() => vm.CanUndo, 200);
             Assert.False(vm.CanUndo);
         }
 
@@ -108,7 +86,7 @@ namespace VDrumExplorer.ViewModel.Test.Data
             // CopyMultipleKits uses CopyKitsViewModel with SourceFrom/Destination etc, default values.
             // By default CopyCount maybe 1? Should push undo regardless.
             vm.CopyMultipleKitsCommand.Execute(null!);
-            await Task.Delay(100);
+            await ViewModelTestHelpers.WaitUntilAsync(() => vm.CanUndo);
             Assert.True(vm.CanUndo);
         }
 
@@ -119,7 +97,7 @@ namespace VDrumExplorer.ViewModel.Test.Data
             var vm = new ModuleExplorerViewModel(vs, NullLogger.Instance, new DeviceViewModel(), module);
             var kitNode = FindKitRoot(vm.Root[0]);
             vm.ImportKitFromFileCommand.Execute(kitNode);
-            await Task.Delay(100);
+            await ViewModelTestHelpers.WaitUntilAsync(() => vm.CanUndo, 200);
             Assert.False(vm.CanUndo);
         }
 
@@ -130,7 +108,7 @@ namespace VDrumExplorer.ViewModel.Test.Data
             var vm = new ModuleExplorerViewModel(vs, NullLogger.Instance, new DeviceViewModel(), module);
             var kitNode = FindKitRoot(vm.Root[0]);
             vm.ImportKitFromFileCommand.Execute(kitNode);
-            await Task.Delay(100);
+            await ViewModelTestHelpers.WaitUntilAsync(() => vm.CanUndo, 200);
             Assert.False(vm.CanUndo);
         }
 
@@ -148,7 +126,7 @@ namespace VDrumExplorer.ViewModel.Test.Data
             try
             {
                 vm.ImportKitFromFileCommand.Execute(kitNode);
-                await Task.Delay(200);
+                await ViewModelTestHelpers.WaitUntilAsync(() => vm.CanUndo);
                 Assert.True(vm.CanUndo);
             }
             finally
@@ -163,7 +141,7 @@ namespace VDrumExplorer.ViewModel.Test.Data
             var vs = new ConfigurableViewServices { OpenFileResult = "/tmp/file.vkit" };
             var vm = new ModuleExplorerViewModel(vs, NullLogger.Instance, new DeviceViewModel(), module);
             vm.ImportKitFromFileCommand.Execute(vm.Root[0]);
-            await Task.Delay(100);
+            await ViewModelTestHelpers.WaitUntilAsync(() => vm.CanUndo, 200);
         }
 
         [Fact]
@@ -173,7 +151,7 @@ namespace VDrumExplorer.ViewModel.Test.Data
             var vm = new ModuleExplorerViewModel(vs, NullLogger.Instance, new DeviceViewModel(), module);
             var kitNode = FindKitRoot(vm.Root[0]);
             vm.ExportKitCommand.Execute(kitNode);
-            await Task.Delay(100);
+            await ViewModelTestHelpers.WaitUntilAsync(() => vm.CanUndo, 200);
         }
 
         [Fact]
@@ -186,7 +164,7 @@ namespace VDrumExplorer.ViewModel.Test.Data
             try
             {
                 vm.ExportKitCommand.Execute(kitNode);
-                await Task.Delay(150);
+                await ViewModelTestHelpers.WaitUntilAsync(() => File.Exists(temp));
                 Assert.True(File.Exists(temp));
                 Assert.True(new FileInfo(temp).Length > 0);
             }
@@ -202,7 +180,7 @@ namespace VDrumExplorer.ViewModel.Test.Data
             var vs = new ConfigurableViewServices { SaveFileResult = "/tmp/out.vkit" };
             var vm = new ModuleExplorerViewModel(vs, NullLogger.Instance, new DeviceViewModel(), module);
             vm.ExportKitCommand.Execute(vm.Root[0]);
-            await Task.Delay(100);
+            await ViewModelTestHelpers.WaitUntilAsync(() => vm.CanUndo, 200);
         }
 
         [Fact]
@@ -228,7 +206,7 @@ namespace VDrumExplorer.ViewModel.Test.Data
             try
             {
                 vm.ImportKitFromFileCommand.Execute(kitNode);
-                await Task.Delay(150);
+                await ViewModelTestHelpers.WaitUntilAsync(() => vm.CanUndo, 200);
                 Assert.False(vm.CanUndo);
             }
             finally

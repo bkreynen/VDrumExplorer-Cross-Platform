@@ -66,26 +66,12 @@ namespace VDrumExplorer.ViewModel.Test.Home
             public void Send(MidiMessage message) { }
             public void Dispose() { }
         }
-        private static RolandMidiClient CreateRolandMidiClient(IMidiInput input, IMidiOutput output, string name, byte id, ModuleIdentifier identifier)
-        {
-            var t = typeof(RolandMidiClient);
-            var ctor = t.GetConstructor(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic, null,
-                new[] { typeof(IMidiInput), typeof(IMidiOutput), typeof(string), typeof(string), typeof(byte), typeof(ModuleIdentifier) }, null)!;
-            return (RolandMidiClient)ctor.Invoke(new object[] { input, output, name, name, id, identifier });
-        }
-        private static DeviceController CreateDeviceController(RolandMidiClient client)
-        {
-            var t = typeof(DeviceController);
-            var ctor = t.GetConstructor(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic, null,
-                new[] { typeof(RolandMidiClient), typeof(ILogger), typeof(TimeSpan) }, null)!;
-            return (DeviceController)ctor.Invoke(new object[] { client, NullLogger.Instance, TimeSpan.FromSeconds(1) });
-        }
         private static DeviceViewModel CreateDeviceViewModelWithFakeDevice()
         {
             var input = new FakeMidiInput();
             var output = new FakeMidiOutput();
-            var client = CreateRolandMidiClient(input, output, "Test MIDI", 0x10, ModuleIdentifier.TD27);
-            var controller = CreateDeviceController(client);
+            var client = ViewModelTestHelpers.CreateFakeRolandClient(input, output, "Test MIDI", 0x10, ModuleIdentifier.TD27);
+            var controller = ViewModelTestHelpers.CreateDeviceController(client);
             return new DeviceViewModel { ConnectedDevice = controller };
         }
 
@@ -103,7 +89,7 @@ namespace VDrumExplorer.ViewModel.Test.Home
             var vs = new TrackingViewServices { OpenFileResult = null };
             var vm = CreateVm(vs);
             vm.LoadFileCommand.Execute(null!);
-            await Task.Delay(100);
+            await ViewModelTestHelpers.WaitUntilAsync(() => vs.ShowKitExplorerCount + vs.ShowModuleExplorerCount > 0, 200);
             Assert.Equal(0, vs.ShowKitExplorerCount);
             Assert.Equal(0, vs.ShowModuleExplorerCount);
         }
@@ -169,7 +155,7 @@ namespace VDrumExplorer.ViewModel.Test.Home
             try
             {
                 vm.LoadFileCommand.Execute(null!);
-                await Task.Delay(200);
+                await ViewModelTestHelpers.WaitUntilAsync(() => vs.ShowAudioExplorerCount > 0);
                 Assert.Equal(1, vs.ShowAudioExplorerCount);
             }
             finally { if (File.Exists(temp)) File.Delete(temp); }
@@ -181,7 +167,7 @@ namespace VDrumExplorer.ViewModel.Test.Home
             var vs = new TrackingViewServices();
             var vm = CreateVm(vs);
             vm.LoadModuleFromDeviceCommand.Execute(null!);
-            await Task.Delay(100);
+            await ViewModelTestHelpers.WaitUntilAsync(() => vs.DataTransferExecuted, 200);
             Assert.False(vs.DataTransferExecuted);
         }
 
@@ -193,7 +179,7 @@ namespace VDrumExplorer.ViewModel.Test.Home
             var dvm = CreateDeviceViewModelWithFakeDevice();
             var vm = CreateVm(vs, dvm);
             vm.LoadModuleFromDeviceCommand.Execute(null!);
-            await Task.Delay(200);
+            await ViewModelTestHelpers.WaitUntilAsync(() => vs.ShowModuleExplorerCount > 0);
             Assert.True(vs.DataTransferExecuted);
             Assert.Equal(1, vs.ShowModuleExplorerCount);
         }
@@ -204,7 +190,7 @@ namespace VDrumExplorer.ViewModel.Test.Home
             var vs = new TrackingViewServices();
             var vm = CreateVm(vs);
             vm.LoadKitFromDeviceCommand.Execute(null!);
-            await Task.Delay(100);
+            await ViewModelTestHelpers.WaitUntilAsync(() => vs.DataTransferExecuted, 200);
             Assert.False(vs.DataTransferExecuted);
         }
 
@@ -219,7 +205,7 @@ namespace VDrumExplorer.ViewModel.Test.Home
             var vm = CreateVm(vs, dvm);
             vm.LoadKitFromDeviceNumber = 1; // now valid with device
             vm.LoadKitFromDeviceCommand.Execute(null!);
-            await Task.Delay(200);
+            await ViewModelTestHelpers.WaitUntilAsync(() => vs.ShowKitExplorerCount > 0);
             Assert.True(vs.DataTransferExecuted);
             Assert.Equal(1, vs.ShowKitExplorerCount);
         }
@@ -231,7 +217,7 @@ namespace VDrumExplorer.ViewModel.Test.Home
             var lvm = new LogViewModel();
             var vm = CreateVm(vs, lvm: lvm);
             vm.SaveLogCommand.Execute(null!);
-            await Task.Delay(100);
+            await ViewModelTestHelpers.WaitUntilAsync(() => false, 100); // deterministic: cancelled, no file expected
         }
 
         [Fact]
@@ -245,7 +231,7 @@ namespace VDrumExplorer.ViewModel.Test.Home
             try
             {
                 vm.SaveLogCommand.Execute(null!);
-                await Task.Delay(150);
+                await ViewModelTestHelpers.WaitUntilAsync(() => File.Exists(temp));
                 Assert.True(File.Exists(temp));
                 var text = File.ReadAllText(temp);
                 Assert.Contains("test entry", text);
@@ -268,7 +254,7 @@ namespace VDrumExplorer.ViewModel.Test.Home
             var quickVs = new QuickNullViewServices();
             var vm = CreateVm(quickVs, dvm);
             vm.LoadModuleFromDeviceCommand.Execute(null!);
-            await Task.Delay(200);
+            await ViewModelTestHelpers.WaitUntilAsync(() => quickVs.ShowModuleExplorerCount > 0, 200);
             Assert.Equal(0, quickVs.ShowModuleExplorerCount);
         }
 

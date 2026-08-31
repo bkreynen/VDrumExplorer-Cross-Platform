@@ -126,5 +126,30 @@ namespace VDrumExplorer.Model.Test.Helpers
             var schemaField = FindNumericField(module);
             return (NumericDataField)module.Data.GetDataField(schemaField);
         }
+
+        /// <summary>
+        /// Returns the <c>/Current</c> <see cref="FieldContainer"/> – the first field container
+        /// in TD-27's physical schema (holds CurrentKit). Pinned by absolute path instead of
+        /// <c>DescendantsAndSelf().OfType&lt;FieldContainer&gt;().First()</c> so refactors that
+        /// change traversal order do not silently pick a different fixture.
+        /// </summary>
+        internal static FieldContainer FindCurrentFieldContainer(Module module) =>
+            (FieldContainer)module.Schema.PhysicalRoot.ResolveContainer("/Current");
+
+        /// <summary>
+        /// Resolves a <see cref="FieldContainer"/> by absolute path, e.g. <c>"/Current"</c> or
+        /// <c>"/Setup/Output"</c>. Useful for pinning <c>ContainerBaseTest</c> / <c>FieldContainerTest</c>
+        /// fixtures to a known container instead of <c>First()</c>.
+        /// </summary>
+        internal static FieldContainer ResolveFieldContainer(Module module, string absolutePath) =>
+            (FieldContainer)module.Schema.PhysicalRoot.ResolveContainer(absolutePath);
+
+        /// <summary>
+        /// Returns the <see cref="IContainer"/> at <paramref name="absolutePath"/> – thin wrapper
+        /// over <see cref="ContainerBase.ResolveContainer(string)"/> for tests that want a named
+        /// container rather than an ordinal lookup.
+        /// </summary>
+        internal static IContainer ResolveContainer(Module module, string absolutePath) =>
+            module.Schema.PhysicalRoot.ResolveContainer(absolutePath);
     }
 }

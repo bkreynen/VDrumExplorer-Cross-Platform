@@ -6,6 +6,7 @@ using NUnit.Framework;
 using System;
 using System.Linq;
 using VDrumExplorer.Model.Schema.Physical;
+using VDrumExplorer.Model.Test.Helpers;
 
 namespace VDrumExplorer.Model.Test.Schema.Physical;
 
@@ -159,7 +160,8 @@ internal class ContainerBaseTest
     public void ResolveContainer_PathThroughFieldContainer_Throws()
     {
         // A FieldContainer has no child containers, so resolving through it should fail.
-        var fieldContainer = root.DescendantsAndSelf().OfType<FieldContainer>().First();
+        // Pinned to /Current (the canonical first FieldContainer) instead of First().
+        var fieldContainer = (FieldContainer)root.ResolveContainer("/Current");
         var ex = Assert.Throws<ArgumentException>(() => fieldContainer.ResolveContainer("Nonexistent"));
         Assert.That(ex!.Message, Does.Contain("Nonexistent"));
     }
@@ -169,7 +171,8 @@ internal class ContainerBaseTest
     [Test]
     public void ResolveField_ValidFieldName_ReturnsField()
     {
-        var fieldContainer = root.DescendantsAndSelf().OfType<FieldContainer>().First();
+        // Pinned to /Current instead of First() – see ModelTestHelpers.FindCurrentFieldContainer
+        var fieldContainer = (FieldContainer)root.ResolveContainer("/Current");
         var field = fieldContainer.Fields.First();
         var resolved = fieldContainer.ResolveField(field.Name);
         Assert.AreSame(field, resolved);
@@ -178,7 +181,7 @@ internal class ContainerBaseTest
     [Test]
     public void ResolveField_ValidPath_ReturnsField()
     {
-        var fieldContainer = root.DescendantsAndSelf().OfType<FieldContainer>().First();
+        var fieldContainer = (FieldContainer)root.ResolveContainer("/Current");
         var field = fieldContainer.Fields.First();
         var resolved = root.ResolveField($"{fieldContainer.Path.Substring(1)}/{field.Name}");
         Assert.AreSame(field, resolved);
@@ -187,7 +190,7 @@ internal class ContainerBaseTest
     [Test]
     public void ResolveField_InvalidFieldName_Throws()
     {
-        var fieldContainer = root.DescendantsAndSelf().OfType<FieldContainer>().First();
+        var fieldContainer = (FieldContainer)root.ResolveContainer("/Current");
         var ex = Assert.Throws<ArgumentException>(() => fieldContainer.ResolveField("NonexistentField"));
         Assert.That(ex!.Message, Does.Contain("NonexistentField"));
     }

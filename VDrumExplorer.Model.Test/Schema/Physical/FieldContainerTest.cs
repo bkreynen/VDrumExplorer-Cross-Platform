@@ -7,6 +7,7 @@ using NUnit.Framework.Legacy;
 using System;
 using System.Linq;
 using VDrumExplorer.Model.Schema.Physical;
+using VDrumExplorer.Model.Test.Helpers;
 
 namespace VDrumExplorer.Model.Test.Schema.Physical;
 
@@ -18,8 +19,10 @@ internal class FieldContainerTest
     [SetUp]
     public void SetUp()
     {
-        root = TestData.LoadTD27().Schema.PhysicalRoot;
-        fieldContainer = root.DescendantsAndSelf().OfType<FieldContainer>().First();
+        var module = TestData.LoadTD27();
+        root = module.Schema.PhysicalRoot;
+        // Pinned via shared helper instead of First() – proves fixture stability
+        fieldContainer = ModelTestHelpers.FindCurrentFieldContainer(module);
     }
 
     // --- Fields collection ---

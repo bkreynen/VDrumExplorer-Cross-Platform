@@ -34,26 +34,12 @@ namespace VDrumExplorer.ViewModel.Test.Dialogs
             public void Send(MidiMessage message) => Sent.Add(message);
             public void Dispose() { }
         }
-        private static RolandMidiClient CreateRolandMidiClient(IMidiInput input, IMidiOutput output, string name, byte id, ModuleIdentifier identifier)
-        {
-            var t = typeof(RolandMidiClient);
-            var ctor = t.GetConstructor(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic, null,
-                new[] { typeof(IMidiInput), typeof(IMidiOutput), typeof(string), typeof(string), typeof(byte), typeof(ModuleIdentifier) }, null)!;
-            return (RolandMidiClient)ctor.Invoke(new object[] { input, output, name, name, id, identifier });
-        }
-        private static DeviceController CreateDeviceController(RolandMidiClient client, TimeSpan timeout)
-        {
-            var t = typeof(DeviceController);
-            var ctor = t.GetConstructor(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic, null,
-                new[] { typeof(RolandMidiClient), typeof(Microsoft.Extensions.Logging.ILogger), typeof(TimeSpan) }, null)!;
-            return (DeviceController)ctor.Invoke(new object[] { client, NullLogger.Instance, timeout });
-        }
         private static DeviceViewModel CreateDeviceViewModelWithFakeDevice(string midiName = "Test MIDI", IMidiOutput? output = null, TimeSpan? timeout = null)
         {
             var input = new FakeMidiInput();
             var outp = output ?? new FakeMidiOutput();
-            var client = CreateRolandMidiClient(input, outp, midiName, 0x10, ModuleIdentifier.TD27);
-            var controller = CreateDeviceController(client, timeout ?? TimeSpan.FromSeconds(1));
+            var client = ViewModelTestHelpers.CreateFakeRolandClient(input, outp, midiName, 0x10, ModuleIdentifier.TD27);
+            var controller = ViewModelTestHelpers.CreateDeviceController(client, timeout: timeout ?? TimeSpan.FromSeconds(1));
             return new DeviceViewModel { ConnectedDevice = controller };
         }
 
