@@ -5,8 +5,9 @@
       <DataCollector friendlyName="XPlat Code Coverage">
         <Configuration>
           <Format>cobertura</Format>
-          <Exclude>[*.Test]*</Exclude>
-          <ExcludeByAttribute>ExcludeFromCodeCoverageAttribute</ExcludeByAttribute>
+          <Exclude>[*.Test]*,[VDrumExplorer.Gui.Avalonia]*,[VDrumExplorer.Blazor]*,[VDrumExplorer.Console]*,[VDrumExplorer.Benchmarks]*,[VDrumExplorer.InstrumentParser]*</Exclude>
+          <ExcludeByAttribute>ExcludeFromCodeCoverageAttribute,GeneratedCodeAttribute</ExcludeByAttribute>
+          <ExcludeByFile>**/DrumFiles.g.cs,**/NullableAttributes.cs</ExcludeByFile>
           <SkipAutoProps>true</SkipAutoProps>
         </Configuration>
       </DataCollector>

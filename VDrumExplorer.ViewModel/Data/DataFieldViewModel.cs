@@ -15,8 +15,13 @@ namespace VDrumExplorer.ViewModel.Data
 
         public string Description => Model.SchemaField.Description;
 
-        internal static DataFieldViewModel CreateViewModel(IDataField field, bool readOnly) =>
-            readOnly
+        internal static DataFieldViewModel CreateViewModel(IDataField field, bool readOnly)
+        {
+            if (field is OverlayDataField)
+            {
+                throw new ArgumentException("Overlay fields must be flattened before creating view model", nameof(field));
+            }
+            return readOnly
             ? (DataFieldViewModel)new ReadOnlyDataFieldViewModel(field)
             : field switch
             {
@@ -28,6 +33,7 @@ namespace VDrumExplorer.ViewModel.Data
                 TempoDataField model => new EditableTempoDataFieldViewModel(model),
                 _ => throw new ArgumentException($"Can't create editable field of type {field?.GetType()}")
             };
+        }
     }
 
     public abstract class DataFieldViewModel<TModel> : DataFieldViewModel where TModel : IDataField

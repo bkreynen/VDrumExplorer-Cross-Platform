@@ -68,6 +68,8 @@ namespace VDrumExplorer.Utility
             }
 
             public void Dispose() { }
+            // Intentionally a no-op: IEnumerator.Reset on this lightweight single-item enumerator does not
+            // restore iteration state. Consumers requiring re-enumeration should obtain a fresh enumerator via GetEnumerator().
             public void Reset() { }
         }
     }

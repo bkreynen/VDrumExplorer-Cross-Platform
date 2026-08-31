@@ -89,7 +89,7 @@ namespace VDrumExplorer.Model.Schema.Fields
 
         private static int ReadFixme32(ReadOnlySpan<byte> data) =>
             (short)
-            ((data[0] & 0x0700_0000 << 12) |
+            ((data[0] << 12) |
             (data[1] << 8) |
             (data[2] << 4) |
             (data[3] << 0));

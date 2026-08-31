@@ -1,0 +1,130 @@
+// Copyright 2020 Jon Skeet. All rights reserved.
+// Use of this source code is governed by the Apache License 2.0,
+// as found in the LICENSE.txt file.
+
+using System.Collections.Generic;
+using System.ComponentModel;
+using VDrumExplorer.Model.Data.Fields;
+using VDrumExplorer.ViewModel.Data;
+using Xunit;
+
+namespace VDrumExplorer.ViewModel.Test.Data
+{
+    public class EditableNumericDataFieldViewModelTest
+    {
+        private readonly Model.Module module = TestData.LoadTD27Module();
+
+        private EditableNumericDataFieldViewModel CreateViewModel()
+        {
+            // Pin to named field to avoid fixture order sensitivity (was .First()).
+            var field = FieldFinder.FindNumericField(module.Data.LogicalRoot, "Kit volume");
+            return new EditableNumericDataFieldViewModel(field);
+        }
+
+        [Fact]
+        public void MinValue_MatchesSchemaField()
+        {
+            var vm = CreateViewModel();
+            Assert.Equal(vm.Model.SchemaField.Min, vm.MinValue);
+        }
+
+        [Fact]
+        public void MaxValue_MatchesSchemaField()
+        {
+            var vm = CreateViewModel();
+            Assert.Equal(vm.Model.SchemaField.Max, vm.MaxValue);
+        }
+
+        [Fact]
+        public void LargeChange_IsMaxOfRangeDivTenOrOne()
+        {
+            // Subsumes IsAtLeastOne: Math.Max(...,1) guarantees >=1.
+            var vm = CreateViewModel();
+            var expected = System.Math.Max((vm.MaxValue - vm.MinValue) / 10, 1);
+            Assert.Equal(expected, vm.LargeChange);
+            Assert.True(vm.LargeChange >= 1);
+        }
+
+        [Fact]
+        public void Value_Get_ReturnsUnderlyingFieldRawValue()
+        {
+            var vm = CreateViewModel();
+            Assert.Equal(vm.Model.RawValue, vm.Value);
+        }
+
+        [Fact]
+        public void Value_Set_UpdatesUnderlyingField()
+        {
+            var vm = CreateViewModel();
+            var newValue = vm.Model.RawValue == vm.MinValue ? vm.MinValue + 1 : vm.MinValue;
+            vm.Value = newValue;
+            Assert.Equal(newValue, vm.Model.RawValue);
+            Assert.Equal(newValue, vm.Value);
+        }
+
+        [Fact]
+        public void Value_Set_FiresPropertyChanged()
+        {
+            var vm = CreateViewModel();
+            var changedProperties = new List<string?>();
+            ((INotifyPropertyChanged)vm).PropertyChanged += (s, e) => changedProperties.Add(e.PropertyName);
+
+            var newValue = vm.Model.RawValue == vm.MinValue ? vm.MinValue + 1 : vm.MinValue;
+            vm.Value = newValue;
+            Assert.Contains(nameof(EditableNumericDataFieldViewModel.Value), changedProperties);
+            Assert.Contains(nameof(EditableNumericDataFieldViewModel.FormattedText), changedProperties);
+            Assert.Contains(nameof(EditableNumericDataFieldViewModel.FormattedValue), changedProperties);
+        }
+
+        [Fact]
+        public void FormattedText_ReturnsFieldFormattedText()
+        {
+            var vm = CreateViewModel();
+            Assert.Equal(vm.Model.FormattedText, vm.FormattedText);
+        }
+
+        [Fact]
+        public void FormattedValue_Get_ReturnsFieldFormattedText()
+        {
+            var vm = CreateViewModel();
+            Assert.Equal(vm.Model.FormattedText, vm.FormattedValue);
+        }
+
+        [Fact]
+        public void FormattedValue_SetValidText_UpdatesValue()
+        {
+            var vm = CreateViewModel();
+            var originalRaw = vm.Model.RawValue;
+            var originalFormatted = vm.FormattedValue;
+
+            // Pick a different valid raw value within [MinValue, MaxValue]
+            var otherRaw = originalRaw == vm.MinValue
+                ? System.Math.Min(vm.MinValue + 1, vm.MaxValue)
+                : vm.MinValue;
+            if (otherRaw == originalRaw)
+            {
+                otherRaw = vm.MaxValue;
+            }
+
+            // Generate formatted text for the different raw value by temporarily setting RawValue and reading FormattedText
+            vm.Model.RawValue = otherRaw;
+            var formattedForOtherValue = vm.Model.FormattedText;
+
+            // Restore original value and ensure we are starting from the original text
+            vm.Model.RawValue = originalRaw;
+            Assert.Equal(originalFormatted, vm.FormattedValue);
+
+            // Assign formatted text for otherRaw and verify the raw value changed
+            vm.FormattedValue = formattedForOtherValue;
+            Assert.Equal(otherRaw, vm.Model.RawValue);
+            Assert.Equal(formattedForOtherValue, vm.FormattedValue);
+        }
+
+        [Fact]
+        public void Description_ReturnsFieldDescription()
+        {
+            var vm = CreateViewModel();
+            Assert.Equal(vm.Model.SchemaField.Description, vm.Description);
+        }
+    }
+}
