@@ -1,6 +1,6 @@
 # Drums (VDrumExplorer for Linux)
 
-[![Coverage Status](https://coveralls.io/repos/github/bkreynen/VDrumExplorer-Cross-Platform/badge.svg?branch=coverage)](https://coveralls.io/github/bkreynen/VDrumExplorer-Cross-Platform?branch=coverage)
+[![Coverage Status](https://coveralls.io/repos/github/bkreynen/VDrumExplorer-Cross-Platform/badge.svg?branch=main)](https://coveralls.io/github/bkreynen/VDrumExplorer-Cross-Platform?branch=main)
 
 This is a fork of [Jon Skeet's](https://github.com/jskeet) demo code
 repository, focused on the **VDrumExplorer** project — a tool for
