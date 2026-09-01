@@ -16,6 +16,20 @@ updates:
       prefix-development: "chore"
       include: "scope"
     open-pull-requests-limit: 10
+    # Block preview-era major jumps for legacy Blazor 3.2 packages until TFM is upgraded.
+    # Then remove these two stanzas manually as part of the TFM upgrade PR.
+    ignore:
+      - dependency-name: "System.Net.Http.Json"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "Microsoft.AspNetCore.Components.*"
+        update-types: ["version-update:semver-major"]
+      # Defense-in-depth: block future 11.x preview stream while allowing 10.x stable patches.
+      # NuGet range syntax: [11.0.0-preview, 11.0.0) == >=11.0.0-preview <11.0.0
+      # Scoped to System.* / Microsoft.* so JonSkeet beta / ManagedMidi alpha still flow.
+      - dependency-name: "System.*"
+        versions: ["[11.0.0-preview, 11.0.0)"]
+      - dependency-name: "Microsoft.*"
+        versions: ["[11.0.0-preview, 11.0.0)"]
     groups:
       # Group Microsoft extensions / BCL to avoid 5 separate PRs per week
       microsoft:
