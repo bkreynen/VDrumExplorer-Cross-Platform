@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Settings for the `dotnet-coverage` global tool, used to collect coverage from the
+     Avalonia visual test executable (xunit.v3 on Microsoft.Testing.Platform), where
+     neither the VSTest `coverlet.collector` nor `coverlet.MTP` can run:
+       - coverlet.collector is a VSTest data collector and never loads outside VSTest.
+       - every coverlet.MTP release depends on Microsoft.Testing.Platform >= 2.0.2,
+         which is binary-incompatible with the MTP 1.9.1 that xunit.v3 3.2.2 was
+         compiled against (TypeLoadException on IDataConsumer at startup).
+     Exclusion list mirrors coverlet.runsettings. Format reference:
+     https://learn.microsoft.com/dotnet/core/additional-tools/dotnet-coverage -->
+<Configuration>
+  <CodeCoverage>
+    <!-- Each element is an ECMAScript regular expression. -->
+    <!-- Match assembly file paths: -->
+    <ModulePaths>
+      <Exclude>
+        <!-- Test projects themselves (equivalent of coverlet's [*.Test]*). -->
+        <ModulePath>.*\.Test\.dll$</ModulePath>
+        <!-- Projects with no coverage of interest. -->
+        <ModulePath>.*VDrumExplorer\.Blazor\.dll$</ModulePath>
+        <ModulePath>.*VDrumExplorer\.Console\.dll$</ModulePath>
+        <ModulePath>.*VDrumExplorer\.Benchmarks\.dll$</ModulePath>
+        <ModulePath>.*VDrumExplorer\.InstrumentParser\.dll$</ModulePath>
+      </Exclude>
+    </ModulePaths>
+
+    <!-- Match attributes on any code element ("Attribute" suffix required): -->
+    <Attributes>
+      <Exclude>
+        <Attribute>^System\.Diagnostics\.CodeAnalysis\.ExcludeFromCodeCoverageAttribute$</Attribute>
+        <Attribute>^System\.CodeDom\.Compiler\.GeneratedCodeAttribute$</Attribute>
+      </Exclude>
+    </Attributes>
+
+    <!-- Match the path of the source files in which each method is defined: -->
+    <Sources>
+      <Exclude>
+        <Source>.*[/\\]DrumFiles\.g\.cs$</Source>
+        <Source>.*[/\\]NullableAttributes\.cs$</Source>
+      </Exclude>
+    </Sources>
+  </CodeCoverage>
+</Configuration>
