@@ -37,7 +37,25 @@ jobs:
 
       - name: Run tests with coverage
         shell: bash
-        run: dotnet test Drums.sln --no-build --configuration Release --collect:"XPlat Code Coverage" --results-directory ./TestResults --settings coverlet.runsettings
+        run: |
+          dotnet test \
+            VDrumExplorer.Model.Test/VDrumExplorer.Model.Test.csproj \
+            VDrumExplorer.ViewModel.Test/VDrumExplorer.ViewModel.Test.csproj \
+            VDrumExplorer.Utility.Test/VDrumExplorer.Utility.Test.csproj \
+            VDrumExplorer.Proto.Test/VDrumExplorer.Proto.Test.csproj \
+            VDrumExplorer.Midi.ManagedMidi.Test/VDrumExplorer.Midi.ManagedMidi.Test.csproj \
+            --no-build --configuration Release \
+            --collect:"XPlat Code Coverage" \
+            --results-directory ./TestResults \
+            --settings coverlet.runsettings
+
+      # The Avalonia headless visual tests run their own executable (xunit.v3 on
+      # Microsoft.Testing.Platform) and render with the bundled Inter font, so they are
+      # invoked directly rather than via `dotnet test`.
+      - name: Run Avalonia visual tests
+        shell: bash
+        run: |
+          dotnet VDrumExplorer.Gui.Avalonia.Test/bin/Release/net10.0/VDrumExplorer.Gui.Avalonia.Test.dll
 
       - name: Locate cobertura files
         if: matrix.os == 'ubuntu-latest'
