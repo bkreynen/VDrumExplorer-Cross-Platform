@@ -51,11 +51,19 @@
     <!-- Referenced directly for IViewServices, LogViewModel and DeviceViewModel used by the
          visual tests. (Also available transitively via the GUI project.) -->
     <ProjectReference Include="..\VDrumExplorer.ViewModel\VDrumExplorer.ViewModel.csproj" />
+    <!-- Referenced directly for ProtoIo, used by TestData to load the embedded .vdrum file. -->
+    <ProjectReference Include="..\VDrumExplorer.Proto\VDrumExplorer.Proto.csproj" />
   </ItemGroup>
 
   <!-- Baseline screenshots are compared against freshly rendered windows at test time. -->
   <ItemGroup>
     <Content Include="Baselines\**\*.png" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <!-- Sample TD-27 module data, loaded by TestData to construct the Data Explorer and
+       dialog view models. Embedded so the tests do not depend on the working directory. -->
+  <ItemGroup>
+    <EmbeddedResource Include="..\td27.vdrum" LogicalName="td27.vdrum" />
   </ItemGroup>
 
 </Project>

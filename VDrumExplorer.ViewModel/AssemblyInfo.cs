@@ -4,3 +4,6 @@
 
 using System.Runtime.CompilerServices;
 [assembly: InternalsVisibleTo("VDrumExplorer.ViewModel.Test")]
+// The Avalonia GUI visual tests construct NodeSnapshot directly (internal constructor)
+// and call IsValidForTarget to build MultiPasteViewModel candidates.
+[assembly: InternalsVisibleTo("VDrumExplorer.Gui.Avalonia.Test")]

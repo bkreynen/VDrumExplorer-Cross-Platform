@@ -8,85 +8,98 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using Avalonia;
-using Avalonia.Headless;
-using Avalonia.Headless.XUnit;
-using Avalonia.Media;
+using Avalonia.Controls;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
-using VDrumExplorer.Gui.Avalonia.Test.Stubs;
-using VDrumExplorer.Gui.Avalonia.Views;
-using VDrumExplorer.ViewModel;
-using VDrumExplorer.ViewModel.Home;
-using VDrumExplorer.ViewModel.Logging;
 using Xunit;
 
 namespace VDrumExplorer.Gui.Avalonia.Test;
 
 /// <summary>
-/// Visual acceptance tests for the main <see cref="ExplorerHome"/> window.
-/// The window is rendered headlessly (Skia + Avalonia.Headless, real pixel output),
-/// captured to a bitmap and checked in two ways:
-/// <list type="number">
-///   <item><see cref="ExplorerHome_ProducesVisualResult"/>: the render must actually
-///   produce visible content - not a blank, transparent or uniform bitmap.</item>
-///   <item><see cref="ExplorerHome_MatchesBaseline"/>: the render must match a committed
-///   baseline screenshot within a tolerance. If no baseline exists yet (first run), the
-///   current render is saved as the new baseline and the test passes (bootstrap mode).</item>
-/// </list>
+/// Shared helpers for the visual acceptance tests: renders windows headlessly, checks
+/// that a render actually produced visible content, and compares renders against
+/// committed baseline screenshots.
 /// </summary>
-public class VisualRegressionTest
+public static class VisualTestHelper
 {
-    private const string BaselineFileName = "explorer-home.png";
-
     /// <summary>Per-channel tolerance applied before a pixel is considered mismatched,
     /// to absorb minor anti-aliasing differences.</summary>
-    private const int PerChannelTolerance = 15;
+    public const int PerChannelTolerance = 15;
 
     /// <summary>Maximum percentage of mismatched pixels allowed for the baseline check.</summary>
-    private const double MaxMismatchPercentage = 15.0;
+    public const double MaxMismatchPercentage = 15.0;
 
     /// <summary>The rendered window must be at least this fraction of opaque pixels.</summary>
-    private const double MinimumOpaqueRatio = 0.95;
+    public const double MinimumOpaqueRatio = 0.95;
 
     /// <summary>At most this fraction of pixels may share the single most common color,
     /// otherwise the render is considered a blank/uniform surface.</summary>
-    private const double MaximumBackgroundRatio = 0.995;
+    public const double MaximumBackgroundRatio = 0.995;
 
-    [AvaloniaFact]
-    public void ExplorerHome_ProducesVisualResult()
+    /// <summary>
+    /// Creates, shows and renders a window to a bitmap. The window is shown, laid out,
+    /// rendered, then closed. The caller owns the returned bitmap.
+    /// </summary>
+    public static RenderTargetBitmap RenderWindow(Window window)
     {
-        using var bitmap = RenderExplorerHome();
+        try
+        {
+            window.Show();
+
+            // Force a layout pass so that Bounds and child visuals are up to date.
+            window.UpdateLayout();
+
+            var pixelSize = new PixelSize((int)window.Bounds.Width, (int)window.Bounds.Height);
+            Assert.True(pixelSize.Width > 0 && pixelSize.Height > 0, "Window has non-zero size.");
+
+            var bitmap = new RenderTargetBitmap(pixelSize, new Vector(96, 96));
+            bitmap.Render(window);
+            return bitmap;
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    /// <summary>
+    /// Asserts that the rendered bitmap actually contains visible window content:
+    /// it must be non-empty, mostly opaque and not a uniform surface.
+    /// </summary>
+    public static void AssertProducesVisualResult(RenderTargetBitmap bitmap, string screenName)
+    {
         var pixelSize = bitmap.PixelSize;
-        Assert.True(pixelSize.Width > 0 && pixelSize.Height > 0, "Rendered bitmap has no pixels.");
+        Assert.True(pixelSize.Width > 0 && pixelSize.Height > 0, $"{screenName}: Rendered bitmap has no pixels.");
 
         byte[] pixels = GetPixelBytes(bitmap);
 
         // Fail fast on an empty PNG before looking at pixel content.
-        Assert.True(pixels.Length > 0, "Rendered bitmap has no pixel data.");
+        Assert.True(pixels.Length > 0, $"{screenName}: Rendered bitmap has no pixel data.");
 
         bool hasVisualContent = HasVisualContent(pixels, out string details);
 
         // The current render is saved to a temp file so failures can be inspected manually.
-        string debugPath = SaveDebugCopy(bitmap);
+        string debugPath = SaveDebugCopy(bitmap, screenName);
         Assert.True(
             hasVisualContent,
-            $"Rendered window has no visible content (blank/transparent). {details} " +
+            $"{screenName}: Rendered window has no visible content (blank/transparent). {details} " +
             $"Render saved for debugging to: {debugPath}");
     }
 
-    [AvaloniaFact]
-    public void ExplorerHome_MatchesBaseline()
+    /// <summary>
+    /// Compares the rendered bitmap against a committed baseline screenshot. If no baseline
+    /// exists yet (first run), the current render is saved as the new baseline and the test
+    /// passes (bootstrap mode). The comparison only runs on Linux, as the committed baselines
+    /// were generated there and font shaping/rendering may differ on other operating systems.
+    /// </summary>
+    public static void AssertMatchesBaseline(RenderTargetBitmap bitmap, string baselineFileName)
     {
-        // The committed baseline was generated on Linux; font shaping/rendering may differ
-        // on other operating systems, so the comparison only runs on Linux. (xunit 2.x has
-        // no runtime "skip" API, so non-Linux platforms simply return early.)
         if (!OperatingSystem.IsLinux())
         {
             return;
         }
 
-        using var bitmap = RenderExplorerHome();
-        string baselinePath = Path.Combine(GetBaselineDirectory(), BaselineFileName);
+        string baselinePath = Path.Combine(GetBaselineDirectory(), baselineFileName);
 
         if (!File.Exists(baselinePath))
         {
@@ -112,57 +125,21 @@ public class VisualRegressionTest
         double mismatchPercentage = CalculateMismatchPercentage(
             currentPixels, baselinePixels, PerChannelTolerance);
 
-        string debugPath = SaveDebugCopy(bitmap);
+        string debugPath = SaveDebugCopy(bitmap, baselineFileName);
         Assert.True(
             mismatchPercentage <= MaxMismatchPercentage,
-            $"Rendered ExplorerHome does not match baseline '{baselinePath}': " +
+            $"Rendered screen does not match baseline '{baselinePath}': " +
             $"{mismatchPercentage:F2}% mismatched pixels (tolerance {PerChannelTolerance} per channel, " +
             $"maximum {MaxMismatchPercentage:F0}%). " +
             $"Current render saved for debugging to: {debugPath}");
     }
 
     /// <summary>
-    /// Creates, shows and renders the <see cref="ExplorerHome"/> window with a view model
-    /// backed by test stubs (no device, no log entries - keeping the render deterministic).
-    /// </summary>
-    private static RenderTargetBitmap RenderExplorerHome()
-    {
-        var window = new ExplorerHome { DataContext = CreateViewModel() };
-        try
-        {
-            window.Show();
-
-            // Force a layout pass so that Bounds and child visuals are up to date.
-            window.UpdateLayout();
-
-            var pixelSize = new PixelSize((int)window.Bounds.Width, (int)window.Bounds.Height);
-            Assert.True(pixelSize.Width > 0 && pixelSize.Height > 0, "Window has non-zero size.");
-
-            var bitmap = new RenderTargetBitmap(pixelSize, new Vector(96, 96));
-            bitmap.Render(window);
-            return bitmap;
-        }
-        finally
-        {
-            window.Close();
-        }
-    }
-
-    private static ExplorerHomeViewModel CreateViewModel()
-    {
-        return new ExplorerHomeViewModel(
-            new StubViewServices(),
-            new LogViewModel(),
-            new DeviceViewModel(),
-            new StubAudioDeviceManager());
-    }
-
-    /// <summary>
     /// Returns the raw BGRA8888 (premultiplied) pixel data of the given bitmap. The pixels are
     /// copied into a scratch <see cref="WriteableBitmap"/> framebuffer of a known format via
-    /// <see cref="Bitmap.CopyPixels(Avalonia.Platform.ILockedFramebuffer)"/>, which transcodes
-    /// the pixel/alpha format if needed - so both sides of a comparison (a freshly rendered
-    /// target bitmap and a decoded baseline PNG) produce bytes in exactly the same layout.
+    /// <see cref="Bitmap.CopyPixels(ILockedFramebuffer)"/>, which transcodes the pixel/alpha
+    /// format if needed - so both sides of a comparison (a freshly rendered target bitmap and
+    /// a decoded baseline PNG) produce bytes in exactly the same layout.
     /// </summary>
     private static byte[] GetPixelBytes(Bitmap bitmap)
     {
@@ -252,12 +229,14 @@ public class VisualRegressionTest
     }
 
     /// <summary>Saves a copy of the rendered bitmap to a temp file for failure diagnosis.</summary>
+    /// <param name="bitmap">The rendered bitmap to save.</param>
+    /// <param name="screenName">A name identifying the screen, used for the debug file name.</param>
     /// <returns>The path of the saved file.</returns>
-    private static string SaveDebugCopy(RenderTargetBitmap bitmap)
+    private static string SaveDebugCopy(RenderTargetBitmap bitmap, string screenName)
     {
         string directory = Path.Combine(Path.GetTempPath(), "VDrumExplorer.Gui.Avalonia.Test");
         Directory.CreateDirectory(directory);
-        string path = Path.Combine(directory, BaselineFileName);
+        string path = Path.Combine(directory, screenName);
         using var stream = File.Create(path);
         bitmap.Save(stream, PngBitmapEncoderOptions.Default);
         return path;
