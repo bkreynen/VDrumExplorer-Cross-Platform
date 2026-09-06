@@ -135,7 +135,7 @@ public class VisualRegressionTest
             // Force a layout pass so that Bounds and child visuals are up to date.
             window.UpdateLayout();
 
-            var pixelSize = new PixelSize((int) window.Bounds.Width, (int) window.Bounds.Height);
+            var pixelSize = new PixelSize((int)window.Bounds.Width, (int)window.Bounds.Height);
             Assert.True(pixelSize.Width > 0 && pixelSize.Height > 0, "Window has non-zero size.");
 
             var bitmap = new RenderTargetBitmap(pixelSize, new Vector(96, 96));
@@ -208,8 +208,8 @@ public class VisualRegressionTest
         }
 
         int mostCommonCount = colorCounts.Values.Max();
-        double opaqueRatio = (double) opaque / total;
-        double backgroundRatio = (double) mostCommonCount / total;
+        double opaqueRatio = (double)opaque / total;
+        double backgroundRatio = (double)mostCommonCount / total;
         details = $"Analysis of {total} pixels: opaque={opaqueRatio:P1} " +
                   $"(minimum {MinimumOpaqueRatio:P1}), " +
                   $"most-common-color coverage={backgroundRatio:P2} (maximum {MaximumBackgroundRatio:P2}), " +
@@ -248,7 +248,7 @@ public class VisualRegressionTest
                 }
             }
         }
-        return total == 0 ? 100.0 : (double) mismatched / total * 100.0;
+        return total == 0 ? 100.0 : (double)mismatched / total * 100.0;
     }
 
     /// <summary>Saves a copy of the rendered bitmap to a temp file for failure diagnosis.</summary>
