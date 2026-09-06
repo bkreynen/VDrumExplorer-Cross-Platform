@@ -6,11 +6,18 @@
     <IsPackable>false</IsPackable>
     <Nullable>Enable</Nullable>
     <LangVersion>latest</LangVersion>
+    <!-- xunit.v3 runs on Microsoft.Testing.Platform; opt in to the new `dotnet test`
+         experience (VSTest mode is no longer supported on the .NET 10 SDK). -->
+    <TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.9.0" />
-    <PackageReference Include="xunit" Version="2.9.3" />
+    <!-- xunit.v3 3.2.2: pinned to the exact xunit.v3.extensibility.core version that
+         Avalonia.Headless.XUnit 12.1.1 was compiled against. xunit.v3 4.x changes internal
+         APIs (TestIntrospectionHelper.GetTestCaseDetails), which breaks test discovery at
+         runtime with a MissingMethodException. -->
+    <PackageReference Include="xunit.v3" Version="3.2.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="4.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -19,10 +26,43 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <!-- Headless rendering (versions must match the Avalonia packages in the GUI project). -->
+    <PackageReference Include="Avalonia.Headless.XUnit" Version="12.1.1" />
+    <PackageReference Include="Avalonia.Skia" Version="12.1.1" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="12.1.1" />
+    <!-- Bundled Inter font: registered as "fonts:Inter#Inter" by WithInterFont() and
+         pinned as the FontManagerOptions default family, so text resolves without
+         consulting system fontconfig (which the NoDependencies Skia binary lacks). -->
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="12.1.1" />
+    <!-- Fontconfig-free Skia native binary: some minimal environments (containers, bare CI
+         images) lack libfontconfig.so.1, which the regular SkiaSharp.NativeAssets.Linux
+         binary links against. Rendering only uses the bundled Inter font, so fontconfig is
+         not required. Version must match the SkiaSharp version Avalonia.Skia pulls in. -->
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="3.119.4" />
+    <!-- Suppress the fontconfig-dependent libSkiaSharp that Avalonia.Skia pulls in
+         transitively; both packages ship the same asset path and the transitive one
+         would otherwise win the duplicate-asset resolution. -->
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="3.119.4" ExcludeAssets="all" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\VDrumExplorer.Gui.Avalonia\VDrumExplorer.Gui.Avalonia.csproj" />
+    <!-- Referenced directly for IViewServices, LogViewModel and DeviceViewModel used by the
+         visual tests. (Also available transitively via the GUI project.) -->
+    <ProjectReference Include="..\VDrumExplorer.ViewModel\VDrumExplorer.ViewModel.csproj" />
+    <!-- Referenced directly for ProtoIo, used by TestData to load the embedded .vdrum file. -->
+    <ProjectReference Include="..\VDrumExplorer.Proto\VDrumExplorer.Proto.csproj" />
+  </ItemGroup>
+
+  <!-- Baseline screenshots are compared against freshly rendered windows at test time. -->
+  <ItemGroup>
+    <Content Include="Baselines\**\*.png" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <!-- Sample TD-27 module data, loaded by TestData to construct the Data Explorer and
+       dialog view models. Embedded so the tests do not depend on the working directory. -->
+  <ItemGroup>
+    <EmbeddedResource Include="..\td27.vdrum" LogicalName="td27.vdrum" />
   </ItemGroup>
 
 </Project>

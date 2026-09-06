@@ -13,11 +13,13 @@ class Program
     // Initialization code. Don't use any Avalonia, third-party APIs or any
     // SynchronizationContext-reliant code before AppMain, as things may not be
     // initialized yet.
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     [STAThread]
     public static void Main(string[] args) => BuildAvaloniaApp()
         .StartWithClassicDesktopLifetime(args);
 
     // Avalonia configuration, don't remove; also used by visual designer.
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public static AppBuilder BuildAvaloniaApp()
         => AppBuilder.Configure<App>()
             .UsePlatformDetect()

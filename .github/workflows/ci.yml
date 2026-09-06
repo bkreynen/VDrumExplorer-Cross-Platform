@@ -35,16 +35,62 @@ jobs:
         shell: bash
         run: dotnet build Drums.sln --configuration Release
 
+      # `dotnet test` accepts only one project on the .NET 10 SDK (MSB1008), so the
+      # VSTest-compatible projects are tested in a loop. The Avalonia visual test
+      # project is excluded here (runs in the next step).
       - name: Run tests with coverage
         shell: bash
-        run: dotnet test Drums.sln --no-build --configuration Release --collect:"XPlat Code Coverage" --results-directory ./TestResults --settings coverlet.runsettings
+        run: |
+          for project in \
+            VDrumExplorer.Model.Test/VDrumExplorer.Model.Test.csproj \
+            VDrumExplorer.ViewModel.Test/VDrumExplorer.ViewModel.Test.csproj \
+            VDrumExplorer.Utility.Test/VDrumExplorer.Utility.Test.csproj \
+            VDrumExplorer.Proto.Test/VDrumExplorer.Proto.Test.csproj \
+            VDrumExplorer.Midi.ManagedMidi.Test/VDrumExplorer.Midi.ManagedMidi.Test.csproj
+          do
+            dotnet test "$project" \
+              --no-build --configuration Release \
+              --collect:"XPlat Code Coverage" \
+              --results-directory ./TestResults \
+              --settings coverlet.runsettings
+          done
+
+      # The Avalonia headless visual tests run their own executable (xunit.v3 on
+      # Microsoft.Testing.Platform) and render with the bundled Inter font, so they are
+      # invoked directly rather than via `dotnet test`. On Linux the run is wrapped in
+      # the `dotnet-coverage` global tool to collect coverage: coverlet.collector is a
+      # VSTest data collector that never loads outside VSTest, and every coverlet.MTP
+      # release depends on Microsoft.Testing.Platform >= 2.0.2, which is
+      # binary-incompatible with the MTP 1.9.1 that xunit.v3 3.2.2 was compiled against
+      # (TypeLoadException at startup). Exclusions live in dotnet-coverage.settings.xml.
+      # Other OSes run the tests bare: dynamic instrumentation is unavailable on macOS
+      # arm64 runners, and only Linux publishes coverage to Coveralls.
+      - name: Run Avalonia visual tests with coverage
+        if: matrix.os == 'ubuntu-latest'
+        shell: bash
+        env:
+          DOTNET_COVERAGE_TELEMETRY_OPTOUT: 1
+        run: |
+          dotnet tool install --global dotnet-coverage
+          mkdir -p ./TestResults
+          dotnet-coverage collect \
+            --settings dotnet-coverage.settings.xml \
+            --output-format cobertura \
+            --output ./TestResults/VDrumExplorer.Gui.Avalonia.Test.cobertura.xml \
+            --nologo \
+            -- dotnet VDrumExplorer.Gui.Avalonia.Test/bin/Release/net10.0/VDrumExplorer.Gui.Avalonia.Test.dll
+
+      - name: Run Avalonia visual tests
+        if: matrix.os != 'ubuntu-latest'
+        shell: bash
+        run: dotnet VDrumExplorer.Gui.Avalonia.Test/bin/Release/net10.0/VDrumExplorer.Gui.Avalonia.Test.dll
 
       - name: Locate cobertura files
         if: matrix.os == 'ubuntu-latest'
         id: coverage
         shell: bash
         run: |
-          files=$(find ./TestResults -name 'coverage.cobertura.xml' | tr '\n' ' ' | sed 's/ $//')
+          files=$(find ./TestResults -name '*.cobertura.xml' | tr '\n' ' ' | sed 's/ $//')
           echo "files=$files" >> "$GITHUB_OUTPUT"
 
       - name: Upload coverage to Coveralls

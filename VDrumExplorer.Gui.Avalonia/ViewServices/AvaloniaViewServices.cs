@@ -175,7 +175,8 @@ internal sealed class AvaloniaViewServices : IViewServices
     /// "Description1|*.ext1|Description2|*.ext2") into Avalonia FilePickerFileType[].
     /// Multiple extensions within one filter are separated by semicolons (e.g. "*.vdrum;*.vkit").
     /// </summary>
-    private static List<FilePickerFileType> ParseFilter(string filter)
+    // Internal (rather than private) so the interaction tests can verify the parsing directly.
+    internal static List<FilePickerFileType> ParseFilter(string filter)
     {
         var types = new List<FilePickerFileType>();
         var parts = filter.Split('|');
