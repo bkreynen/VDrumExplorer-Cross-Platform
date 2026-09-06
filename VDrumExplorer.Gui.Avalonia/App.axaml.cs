@@ -28,6 +28,7 @@ public class App : Application
         AvaloniaXamlLoader.Load(this);
     }
 
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public override void OnFrameworkInitializationCompleted()
     {
         // Set up the MIDI manager (cross-platform managed-midi implementation).
@@ -78,6 +79,7 @@ public class App : Application
         base.OnFrameworkInitializationCompleted();
     }
 
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public override void RegisterServices()
     {
         base.RegisterServices();
