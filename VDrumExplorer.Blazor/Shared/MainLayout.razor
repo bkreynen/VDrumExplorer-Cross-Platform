@@ -1,7 +1,20 @@
 ﻿@inherits LayoutComponentBase
 
-<div class="main">
-    <div class="content px-4">
-        @Body
-    </div>
+<div class="app-shell">
+    <header class="app-header">
+        <div class="app-header-content">
+            <div class="app-logo">
+                <span class="app-logo-icon">🥁</span>
+                <span class="app-logo-text">V-Drum Explorer</span>
+            </div>
+        </div>
+    </header>
+    <main class="app-main">
+        <div class="app-content">
+            @Body
+        </div>
+    </main>
+    <footer class="app-footer">
+        <span>Built on <a href="https://blazor.net">Blazor</a> · Based on <a href="https://github.com/jskeet/DemoCode/tree/master/Drums">Jon Skeet's V-Drum Explorer</a></span>
+    </footer>
 </div>

@@ -4,8 +4,9 @@
         x:Class="VDrumExplorer.Gui.Avalonia.Views.SchemaExplorer"
         x:CompileBindings="True"
         x:DataType="vmls:ModuleSchemaViewModel"
-        Title="{Binding Title}" Height="450" Width="800">
-    <Grid>
+        Title="{Binding Title}" Height="600" Width="1000"
+        WindowStartupLocation="CenterScreen">
+    <Grid Margin="16">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*" />
             <ColumnDefinition Width="5" />
@@ -13,9 +14,8 @@
         </Grid.ColumnDefinitions>
 
         <!-- Tree of container nodes. -->
-        <TreeView x:Name="treeView" Grid.Column="0" BorderThickness="0" ItemsSource="{Binding Root}"
-                  SelectionChanged="TreeView_SelectionChanged"
-                  Margin="{StaticResource AllAroundMargin}">
+        <TreeView x:Name="treeView" Grid.Column="0" ItemsSource="{Binding Root}"
+                  SelectionChanged="TreeView_SelectionChanged">
             <TreeView.ItemTemplate>
                 <TreeDataTemplate ItemsSource="{Binding Children}" x:DataType="vmls:TreeNodeViewModel">
                     <TextBlock Text="{Binding Format.FormatString}" />
@@ -26,7 +26,7 @@
 
         <!-- Details for the selected node. -->
         <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" Grid.Column="2">
-            <StackPanel Margin="5,0,5,0">
+            <StackPanel Margin="8,0,8,0">
                 <GroupBox Header="Tree node">
                     <ItemsControl ItemsSource="{Binding SelectedNode.Table}" ItemTemplate="{StaticResource KeyValueItemTemplate}">
                         <ItemsControl.ItemsPanel>
