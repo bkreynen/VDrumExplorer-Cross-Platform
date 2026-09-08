@@ -93,6 +93,42 @@ jobs:
           files=$(find ./TestResults -name '*.cobertura.xml' | tr '\n' ' ' | sed 's/ $//')
           echo "files=$files" >> "$GITHUB_OUTPUT"
 
+      - name: Check coverage threshold
+        if: matrix.os == 'ubuntu-latest'
+        shell: bash
+        run: |
+          # Parse all Cobertura XML files and compute overall line coverage.
+          # Cobertura <coverage line-rate="0.87" ...> — line-rate is a fraction 0-1.
+          total_lines=0
+          covered_lines=0
+          for xml in $(find ./TestResults -name '*.cobertura.xml'); do
+            # Extract line-rate and total/covered line counts from each report.
+            rate=$(grep -oP '<coverage[^>]*line-rate="\K[0-9.]+' "$xml" | head -1)
+            lines_valid=$(grep -oP '<coverage[^>]*lines-valid="\K[0-9]+' "$xml" | head -1)
+            lines_covered=$(grep -oP '<coverage[^>]*lines-covered="\K[0-9]+' "$xml" | head -1)
+            # Fallback: if lines-valid/lines-covered are not present, compute from line-rate.
+            if [ -z "$lines_valid" ] || [ "$lines_valid" = "0" ]; then
+              echo "  $xml: line-rate=$rate (no line counts, skipping)"
+              continue
+            fi
+            total_lines=$((total_lines + lines_valid))
+            covered_lines=$((covered_lines + lines_covered))
+            pct=$(awk "BEGIN {printf \"%.1f\", ($lines_covered / $lines_valid) * 100}")
+            echo "  $xml: $pct% ($lines_covered/$lines_valid lines)"
+          done
+          if [ "$total_lines" -eq 0 ]; then
+            echo "WARNING: No line coverage data found in Cobertura reports."
+            exit 0
+          fi
+          overall=$(awk "BEGIN {printf \"%.1f\", ($covered_lines / $total_lines) * 100}")
+          echo "Overall coverage: $overall% ($covered_lines/$total_lines lines)"
+          threshold=85
+          if awk "BEGIN {exit !($overall < $threshold)}"; then
+            echo "ERROR: Coverage $overall% is below the $threshold% threshold."
+            exit 1
+          fi
+          echo "Coverage $overall% meets the $threshold% threshold."
+
       - name: Upload coverage to Coveralls
         if: matrix.os == 'ubuntu-latest'
         uses: coverallsapp/github-action@v2
