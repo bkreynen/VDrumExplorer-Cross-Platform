@@ -135,7 +135,7 @@ jobs:
 
           overall=$(awk "BEGIN {printf \"%.1f\", ($lines_covered / $lines_valid) * 100}")
           echo "Overall coverage: $overall% ($lines_covered/$lines_valid lines)"
-          threshold=65
+          threshold=90
           if awk "BEGIN {exit !($overall < $threshold)}"; then
             echo "ERROR: Coverage $overall% is below the $threshold% threshold."
             exit 1
