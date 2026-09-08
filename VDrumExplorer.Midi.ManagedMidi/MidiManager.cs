@@ -15,12 +15,28 @@ namespace VDrumExplorer.Midi.ManagedMidi
     /// </summary>
     public class MidiManager : IMidiManager
     {
+        private readonly IMidiAccess access;
+
+        /// <summary>
+        /// Creates a manager using the default system MIDI access (hardware-backed).
+        /// </summary>
+        public MidiManager() : this(MidiAccessManager.Default)
+        {
+        }
+
+        /// <summary>
+        /// Creates a manager using the given <see cref="IMidiAccess"/>, enabling
+        /// hardware-free testing with fake implementations. Internal so that only
+        /// the test project (via InternalsVisibleTo) can inject a non-default access.
+        /// </summary>
+        internal MidiManager(IMidiAccess access) => this.access = access;
+
         public IEnumerable<MidiInputDevice> ListInputDevices() =>
-            MidiAccessManager.Default.Inputs
+            access.Inputs
                 .Select(port => new MidiInputDevice(port.Id, port.Name, port.Manufacturer));
 
         public IEnumerable<MidiOutputDevice> ListOutputDevices() =>
-            MidiAccessManager.Default.Outputs
+            access.Outputs
                 .Select(port => new MidiOutputDevice(port.Id, port.Name, port.Manufacturer));
 
         public async Task<Model.Midi.IMidiInput> OpenInputAsync(Model.Midi.MidiInputDevice input)
@@ -32,7 +48,7 @@ namespace VDrumExplorer.Midi.ManagedMidi
             {
                 try
                 {
-                    var managedInput = await MidiAccessManager.Default.OpenInputAsync(input.SystemDeviceId);
+                    var managedInput = await access.OpenInputAsync(input.SystemDeviceId);
                     return new MidiInput(managedInput);
                 }
                 catch when (failures < 3)
@@ -45,7 +61,7 @@ namespace VDrumExplorer.Midi.ManagedMidi
 
         public async Task<Model.Midi.IMidiOutput> OpenOutputAsync(Model.Midi.MidiOutputDevice output)
         {
-            var managedOutput = await MidiAccessManager.Default.OpenOutputAsync(output.SystemDeviceId);
+            var managedOutput = await access.OpenOutputAsync(output.SystemDeviceId);
             return new MidiOutput(managedOutput);
         }
     }
