@@ -8,7 +8,7 @@
     </Style>
 
     <Style Selector="Button">
-        <Setter Property="CornerRadius" Value="{StaticResource ButtonCornerRadius}" />
+        <Setter Property="CornerRadius" Value="{DynamicResource ButtonCornerRadius}" />
         <Setter Property="Padding" Value="16,8" />
         <Setter Property="FontWeight" Value="Medium" />
         <Setter Property="MinHeight" Value="32" />
@@ -52,7 +52,7 @@
     </Style>
 
     <Style Selector="TextBox">
-        <Setter Property="CornerRadius" Value="{StaticResource InputCornerRadius}" />
+        <Setter Property="CornerRadius" Value="{DynamicResource InputCornerRadius}" />
         <Setter Property="Padding" Value="8,6" />
         <Setter Property="MinHeight" Value="32" />
         <Setter Property="BorderBrush" Value="{DynamicResource CardBorder}" />
@@ -73,11 +73,11 @@
     </Style>
 
     <Style Selector="GroupBox">
-        <Setter Property="CornerRadius" Value="{StaticResource CardCornerRadius}" />
+        <Setter Property="CornerRadius" Value="{DynamicResource CardCornerRadius}" />
         <Setter Property="BorderBrush" Value="{DynamicResource CardBorder}" />
         <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="Padding" Value="{StaticResource CardPadding}" />
-        <Setter Property="Margin" Value="{StaticResource CardMargin}" />
+        <Setter Property="Padding" Value="{DynamicResource CardPadding}" />
+        <Setter Property="Margin" Value="{DynamicResource CardMargin}" />
         <Setter Property="Background" Value="{DynamicResource CardBackground}" />
     </Style>
 
@@ -96,7 +96,7 @@
     <Style Selector="TreeView">
         <Setter Property="BorderBrush" Value="{DynamicResource CardBorder}" />
         <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="CornerRadius" Value="{StaticResource CardCornerRadius}" />
+        <Setter Property="CornerRadius" Value="{DynamicResource CardCornerRadius}" />
         <Setter Property="Background" Value="{DynamicResource CardBackground}" />
     </Style>
     <Style Selector="TreeViewItem">
@@ -125,7 +125,7 @@
     <Style Selector="ListBox">
         <Setter Property="BorderBrush" Value="{DynamicResource CardBorder}" />
         <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="CornerRadius" Value="{StaticResource CardCornerRadius}" />
+        <Setter Property="CornerRadius" Value="{DynamicResource CardCornerRadius}" />
         <Setter Property="Background" Value="{DynamicResource CardBackground}" />
     </Style>
     <Style Selector="ListBoxItem">
