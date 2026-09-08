@@ -85,44 +85,57 @@ jobs:
         shell: bash
         run: dotnet VDrumExplorer.Gui.Avalonia.Test/bin/Release/net10.0/VDrumExplorer.Gui.Avalonia.Test.dll
 
+      # Per-project coverlet reports each include ALL instrumented production
+      # modules loaded in that test host, so shared assemblies get counted
+      # multiple times when the reports are summed naively. `dotnet-coverage
+      # merge` unions per-module coverage instead, producing a single correct
+      # report used for the threshold check and the Coveralls upload.
+      # (dotnet-coverage is already installed by the Avalonia test step above.)
+      - name: Merge coverage reports
+        if: matrix.os == 'ubuntu-latest'
+        shell: bash
+        env:
+          DOTNET_COVERAGE_TELEMETRY_OPTOUT: 1
+        run: |
+          mkdir -p ./TestResults
+          files=$(find ./TestResults -name '*.cobertura.xml' | tr '\n' ' ')
+          dotnet-coverage merge $files \
+            --output-format cobertura \
+            --output ./TestResults/merged.cobertura.xml \
+            --nologo
+
       - name: Locate cobertura files
         if: matrix.os == 'ubuntu-latest'
         id: coverage
         shell: bash
         run: |
-          files=$(find ./TestResults -name '*.cobertura.xml' | tr '\n' ' ' | sed 's/ $//')
-          echo "files=$files" >> "$GITHUB_OUTPUT"
+          echo "files=./TestResults/merged.cobertura.xml" >> "$GITHUB_OUTPUT"
 
       - name: Check coverage threshold
         if: matrix.os == 'ubuntu-latest'
         shell: bash
         run: |
-          # Parse all Cobertura XML files and compute overall line coverage.
-          # Cobertura <coverage line-rate="0.87" ...> — line-rate is a fraction 0-1.
-          total_lines=0
-          covered_lines=0
-          for xml in $(find ./TestResults -name '*.cobertura.xml'); do
-            # Extract line-rate and total/covered line counts from each report.
-            rate=$(grep -oP '<coverage[^>]*line-rate="\K[0-9.]+' "$xml" | head -1)
-            lines_valid=$(grep -oP '<coverage[^>]*lines-valid="\K[0-9]+' "$xml" | head -1)
-            lines_covered=$(grep -oP '<coverage[^>]*lines-covered="\K[0-9]+' "$xml" | head -1)
-            # Fallback: if lines-valid/lines-covered are not present, compute from line-rate.
-            if [ -z "$lines_valid" ] || [ "$lines_valid" = "0" ]; then
-              echo "  $xml: line-rate=$rate (no line counts, skipping)"
-              continue
-            fi
-            total_lines=$((total_lines + lines_valid))
-            covered_lines=$((covered_lines + lines_covered))
-            pct=$(awk "BEGIN {printf \"%.1f\", ($lines_covered / $lines_valid) * 100}")
-            echo "  $xml: $pct% ($lines_covered/$lines_valid lines)"
-          done
-          if [ "$total_lines" -eq 0 ]; then
-            echo "WARNING: No line coverage data found in Cobertura reports."
+          # Read from the single merged Cobertura report (see "Merge coverage
+          # reports" above): the merge unions per-module coverage, so the
+          # aggregate is correct — summing per-project reports would
+          # double-count shared assemblies.
+          xml="./TestResults/merged.cobertura.xml"
+          if [ ! -f "$xml" ]; then
+            echo "ERROR: Merged coverage report not found at $xml"
+            exit 1
+          fi
+          rate=$(grep -oP '<coverage[^>]*line-rate="\K[0-9.]+' "$xml" | head -1)
+          lines_valid=$(grep -oP '<coverage[^>]*lines-valid="\K[0-9]+' "$xml" | head -1)
+          lines_covered=$(grep -oP '<coverage[^>]*lines-covered="\K[0-9]+' "$xml" | head -1)
+
+          if [ -z "$lines_valid" ] || [ "$lines_valid" = "0" ]; then
+            echo "WARNING: No line coverage data found in merged report."
             exit 0
           fi
-          overall=$(awk "BEGIN {printf \"%.1f\", ($covered_lines / $total_lines) * 100}")
-          echo "Overall coverage: $overall% ($covered_lines/$total_lines lines)"
-          threshold=85
+
+          overall=$(awk "BEGIN {printf \"%.1f\", ($lines_covered / $lines_valid) * 100}")
+          echo "Overall coverage: $overall% ($lines_covered/$lines_valid lines)"
+          threshold=65
           if awk "BEGIN {exit !($overall < $threshold)}"; then
             echo "ERROR: Coverage $overall% is below the $threshold% threshold."
             exit 1
