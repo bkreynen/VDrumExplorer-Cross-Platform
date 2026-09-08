@@ -22,10 +22,6 @@
         <ModulePath>.*VDrumExplorer\.Benchmarks\.dll$</ModulePath>
         <ModulePath>.*VDrumExplorer\.InstrumentParser\.dll$</ModulePath>
         <ModulePath>.*VDrumExplorer\.Gui\.Avalonia\.dll$</ModulePath>
-        <!-- Third-party MIDI library (NuGet: ManagedMidi) — instrumented because it loads
-             in the test host, but not our code. Excluding it makes CI and Coveralls converge. -->
-        <ModulePath>.*ManagedMidi\.dll$</ModulePath>
-        <ModulePath>.*Commons\.Music\.Midi\.dll$</ModulePath>
       </Exclude>
     </ModulePaths>
 

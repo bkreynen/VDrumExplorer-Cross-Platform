@@ -115,32 +115,57 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         shell: bash
         run: |
-          # Read from the single merged Cobertura report (see "Merge coverage
-          # reports" above): the merge unions per-module coverage, so the
-          # aggregate is correct — summing per-project reports would
-          # double-count shared assemblies.
-          xml="./TestResults/merged.cobertura.xml"
-          if [ ! -f "$xml" ]; then
-            echo "ERROR: Merged coverage report not found at $xml"
-            exit 1
-          fi
-          rate=$(grep -oP '<coverage[^>]*line-rate="\K[0-9.]+' "$xml" | head -1)
-          lines_valid=$(grep -oP '<coverage[^>]*lines-valid="\K[0-9]+' "$xml" | head -1)
-          lines_covered=$(grep -oP '<coverage[^>]*lines-covered="\K[0-9]+' "$xml" | head -1)
+          # The merged Cobertura report combines coverlet (VSTest) and dotnet-coverage
+          # (MTP) collector formats. Both collectors instrument the same source files but
+          # emit different filename forms (e.g. "VDrumExplorer.Utility/Timing.cs" vs bare
+          # "Timing.cs"), so the top-level <coverage> aggregate double-counts lines.
+          # Parse per-<class> entries, deduplicate by filename basename (keeping the entry
+          # with higher lines-covered), and compute the true per-file union — matching
+          # how Coveralls reports coverage.
+          python3 - <<'PYEOF'
+          import xml.etree.ElementTree as ET
+          import os
+          import sys
 
-          if [ -z "$lines_valid" ] || [ "$lines_valid" = "0" ]; then
-            echo "WARNING: No line coverage data found in merged report."
-            exit 0
-          fi
+          xml_path = "./TestResults/merged.cobertura.xml"
+          if not os.path.isfile(xml_path):
+              print(f"ERROR: Merged coverage report not found at {xml_path}")
+              sys.exit(1)
 
-          overall=$(awk "BEGIN {printf \"%.1f\", ($lines_covered / $lines_valid) * 100}")
-          echo "Overall coverage: $overall% ($lines_covered/$lines_valid lines)"
-          threshold=90
-          if awk "BEGIN {exit !($overall < $threshold)}"; then
-            echo "ERROR: Coverage $overall% is below the $threshold% threshold."
-            exit 1
-          fi
-          echo "Coverage $overall% meets the $threshold% threshold."
+          tree = ET.parse(xml_path)
+          root = tree.getroot()
+
+          # Collect per-class coverage, keyed by filename basename.
+          # When the same basename appears in both coverlet and dotnet-coverage formats,
+          # keep the entry with the higher lines-covered (the more accurate collector for
+          # that test host).
+          best_by_basename = {}
+          for cls in root.iter('class'):
+              filename = cls.get('filename', '')
+              if not filename:
+                  continue
+              basename = os.path.basename(filename)
+              lines_valid = int(cls.get('lines-valid', 0))
+              lines_covered = int(cls.get('lines-covered', 0))
+              if basename not in best_by_basename or lines_covered > best_by_basename[basename][1]:
+                  best_by_basename[basename] = (lines_valid, lines_covered)
+
+          total_valid = sum(v[0] for v in best_by_basename.values())
+          total_covered = sum(v[1] for v in best_by_basename.values())
+
+          if total_valid == 0:
+              print("WARNING: No line coverage data found in merged report.")
+              sys.exit(0)
+
+          overall = (total_covered / total_valid) * 100
+          print(f"Overall coverage: {overall:.1f}% ({total_covered}/{total_valid} lines)")
+
+          threshold = 90
+          if overall < threshold:
+              print(f"ERROR: Coverage {overall:.1f}% is below the {threshold}% threshold.")
+              sys.exit(1)
+          print(f"Coverage {overall:.1f}% meets the {threshold}% threshold.")
+          PYEOF
 
       - name: Upload coverage to Coveralls
         if: matrix.os == 'ubuntu-latest'
