@@ -139,14 +139,25 @@ jobs:
           # When the same basename appears in both coverlet and dotnet-coverage formats,
           # keep the entry with the higher lines-covered (the more accurate collector for
           # that test host).
+          # NOTE: dotnet-coverage's Cobertura output does NOT emit lines-valid/lines-covered
+          # attributes on <class> elements (only coverlet does), so per-class counts are
+          # computed from the class-level <lines> children in both formats.
           best_by_basename = {}
           for cls in root.iter('class'):
               filename = cls.get('filename', '')
               if not filename:
                   continue
               basename = os.path.basename(filename)
-              lines_valid = int(cls.get('lines-valid', 0))
-              lines_covered = int(cls.get('lines-covered', 0))
+              lines_elem = cls.find('lines')
+              if lines_elem is not None:
+                  line_nodes = lines_elem.findall('line')
+                  lines_valid = len(line_nodes)
+                  lines_covered = sum(1 for ln in line_nodes if int(ln.get('hits', '0')) > 0)
+              else:
+                  lines_valid = int(cls.get('lines-valid', 0))
+                  lines_covered = int(cls.get('lines-covered', 0))
+              if lines_valid == 0:
+                  continue
               if basename not in best_by_basename or lines_covered > best_by_basename[basename][1]:
                   best_by_basename[basename] = (lines_valid, lines_covered)
 
