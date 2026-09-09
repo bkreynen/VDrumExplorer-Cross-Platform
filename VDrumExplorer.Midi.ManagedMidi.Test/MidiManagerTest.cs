@@ -5,179 +5,255 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using ManagedMidi;
 using NUnit.Framework;
+using VDrumExplorer.Midi.ManagedMidi.Test.Fakes;
 using VDrumExplorer.Model.Midi;
 
 namespace VDrumExplorer.Midi.ManagedMidi.Test
 {
-    /// <remarks>
-    /// Coverage note: MidiManager.OpenInputAsync / OpenOutputAsync are intentionally not fully covered.
-    /// They delegate to the static singleton MidiAccessManager.Default which talks directly to OS MIDI hardware
-    /// (ALSA on Linux, WinMM on Windows, CoreMIDI on macOS). The retry loop in OpenInputAsync (3 retries with
-    /// Task.Delay(250) on Win32Exception) cannot be exercised without either real hardware or a mockable
-    /// abstraction over MidiAccessManager. That abstraction does not exist in the ManagedMidi library, so the
-    /// methods are fundamentally untestable in a unit-test context without hardware. ListInputDevices /
-    /// ListOutputDevices are the coverable surface and are tested here; they correctly project
-    /// IMidiPortDetails (Id, Name, Manufacturer) into Model.Midi.MidiInputDevice/MidiOutputDevice.
-    /// If stricter coverage gating is required, consider adding [ExcludeFromCodeCoverage] to the
-    /// OpenInputAsync/OpenOutputAsync state machines rather than introducing a test-only seam.
-    /// </remarks>
     public class MidiManagerTest
     {
-        private MidiManager manager = null!;
+        [Test]
+        public void ListInputDevices_ProjectsFakeInputs()
+        {
+            var access = new FakeMidiAccess
+            {
+                Inputs = new List<IMidiPortDetails>
+                {
+                    new FakePortDetails("in-1", "TD-50 Input", "Roland"),
+                },
+            };
+            var manager = new MidiManager(access);
 
-        [SetUp]
-        public void SetUp() => manager = new MidiManager();
+            var devices = manager.ListInputDevices().ToList();
+
+            Assert.AreEqual(1, devices.Count);
+            Assert.AreEqual("in-1", devices[0].SystemDeviceId);
+            Assert.AreEqual("TD-50 Input", devices[0].Name);
+            // Manufacturer is internal on MidiDeviceBase (not visible to this assembly);
+            // it is included in ToString, so assert via that.
+            Assert.That(devices[0].ToString(), Does.Contain("Roland"));
+        }
 
         [Test]
-        public void ListInputDevices_ReturnsNonNullEnumerable()
+        public void ListInputDevices_NoDevices_ReturnsEmpty()
         {
-            IEnumerable<MidiInputDevice> devices;
-            try
-            {
-                devices = manager.ListInputDevices();
-            }
-            catch (Exception ex)
-            {
-                Assert.Inconclusive($"ListInputDevices threw on this system (likely no ALSA/MIDI support): {ex.GetType().Name}: {ex.Message}");
-                return;
-            }
+            var access = new FakeMidiAccess { Inputs = new List<IMidiPortDetails>() };
+            var manager = new MidiManager(access);
+
+            var devices = manager.ListInputDevices().ToList();
 
             Assert.IsNotNull(devices);
-            // Enumerate to ensure the enumerable can be evaluated without error.
-            var list = devices.ToList();
-            Assert.IsNotNull(list);
+            Assert.AreEqual(0, devices.Count);
         }
 
         [Test]
-        public void ListOutputDevices_ReturnsNonNullEnumerable()
+        public void ListInputDevices_MultipleDevices_AllProjected()
         {
-            IEnumerable<MidiOutputDevice> devices;
-            try
+            var access = new FakeMidiAccess
             {
-                devices = manager.ListOutputDevices();
-            }
-            catch (Exception ex)
-            {
-                Assert.Inconclusive($"ListOutputDevices threw on this system (likely no ALSA/MIDI support): {ex.GetType().Name}: {ex.Message}");
-                return;
-            }
+                Inputs = new List<IMidiPortDetails>
+                {
+                    new FakePortDetails("in-1", "TD-50 Input", "Roland"),
+                    new FakePortDetails("in-2", "UM-ONE Input", "Roland"),
+                    new FakePortDetails("in-3", "Scarlett Input", "Focusrite"),
+                },
+            };
+            var manager = new MidiManager(access);
 
-            Assert.IsNotNull(devices);
-            // Enumerate to ensure the enumerable can be evaluated without error.
-            var list = devices.ToList();
-            Assert.IsNotNull(list);
-        }
+            var devices = manager.ListInputDevices().ToList();
 
-        [Test]
-        public void ListInputDevices_DevicesHaveValidProperties()
-        {
-            IEnumerable<MidiInputDevice> devices;
-            try
-            {
-                devices = manager.ListInputDevices();
-            }
-            catch (Exception ex)
-            {
-                Assert.Inconclusive($"ListInputDevices threw on this system (likely no ALSA/MIDI support): {ex.GetType().Name}: {ex.Message}");
-                return;
-            }
-
-            var list = devices.ToList();
-            if (list.Count == 0)
-            {
-                Assert.Inconclusive("No MIDI input ports exposed on this system — loop would vacuously pass; cannot verify projection");
-                return;
-            }
-            foreach (var device in list)
-            {
-                Assert.IsNotNull(device.SystemDeviceId, "SystemDeviceId should not be null");
-                Assert.IsNotNull(device.Name, "Name should not be null");
-                // SystemDeviceId and Name are projected from IMidiPortDetails via MidiManager.Select; Manufacturer also available but not asserted here.
-                Assert.IsNotEmpty(device.SystemDeviceId, "SystemDeviceId should be non-empty");
-                Assert.IsNotEmpty(device.Name, "Name should be non-empty");
-            }
-        }
-
-        [Test]
-        public void ListOutputDevices_DevicesHaveValidProperties()
-        {
-            IEnumerable<MidiOutputDevice> devices;
-            try
-            {
-                devices = manager.ListOutputDevices();
-            }
-            catch (Exception ex)
-            {
-                Assert.Inconclusive($"ListOutputDevices threw on this system (likely no ALSA/MIDI support): {ex.GetType().Name}: {ex.Message}");
-                return;
-            }
-
-            var list = devices.ToList();
-            if (list.Count == 0)
-            {
-                Assert.Inconclusive("No MIDI output ports exposed on this system — loop would vacuously pass; cannot verify projection");
-                return;
-            }
-            foreach (var device in list)
-            {
-                Assert.IsNotNull(device.SystemDeviceId, "SystemDeviceId should not be null");
-                Assert.IsNotNull(device.Name, "Name should not be null");
-                Assert.IsNotEmpty(device.SystemDeviceId, "SystemDeviceId should be non-empty");
-                Assert.IsNotEmpty(device.Name, "Name should be non-empty");
-            }
+            Assert.AreEqual(3, devices.Count);
+            Assert.That(
+                devices.Select(d => d.SystemDeviceId).ToList(),
+                Is.EquivalentTo(new[] { "in-1", "in-2", "in-3" }));
+            Assert.That(
+                devices.Select(d => d.Name).ToList(),
+                Is.EquivalentTo(new[] { "TD-50 Input", "UM-ONE Input", "Scarlett Input" }));
         }
 
         [Test]
         public void ListInputDevices_CanBeEnumeratedMultipleTimes()
         {
-            IEnumerable<MidiInputDevice> devices;
-            try
+            var access = new FakeMidiAccess
             {
-                devices = manager.ListInputDevices();
-            }
-            catch (Exception ex)
-            {
-                Assert.Inconclusive($"ListInputDevices threw on this system (likely no ALSA/MIDI support): {ex.GetType().Name}: {ex.Message}");
-                return;
-            }
+                Inputs = new List<IMidiPortDetails>
+                {
+                    new FakePortDetails("in-1", "TD-50 Input", "Roland"),
+                    new FakePortDetails("in-2", "UM-ONE Input", "Roland"),
+                },
+            };
+            var manager = new MidiManager(access);
 
-            // Snapshot via ToList().Count to avoid double Count() re-querying OS (hot-plug race); each ToList enumerates once and freezes count.
-            var first = devices.ToList().Count;
-            var second = devices.ToList().Count;
-            Assert.AreEqual(first, second, "Enumerating the same device list twice should yield the same count");
+            var devices = manager.ListInputDevices();
+            var first = devices.ToList();
+            var second = devices.ToList();
+
+            Assert.AreEqual(first.Count, second.Count);
+            // MidiDeviceBase has no Equals override and each enumeration constructs
+            // new instances, so compare by identity fields rather than references.
+            Assert.That(second.Select(d => (d.SystemDeviceId, d.Name)).ToList(),
+                Is.EquivalentTo(first.Select(d => (d.SystemDeviceId, d.Name)).ToList()));
+        }
+
+        [Test]
+        public void ListOutputDevices_ProjectsFakeOutputs()
+        {
+            var access = new FakeMidiAccess
+            {
+                Outputs = new List<IMidiPortDetails>
+                {
+                    new FakePortDetails("out-1", "TD-50 Output", "Roland"),
+                },
+            };
+            var manager = new MidiManager(access);
+
+            var devices = manager.ListOutputDevices().ToList();
+
+            Assert.AreEqual(1, devices.Count);
+            Assert.AreEqual("out-1", devices[0].SystemDeviceId);
+            Assert.AreEqual("TD-50 Output", devices[0].Name);
+            Assert.That(devices[0].ToString(), Does.Contain("Roland"));
+        }
+
+        [Test]
+        public void ListOutputDevices_NoDevices_ReturnsEmpty()
+        {
+            var access = new FakeMidiAccess { Outputs = new List<IMidiPortDetails>() };
+            var manager = new MidiManager(access);
+
+            var devices = manager.ListOutputDevices().ToList();
+
+            Assert.IsNotNull(devices);
+            Assert.AreEqual(0, devices.Count);
+        }
+
+        [Test]
+        public void ListOutputDevices_MultipleDevices_AllProjected()
+        {
+            var access = new FakeMidiAccess
+            {
+                Outputs = new List<IMidiPortDetails>
+                {
+                    new FakePortDetails("out-1", "TD-50 Output", "Roland"),
+                    new FakePortDetails("out-2", "UM-ONE Output", "Roland"),
+                    new FakePortDetails("out-3", "Scarlett Output", "Focusrite"),
+                },
+            };
+            var manager = new MidiManager(access);
+
+            var devices = manager.ListOutputDevices().ToList();
+
+            Assert.AreEqual(3, devices.Count);
+            Assert.That(
+                devices.Select(d => d.SystemDeviceId).ToList(),
+                Is.EquivalentTo(new[] { "out-1", "out-2", "out-3" }));
+            Assert.That(
+                devices.Select(d => d.Name).ToList(),
+                Is.EquivalentTo(new[] { "TD-50 Output", "UM-ONE Output", "Scarlett Output" }));
         }
 
         [Test]
         public void ListOutputDevices_CanBeEnumeratedMultipleTimes()
         {
-            IEnumerable<MidiOutputDevice> devices;
-            try
+            var access = new FakeMidiAccess
             {
-                devices = manager.ListOutputDevices();
-            }
-            catch (Exception ex)
-            {
-                Assert.Inconclusive($"ListOutputDevices threw on this system (likely no ALSA/MIDI support): {ex.GetType().Name}: {ex.Message}");
-                return;
-            }
+                Outputs = new List<IMidiPortDetails>
+                {
+                    new FakePortDetails("out-1", "TD-50 Output", "Roland"),
+                    new FakePortDetails("out-2", "UM-ONE Output", "Roland"),
+                },
+            };
+            var manager = new MidiManager(access);
 
-            var first = devices.ToList().Count;
-            var second = devices.ToList().Count;
-            Assert.AreEqual(first, second, "Enumerating the same device list twice should yield the same count");
+            var devices = manager.ListOutputDevices();
+            var first = devices.ToList();
+            var second = devices.ToList();
+
+            Assert.AreEqual(first.Count, second.Count);
+            // MidiDeviceBase has no Equals override and each enumeration constructs
+            // new instances, so compare by identity fields rather than references.
+            Assert.That(second.Select(d => (d.SystemDeviceId, d.Name)).ToList(),
+                Is.EquivalentTo(first.Select(d => (d.SystemDeviceId, d.Name)).ToList()));
         }
 
-        // Hardware integration note: OpenInputAsync / OpenOutputAsync are intentionally not unit-tested here.
-        // They call MidiAccessManager.Default.OpenInputAsync / OpenOutputAsync which require OS MIDI hardware
-        // (ALSA/WinMM/CoreMIDI). Add [ExcludeFromCodeCoverage] to those production methods if strict gating
-        // is desired, rather than mocking the static singleton. See class <remarks> above for rationale.
         [Test]
-        public void OpenInputAsync_HardwareIntegration_IsExcludedFromCoverage()
+        public async Task OpenInputAsync_Success_ReturnsNonNullInput()
         {
-            // This test documents the coverage gap; it does not attempt to open hardware.
-            // If MidiManager.OpenInputAsync / OpenOutputAsync were to gain an IMidiAccessManager seam,
-            // a fake could exercise the retry-loop (Win32Exception 3× Delay 250) without hardware.
-            Assert.Inconclusive("OpenInputAsync/OpenOutputAsync require real MIDI hardware — intentionally excluded from unit coverage; see remarks");
+            var access = new FakeMidiAccess();
+            var manager = new MidiManager(access);
+            var device = new MidiInputDevice("td50-in", "TD-50", "Roland");
+
+            var input = await manager.OpenInputAsync(device);
+
+            Assert.IsNotNull(input);
+            Assert.AreEqual(1, access.OpenInputCallCount);
+        }
+
+        [Test]
+        public async Task OpenInputAsync_SucceedsAfterTwoFailures()
+        {
+            // Simulates the transient "device in use" error clearing after 2 attempts:
+            // call 1 and 2 throw, call 3 succeeds. The retry loop delays 250ms between
+            // attempts, so this test takes ~500ms.
+            var access = new FakeMidiAccess { OpenInputFailuresBeforeSuccess = 2 };
+            var manager = new MidiManager(access);
+            var device = new MidiInputDevice("td50-in", "TD-50", "Roland");
+
+            var input = await manager.OpenInputAsync(device);
+
+            Assert.IsNotNull(input);
+            Assert.AreEqual(3, access.OpenInputCallCount);
+        }
+
+        [Test]
+        public void OpenInputAsync_ExhaustsRetries_ThrowsAfterFourthAttempt()
+        {
+            // Retry loop: catch when (failures < 3) catches failures 0, 1, 2 (3 catches),
+            // then on the 4th attempt failures=3 so the filter is false and the exception
+            // propagates. OpenInputAsync is therefore called 4 times in total.
+            var access = new FakeMidiAccess
+            {
+                OpenInputException = new InvalidOperationException("Device in use (persistent)"),
+            };
+            var manager = new MidiManager(access);
+            var device = new MidiInputDevice("td50-in", "TD-50", "Roland");
+
+            var ex = Assert.ThrowsAsync<InvalidOperationException>(() => manager.OpenInputAsync(device));
+
+            Assert.AreEqual("Device in use (persistent)", ex!.Message);
+            Assert.AreEqual(4, access.OpenInputCallCount);
+        }
+
+        [Test]
+        public async Task OpenOutputAsync_Success_ReturnsNonNullOutput()
+        {
+            var access = new FakeMidiAccess();
+            var manager = new MidiManager(access);
+            var device = new MidiOutputDevice("td50-out", "TD-50", "Roland");
+
+            var output = await manager.OpenOutputAsync(device);
+
+            Assert.IsNotNull(output);
+            Assert.AreEqual(1, access.OpenOutputCallCount);
+        }
+
+        [Test]
+        public void OpenOutputAsync_ThrowsWhenAccessThrows_NoRetry()
+        {
+            var access = new FakeMidiAccess
+            {
+                OpenOutputException = new InvalidOperationException("Output unavailable"),
+            };
+            var manager = new MidiManager(access);
+            var device = new MidiOutputDevice("td50-out", "TD-50", "Roland");
+
+            var ex = Assert.ThrowsAsync<InvalidOperationException>(() => manager.OpenOutputAsync(device));
+
+            Assert.AreEqual("Output unavailable", ex!.Message);
+            Assert.AreEqual(1, access.OpenOutputCallCount);
         }
     }
 }

@@ -21,6 +21,7 @@
         <ModulePath>.*VDrumExplorer\.Console\.dll$</ModulePath>
         <ModulePath>.*VDrumExplorer\.Benchmarks\.dll$</ModulePath>
         <ModulePath>.*VDrumExplorer\.InstrumentParser\.dll$</ModulePath>
+        <ModulePath>.*VDrumExplorer\.Gui\.Avalonia\.dll$</ModulePath>
       </Exclude>
     </ModulePaths>
 

@@ -5,64 +5,94 @@
         x:Class="VDrumExplorer.Gui.Avalonia.Views.ExplorerHome"
         x:CompileBindings="True"
         x:DataType="vmh:ExplorerHomeViewModel"
-        Title="V-Drum Explorer Home"
-        Width="800" Height="450">
-    <DockPanel Margin="5">
-        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
-            <Button Command="{Binding LoadFileCommand}" Content="Load file"/>
-            <TextBlock Text="Connected device:" Margin="{StaticResource ValueMargin}" />
-            <TextBlock Text="{Binding DeviceViewModel.ConnectedDeviceName}" Margin="{StaticResource ValueMargin}"/>
+        Title="V-Drum Explorer"
+        Width="900" Height="600"
+        WindowStartupLocation="CenterScreen">
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="16">
+
+            <!-- Header -->
+            <TextBlock Classes="header" Text="V-Drum Explorer" />
+            <TextBlock Classes="subheader" Text="Explore and edit Roland V-Drum settings" />
+
+            <!-- File & Device Section -->
+            <GroupBox Header="File &amp; Device" Margin="{StaticResource CardMargin}">
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                        <Button Classes="accent" Command="{Binding LoadFileCommand}" Content="Load file"/>
+                        <TextBlock Classes="label" Text="Connected device:" Margin="16,0,0,0" />
+                        <TextBlock Text="{Binding DeviceViewModel.ConnectedDeviceName}" Margin="8,0,0,0" FontWeight="SemiBold"/>
+                    </StackPanel>
+                </StackPanel>
+            </GroupBox>
+
+            <!-- Schema Section -->
+            <GroupBox Header="Schema" Margin="{StaticResource CardMargin}">
+                <StackPanel>
+                    <TextBlock Classes="label" Text="Known schemas:" Margin="0,0,0,8" />
+                    <StackPanel Orientation="Horizontal">
+                        <ComboBox Margin="0" ItemsSource="{Binding KnownSchemas}" SelectedItem="{Binding SelectedSchema}" MinWidth="250">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate x:DataType="vmh:ModuleIdentifierViewModel">
+                                    <TextBlock Text="{Binding DisplayName}" />
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                        <Button Classes="accent" Margin="8,0,0,0" Command="{Binding OpenSchemaExplorerCommand}" Content="Explore" />
+                    </StackPanel>
+                </StackPanel>
+            </GroupBox>
+
+            <!-- Device Options Section -->
+            <GroupBox Header="Device Options" Margin="{StaticResource CardMargin}"
+                      IsEnabled="{Binding DeviceViewModel.DeviceConnected}">
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                        <Button Command="{Binding LoadModuleFromDeviceCommand}" Content="Load all data"/>
+                        <Button Margin="8,0,0,0" Command="{Binding LoadKitFromDeviceCommand}" Content="Load single kit"/>
+                        <TextBlock Classes="label" Text="Kit number:" Margin="16,0,0,0"/>
+                        <TextBox Margin="8,0,0,0" Text="{Binding LoadKitFromDeviceNumber}" Width="50"/>
+                    </StackPanel>
+                    <Button Command="{Binding RecordInstrumentAudioCommand}" Content="Record instruments" />
+                </StackPanel>
+            </GroupBox>
+
+            <!-- Log Section -->
+            <GroupBox Header="Log" Margin="{StaticResource CardMargin}">
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                        <TextBlock Classes="label" Text="Log level:"/>
+                        <ComboBox Margin="8,0,0,0" ItemsSource="{Binding LogViewModel.AllFilterLevels}" SelectedItem="{Binding LogViewModel.FilterLevel}" />
+                        <Button Margin="16,0,0,0" Command="{Binding SaveLogCommand}" Content="Save log file"/>
+                    </StackPanel>
+                    <Border Background="{DynamicResource LogBackground}" CornerRadius="{StaticResource CardCornerRadius}" Padding="12" MaxHeight="200">
+                        <ScrollViewer>
+                            <ItemsControl ItemsSource="{Binding LogViewModel.LogEntries}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="vmlog:LogEntryViewModel">
+                                        <Grid Margin="0,2,0,2">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="{Binding Timestamp}" Foreground="{DynamicResource LogForeground}" FontFamily="monospace" FontSize="12"/>
+                                            <TextBlock Grid.Column="1" Text="{Binding Level}" Margin="8,0,0,0" Foreground="{DynamicResource LogForeground}" FontFamily="monospace" FontSize="12" FontWeight="SemiBold"/>
+                                            <TextBlock Grid.Column="2" Text="{Binding Text}" Margin="8,0,0,0" Foreground="{DynamicResource LogForeground}" FontFamily="monospace" FontSize="12" TextWrapping="Wrap" ToolTip.Tip="{Binding ToolTip}"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </Border>
+                </StackPanel>
+            </GroupBox>
+
         </StackPanel>
-        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="{StaticResource PanelMargin}">
-            <TextBlock Text="Known schemas:" />
-            <ComboBox Margin="{StaticResource ValueMargin}" ItemsSource="{Binding KnownSchemas}" SelectedItem="{Binding SelectedSchema}">
-                <ComboBox.ItemTemplate>
-                    <DataTemplate x:DataType="vmh:ModuleIdentifierViewModel">
-                        <TextBlock Text="{Binding DisplayName}" />
-                    </DataTemplate>
-                </ComboBox.ItemTemplate>
-            </ComboBox>
-            <Button Margin="{StaticResource ValueMargin}" Command="{Binding OpenSchemaExplorerCommand}" Content="Explore" />
-        </StackPanel>
-        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" IsEnabled="{Binding DeviceViewModel.DeviceConnected}" Margin="{StaticResource PanelMargin}">
-            <!-- Note: primary reason for using labels instead of text blocks is that they reflect enabled state more simply. -->
-            <TextBlock Text="Device options:" />
-            <Button Margin="{StaticResource ValueMargin}" Command="{Binding LoadModuleFromDeviceCommand}" Content="Load all data"/>
-            <Button Margin="{StaticResource ValueMargin}" Command="{Binding LoadKitFromDeviceCommand}" Content="Load single kit"/>
-            <TextBlock Margin="{StaticResource ValueMargin}" Text="Kit number:"/>
-            <TextBox Margin="{StaticResource ValueMargin}" Text="{Binding LoadKitFromDeviceNumber}" Width="30"/>
-            <Button Margin="{StaticResource ValueMargin}" Command="{Binding RecordInstrumentAudioCommand}" Content="Record instruments" />
-        </StackPanel>
-        <Separator DockPanel.Dock="Top" Margin="{StaticResource PanelMargin}"/>
-        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="{StaticResource PanelMargin}">
-            <TextBlock Text="Log level:"/>
-            <ComboBox Margin="{StaticResource ValueMargin}" ItemsSource="{Binding LogViewModel.AllFilterLevels}" SelectedItem="{Binding LogViewModel.FilterLevel}" />
-            <Button Command="{Binding SaveLogCommand}" Margin="{StaticResource ValueMargin}" Content="Save log file"/>
-        </StackPanel>
-        <GroupBox Header="Log" Margin="{StaticResource PanelMargin}" DockPanel.Dock="Top">
-            <ScrollViewer>
-                <ItemsControl ItemsSource="{Binding LogViewModel.LogEntries}">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <StackPanel />
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate x:DataType="vmlog:LogEntryViewModel">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="*" />
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="{Binding Timestamp}" />
-                                <TextBlock Grid.Column="1" Text="{Binding Level}" Margin="{StaticResource ValueMargin}" />
-                                <TextBlock Grid.Column="2" Text="{Binding Text}" Margin="{StaticResource ValueMargin}" ToolTip.Tip="{Binding ToolTip}" TextWrapping="Wrap"/>
-                            </Grid>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </ScrollViewer>
-        </GroupBox>
-    </DockPanel>
+    </ScrollViewer>
 </Window>

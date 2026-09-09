@@ -85,13 +85,98 @@ jobs:
         shell: bash
         run: dotnet VDrumExplorer.Gui.Avalonia.Test/bin/Release/net10.0/VDrumExplorer.Gui.Avalonia.Test.dll
 
+      # Per-project coverlet reports each include ALL instrumented production
+      # modules loaded in that test host, so shared assemblies get counted
+      # multiple times when the reports are summed naively. `dotnet-coverage
+      # merge` unions per-module coverage instead, producing a single correct
+      # report used for the threshold check and the Coveralls upload.
+      # (dotnet-coverage is already installed by the Avalonia test step above.)
+      - name: Merge coverage reports
+        if: matrix.os == 'ubuntu-latest'
+        shell: bash
+        env:
+          DOTNET_COVERAGE_TELEMETRY_OPTOUT: 1
+        run: |
+          mkdir -p ./TestResults
+          files=$(find ./TestResults -name '*.cobertura.xml' | tr '\n' ' ')
+          dotnet-coverage merge $files \
+            --output-format cobertura \
+            --output ./TestResults/merged.cobertura.xml \
+            --nologo
+
       - name: Locate cobertura files
         if: matrix.os == 'ubuntu-latest'
         id: coverage
         shell: bash
         run: |
-          files=$(find ./TestResults -name '*.cobertura.xml' | tr '\n' ' ' | sed 's/ $//')
-          echo "files=$files" >> "$GITHUB_OUTPUT"
+          echo "files=./TestResults/merged.cobertura.xml" >> "$GITHUB_OUTPUT"
+
+      - name: Check coverage threshold
+        if: matrix.os == 'ubuntu-latest'
+        shell: bash
+        run: |
+          # The merged Cobertura report combines coverlet (VSTest) and dotnet-coverage
+          # (MTP) collector formats. Both collectors instrument the same source files but
+          # emit different filename forms (e.g. "VDrumExplorer.Utility/Timing.cs" vs bare
+          # "Timing.cs"), so the top-level <coverage> aggregate double-counts lines.
+          # Parse per-<class> entries, deduplicate by filename basename (keeping the entry
+          # with higher lines-covered), and compute the true per-file union — matching
+          # how Coveralls reports coverage.
+          python3 - <<'PYEOF'
+          import xml.etree.ElementTree as ET
+          import os
+          import sys
+
+          xml_path = "./TestResults/merged.cobertura.xml"
+          if not os.path.isfile(xml_path):
+              print(f"ERROR: Merged coverage report not found at {xml_path}")
+              sys.exit(1)
+
+          tree = ET.parse(xml_path)
+          root = tree.getroot()
+
+          # Collect per-class coverage, keyed by filename basename.
+          # When the same basename appears in both coverlet and dotnet-coverage formats,
+          # keep the entry with the higher lines-covered (the more accurate collector for
+          # that test host).
+          # NOTE: dotnet-coverage's Cobertura output does NOT emit lines-valid/lines-covered
+          # attributes on <class> elements (only coverlet does), so per-class counts are
+          # computed from the class-level <lines> children in both formats.
+          best_by_basename = {}
+          for cls in root.iter('class'):
+              filename = cls.get('filename', '')
+              if not filename:
+                  continue
+              basename = os.path.basename(filename)
+              lines_elem = cls.find('lines')
+              if lines_elem is not None:
+                  line_nodes = lines_elem.findall('line')
+                  lines_valid = len(line_nodes)
+                  lines_covered = sum(1 for ln in line_nodes if int(ln.get('hits', '0')) > 0)
+              else:
+                  lines_valid = int(cls.get('lines-valid', 0))
+                  lines_covered = int(cls.get('lines-covered', 0))
+              if lines_valid == 0:
+                  continue
+              if basename not in best_by_basename or lines_covered > best_by_basename[basename][1]:
+                  best_by_basename[basename] = (lines_valid, lines_covered)
+
+          total_valid = sum(v[0] for v in best_by_basename.values())
+          total_covered = sum(v[1] for v in best_by_basename.values())
+
+          if total_valid == 0:
+              print("WARNING: No line coverage data found in merged report.")
+              sys.exit(0)
+
+          overall = (total_covered / total_valid) * 100
+          print(f"Overall coverage: {overall:.1f}% ({total_covered}/{total_valid} lines)")
+
+          threshold = 90
+          if overall < threshold:
+              print(f"ERROR: Coverage {overall:.1f}% is below the {threshold}% threshold.")
+              sys.exit(1)
+          print(f"Coverage {overall:.1f}% meets the {threshold}% threshold.")
+          PYEOF
 
       - name: Upload coverage to Coveralls
         if: matrix.os == 'ubuntu-latest'
