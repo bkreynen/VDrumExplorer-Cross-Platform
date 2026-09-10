@@ -52,7 +52,6 @@ jobs:
         with:
           dotnet-version: 10.0.x
           dotnet-quality: preview
-          cache: true
 
       - name: Publish self-contained
         shell: bash
