@@ -106,24 +106,6 @@ namespace VDrumExplorer.ViewModel.Test.Data
         }
 
         [Fact]
-        public void EditCommand_NotNull()
-        {
-            Assert.NotNull(viewModel.EditCommand);
-        }
-
-        [Fact]
-        public void CommitCommand_NotNull()
-        {
-            Assert.NotNull(viewModel.CommitCommand);
-        }
-
-        [Fact]
-        public void CancelEditCommand_NotNull()
-        {
-            Assert.NotNull(viewModel.CancelEditCommand);
-        }
-
-        [Fact]
         public void PlayNoteCommand_NotNull()
         {
             Assert.NotNull(viewModel.PlayNoteCommand);
@@ -242,62 +224,6 @@ namespace VDrumExplorer.ViewModel.Test.Data
         public void CopyToTemporaryStudioSetCommand_IsNotImplemented()
         {
             Assert.Same(CommandBase.NotImplemented, viewModel.CopyToTemporaryStudioSetCommand);
-        }
-
-        [Fact]
-        public void ReadOnly_InitiallyTrue()
-        {
-            Assert.True(viewModel.ReadOnly);
-        }
-
-        [Fact]
-        public void EditCommand_InitiallyEnabled()
-        {
-            Assert.True(viewModel.EditCommand.Enabled);
-        }
-
-        [Fact]
-        public void CommitCommand_InitiallyDisabled()
-        {
-            Assert.False(viewModel.CommitCommand.Enabled);
-        }
-
-        [Fact]
-        public void CancelEditCommand_InitiallyDisabled()
-        {
-            Assert.False(viewModel.CancelEditCommand.Enabled);
-        }
-
-        [Fact]
-        public void EnterEditMode_EnablesCommitAndCancel()
-        {
-            viewModel.EditCommand.Execute(null!);
-            Assert.False(viewModel.ReadOnly);
-            Assert.False(viewModel.EditCommand.Enabled);
-            Assert.True(viewModel.CommitCommand.Enabled);
-            Assert.True(viewModel.CancelEditCommand.Enabled);
-        }
-
-        [Fact]
-        public void CommitEdit_ReenablesEditCommand()
-        {
-            viewModel.EditCommand.Execute(null!);
-            viewModel.CommitCommand.Execute(null!);
-            Assert.True(viewModel.ReadOnly);
-            Assert.True(viewModel.EditCommand.Enabled);
-            Assert.False(viewModel.CommitCommand.Enabled);
-            Assert.False(viewModel.CancelEditCommand.Enabled);
-        }
-
-        [Fact]
-        public void CancelEdit_ReenablesEditCommand()
-        {
-            viewModel.EditCommand.Execute(null!);
-            viewModel.CancelEditCommand.Execute(null!);
-            Assert.True(viewModel.ReadOnly);
-            Assert.True(viewModel.EditCommand.Enabled);
-            Assert.False(viewModel.CommitCommand.Enabled);
-            Assert.False(viewModel.CancelEditCommand.Enabled);
         }
 
         [Fact]

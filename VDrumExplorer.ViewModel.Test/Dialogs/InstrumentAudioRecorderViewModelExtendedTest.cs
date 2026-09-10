@@ -175,6 +175,7 @@ namespace VDrumExplorer.ViewModel.Test.Dialogs
             public Task<T?> ShowDataTransferDialog<T>(DataTransferViewModel<T> viewModel) where T : class => Task.FromResult<T?>(null);
             public void AddRequerySuggestion(EventHandler handler) { }
             public void RemoveRequerySuggestion(EventHandler handler) { }
+            public Task<bool> ConfirmCloseAsync() => Task.FromResult(true);
         }
     }
 }

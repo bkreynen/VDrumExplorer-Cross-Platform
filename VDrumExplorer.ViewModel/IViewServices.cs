@@ -44,6 +44,13 @@ namespace VDrumExplorer.ViewModel
         Task<T?> ShowDataTransferDialog<T>(DataTransferViewModel<T> viewModel)
             where T : class;
 
+        /// <summary>
+        /// Shows a confirmation dialog asking the user whether to proceed with closing
+        /// despite having unsaved changes.
+        /// </summary>
+        /// <returns>True if the user confirms closing; false to cancel the close.</returns>
+        Task<bool> ConfirmCloseAsync();
+
         void AddRequerySuggestion(EventHandler handler);
         void RemoveRequerySuggestion(EventHandler handler);
     }

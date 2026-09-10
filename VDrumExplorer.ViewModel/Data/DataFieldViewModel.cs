@@ -15,15 +15,13 @@ namespace VDrumExplorer.ViewModel.Data
 
         public string Description => Model.SchemaField.Description;
 
-        internal static DataFieldViewModel CreateViewModel(IDataField field, bool readOnly)
+        internal static DataFieldViewModel CreateViewModel(IDataField field)
         {
             if (field is OverlayDataField)
             {
                 throw new ArgumentException("Overlay fields must be flattened before creating view model", nameof(field));
             }
-            return readOnly
-            ? (DataFieldViewModel)new ReadOnlyDataFieldViewModel(field)
-            : field switch
+            return field switch
             {
                 BooleanDataField model => new EditableBooleanDataFieldViewModel(model),
                 EnumDataField model => new EditableEnumDataFieldViewModel(model),

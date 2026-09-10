@@ -53,6 +53,8 @@ internal sealed class StubViewServices : IViewServices
     public Task<T?> ShowDataTransferDialog<T>(DataTransferViewModel<T> viewModel) where T : class =>
         Task.FromResult<T?>(null);
 
+    public Task<bool> ConfirmCloseAsync() => Task.FromResult(true);
+
     public void AddRequerySuggestion(EventHandler handler)
     {
     }

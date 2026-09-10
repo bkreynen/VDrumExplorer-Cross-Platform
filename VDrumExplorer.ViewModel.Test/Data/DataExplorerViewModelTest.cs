@@ -47,34 +47,6 @@ namespace VDrumExplorer.ViewModel.Test.Data
         }
 
         [Fact]
-        public void ReadOnly_InitiallyTrue_AndToggleViaEditCommit()
-        {
-            var vm = CreateKitExplorer();
-            Assert.True(vm.ReadOnly);
-            Assert.True(vm.EditCommand.Enabled);
-            Assert.False(vm.CommitCommand.Enabled);
-            Assert.False(vm.CancelEditCommand.Enabled);
-
-            vm.EditCommand.Execute(null!);
-            Assert.False(vm.ReadOnly);
-            Assert.False(vm.EditCommand.Enabled);
-            Assert.True(vm.CommitCommand.Enabled);
-            Assert.True(vm.CancelEditCommand.Enabled);
-
-            vm.CommitCommand.Execute(null!);
-            Assert.True(vm.ReadOnly);
-        }
-
-        [Fact]
-        public void CancelEdit_RestoresReadOnly()
-        {
-            var vm = CreateKitExplorer();
-            vm.EditCommand.Execute(null!);
-            vm.CancelEditCommand.Execute(null!);
-            Assert.True(vm.ReadOnly);
-        }
-
-        [Fact]
         public void FileName_Setter_UpdatesTitleAndRaisesPropertyChanged()
         {
             var vm = CreateKitExplorer();

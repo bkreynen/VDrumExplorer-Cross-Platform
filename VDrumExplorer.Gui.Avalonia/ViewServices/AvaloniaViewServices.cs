@@ -99,6 +99,23 @@ internal sealed class AvaloniaViewServices : IViewServices
         return result == true;
     }
 
+    /// <summary>
+    /// Shows a confirmation dialog asking the user whether to close the explorer
+    /// despite having unsaved changes. Returns true if the user chooses to close
+    /// without saving; false otherwise. If no main window is available, closing
+    /// is allowed without prompting.
+    /// </summary>
+    public async Task<bool> ConfirmCloseAsync()
+    {
+        if (MainWindow is null)
+        {
+            return true;
+        }
+        var dialog = new ConfirmCloseDialog();
+        var result = await dialog.ShowDialog<bool?>(MainWindow);
+        return result == true;
+    }
+
     public void ShowSchemaExplorer(ModuleSchemaViewModel viewModel)
     {
         var window = new Views.SchemaExplorer { DataContext = viewModel };
