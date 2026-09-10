@@ -1,0 +1,131 @@
+# Release workflow: publishes the Avalonia GUI app self-contained for Windows/Linux/macOS (x64 + arm64), packages each build, and attaches the archives to a GitHub Release for the pushed tag.
+name: release
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Tag name to release (e.g. v1.0.0-alpha17). Created if it does not exist.'
+        required: false
+        type: string
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - rid: win-x64
+            os: windows-latest
+            archive: VDrumExplorer-win-x64.zip
+          - rid: linux-x64
+            os: ubuntu-latest
+            archive: VDrumExplorer-linux-x64.tar.gz
+          - rid: osx-x64
+            os: macos-13
+            archive: VDrumExplorer-osx-x64.tar.gz
+          - rid: osx-arm64
+            os: macos-latest
+            archive: VDrumExplorer-osx-arm64.tar.gz
+    name: build (${{ matrix.rid }})
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+          dotnet-quality: preview
+
+      - name: Publish self-contained
+        shell: bash
+        run: |
+          dotnet publish VDrumExplorer.Gui.Avalonia/VDrumExplorer.Gui.Avalonia.csproj \
+            -c Release \
+            -r ${{ matrix.rid }} \
+            --self-contained true \
+            -p:PublishSingleFile=true \
+            -o publish/${{ matrix.rid }}
+
+      # Windows archives as zip (7z is preinstalled on the runner); the other
+      # platforms use tar.gz. The archive contains the RID folder so extraction
+      # yields a single directory.
+      - name: Package (zip)
+        if: matrix.rid == 'win-x64'
+        shell: bash
+        run: 7z a -tzip ${{ matrix.archive }} publish/${{ matrix.rid }}
+
+      - name: Package (tar.gz)
+        if: matrix.rid != 'win-x64'
+        shell: bash
+        run: tar -czf ${{ matrix.archive }} -C publish ${{ matrix.rid }}
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.archive }}
+          path: ${{ matrix.archive }}
+          if-no-files-found: error
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+          path: dist
+
+      - name: Determine tag and prerelease flag
+        id: meta
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            tag="${{ inputs.tag_name }}"
+          else
+            tag="${{ github.ref_name }}"
+          fi
+          if [ -z "$tag" ]; then
+            echo "ERROR: no tag name available (set the tag_name input for manual runs)." >&2
+            exit 1
+          fi
+          # Prerelease when the tag contains alpha/beta/rc/pre (case-insensitive).
+          if echo "$tag" | grep -qiE 'alpha|beta|rc|pre'; then
+            echo "prerelease=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "prerelease=false" >> "$GITHUB_OUTPUT"
+          fi
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.meta.outputs.tag }}
+          name: VDrumExplorer ${{ steps.meta.outputs.tag }}
+          body: |
+            Release ${{ steps.meta.outputs.tag }}
+
+            Self-contained single-file builds of the VDrumExplorer Avalonia desktop app:
+
+            - `VDrumExplorer-win-x64.zip` — Windows x64
+            - `VDrumExplorer-linux-x64.tar.gz` — Linux x64
+            - `VDrumExplorer-osx-x64.tar.gz` — macOS Intel
+            - `VDrumExplorer-osx-arm64.tar.gz` — macOS Apple Silicon
+
+            No .NET runtime installation is required; each archive bundles the runtime for its platform.
+          prerelease: ${{ steps.meta.outputs.prerelease == 'true' }}
+          files: dist/*
