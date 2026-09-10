@@ -151,10 +151,8 @@ namespace VDrumExplorer.ViewModel.Data
         /// </summary>
         public void MarkDirty()
         {
-            if (!isDirty)
-            {
-                IsDirty = true;
-            }
+            IsDirty = true;
+            RevertAllCommand.Enabled = true;
         }
 
         /// <summary>
@@ -165,6 +163,51 @@ namespace VDrumExplorer.ViewModel.Data
         {
             cleanSnapshot = data.CreateSnapshot();
             IsDirty = false;
+            RevertAllCommand.Enabled = false;
+        }
+
+        /// <summary>
+        /// Recomputes <see cref="IsDirty"/> by comparing the current data against the clean snapshot.
+        /// Called after undo/redo operations that may restore the data to its clean state.
+        /// </summary>
+        private void UpdateDirtyState()
+        {
+            if (cleanSnapshot is null)
+            {
+                return;
+            }
+            var current = data.CreateSnapshot();
+            var dirty = !SnapshotsEqual(current, cleanSnapshot);
+            IsDirty = dirty;
+            RevertAllCommand.Enabled = dirty;
+        }
+
+        /// <summary>
+        /// Compares two snapshots for equality by checking that they have the same segments
+        /// with the same data at the same addresses.
+        /// </summary>
+        private static bool SnapshotsEqual(ModuleDataSnapshot a, ModuleDataSnapshot b)
+        {
+            var aSegments = a.Segments.ToList();
+            var bSegments = b.Segments.ToList();
+            if (aSegments.Count != bSegments.Count)
+            {
+                return false;
+            }
+            for (int i = 0; i < aSegments.Count; i++)
+            {
+                if (!aSegments[i].Address.Equals(bSegments[i].Address))
+                {
+                    return false;
+                }
+                var aData = aSegments[i].CopyData();
+                var bData = bSegments[i].CopyData();
+                if (!aData.SequenceEqual(bData))
+                {
+                    return false;
+                }
+            }
+            return true;
         }
 
         /// <summary>
@@ -183,7 +226,7 @@ namespace VDrumExplorer.ViewModel.Data
             // TODO: t update this (and the results) if the device is plugged in later.
             IsMatchingDeviceConnected = deviceViewModel?.ConnectedDevice?.Schema.Identifier == data.Schema.Identifier;
             cleanSnapshot = data.CreateSnapshot();
-            RevertAllCommand = new DelegateCommand(RevertAll, true);
+            RevertAllCommand = new DelegateCommand(RevertAll, false);
             PlayNoteCommand = new DelegateCommand(PlayNote, IsMatchingDeviceConnected);
             SaveFileCommand = new DelegateCommand(SaveFile, true);
             SaveFileAsCommand = new DelegateCommand(SaveFileAs, true);
@@ -272,6 +315,7 @@ namespace VDrumExplorer.ViewModel.Data
             RaisePropertyChanged(nameof(CanRedo));
             // All undoable operations modify the data, so they make it dirty.
             MarkDirty();
+            RevertAllCommand.Enabled = true;
         }
 
         /// <summary>
@@ -308,6 +352,7 @@ namespace VDrumExplorer.ViewModel.Data
             data.LoadSnapshot(previous, NullLogger.Instance);
             RaisePropertyChanged(nameof(CanUndo));
             RaisePropertyChanged(nameof(CanRedo));
+            UpdateDirtyState();
             // Refresh the details panel to reflect the restored data.
             if (SelectedNode is DataTreeNodeViewModel node)
             {
@@ -329,6 +374,7 @@ namespace VDrumExplorer.ViewModel.Data
             data.LoadSnapshot(next, NullLogger.Instance);
             RaisePropertyChanged(nameof(CanUndo));
             RaisePropertyChanged(nameof(CanRedo));
+            UpdateDirtyState();
             if (SelectedNode is DataTreeNodeViewModel node)
             {
                 SelectedNodeDetails = node.CreateDetails();

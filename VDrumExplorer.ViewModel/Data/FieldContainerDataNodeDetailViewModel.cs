@@ -18,7 +18,6 @@ namespace VDrumExplorer.ViewModel.Data
 
         private readonly DataExplorerViewModel windowViewModel;
 
-        // TODO: ObservableCollection? Might allow for smoother "enter editing mode" experience.
         private IReadOnlyList<DataFieldViewModel> fields;
         public IReadOnlyList<DataFieldViewModel> Fields
         {

@@ -1,0 +1,16 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="VDrumExplorer.Gui.Avalonia.Views.Dialogs.ConfirmCloseDialog"
+        Title="Unsaved Changes"
+        Width="350" Height="150"
+        CanResize="False"
+        ShowInTaskbar="False"
+        WindowStartupLocation="CenterOwner">
+    <StackPanel Margin="16" HorizontalAlignment="Center">
+        <TextBlock Text="You have unsaved changes. Close anyway?" TextWrapping="Wrap" Margin="0,0,0,16" />
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+            <Button x:Name="closeButton" Content="Close without saving" Margin="0,0,8,0" Click="CloseButton_Click" />
+            <Button x:Name="cancelButton" Content="Cancel" Click="CancelButton_Click" />
+        </StackPanel>
+    </StackPanel>
+</Window>
