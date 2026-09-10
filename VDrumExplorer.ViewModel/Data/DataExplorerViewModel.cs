@@ -29,9 +29,7 @@ namespace VDrumExplorer.ViewModel.Data
         private readonly ModuleData data;
         private readonly bool IsMatchingDeviceConnected;
 
-        public DelegateCommand EditCommand { get; }
-        public DelegateCommand CommitCommand { get; }
-        public DelegateCommand CancelEditCommand { get; }
+        public DelegateCommand RevertAllCommand { get; }
         public DelegateCommand PlayNoteCommand { get; }
         public DelegateCommand CopyNodeCommand { get; }
         public DelegateCommand PasteNodeCommand { get; }
@@ -82,8 +80,8 @@ namespace VDrumExplorer.ViewModel.Data
         private string SchemaIdentifierDisplayName => $"{Model.Schema.Identifier.Name} rev 0x{Model.Schema.Identifier.SoftwareRevision:x}";
 
         public string Title => FileName is null
-            ? $"{ExplorerName} ({SchemaIdentifierDisplayName})"
-            : $"{ExplorerName} ({SchemaIdentifierDisplayName}) - {fileName}";
+            ? $"{ExplorerName} ({SchemaIdentifierDisplayName}){(IsDirty ? " *" : "")}"
+            : $"{ExplorerName} ({SchemaIdentifierDisplayName}){(IsDirty ? " *" : "")} - {fileName}";
 
         public IReadOnlyList<int> MidiChannels { get; } = Enumerable.Range(1, 16).ToList();
         public IReadOnlyList<ModuleIdentifierViewModel> ConvertibleModuleIdentifiers { get; }
@@ -125,7 +123,56 @@ namespace VDrumExplorer.ViewModel.Data
 
         private bool IsPasteNodeCommandValid => copiedSnapshot?.IsValidForTarget(SelectedNode?.Model.SchemaNode) ?? false;
 
-        private ModuleDataSnapshot? snapshot;
+        /// <summary>
+        /// Snapshot of the data as of the last save (or load). Used as the baseline
+        /// for the "Revert all" command.
+        /// </summary>
+        private ModuleDataSnapshot? cleanSnapshot;
+
+        private bool isDirty;
+        /// <summary>
+        /// Indicates whether the data has been modified since the last save (or load).
+        /// </summary>
+        public bool IsDirty
+        {
+            get => isDirty;
+            private set
+            {
+                if (SetProperty(ref isDirty, value))
+                {
+                    RaisePropertyChanged(nameof(Title));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Marks the data as dirty (modified since the last save).
+        /// Called by detail view models when field values change.
+        /// </summary>
+        public void MarkDirty()
+        {
+            if (!isDirty)
+            {
+                IsDirty = true;
+            }
+        }
+
+        /// <summary>
+        /// Marks the data as clean, recording the current state as the baseline
+        /// for future "Revert all" operations.
+        /// </summary>
+        public void MarkClean()
+        {
+            cleanSnapshot = data.CreateSnapshot();
+            IsDirty = false;
+        }
+
+        /// <summary>
+        /// Asks the user to confirm closing the explorer when there are unsaved changes.
+        /// Exposed publicly so the view's Closing handler can prompt without
+        /// reaching into the protected <see cref="ViewServices"/> property.
+        /// </summary>
+        public Task<bool> ConfirmCloseAsync() => ViewServices.ConfirmCloseAsync();
 
         public DataExplorerViewModel(IViewServices viewServices, ILogger logger, DeviceViewModel deviceViewModel, ModuleData data) : base(data)
         {
@@ -135,10 +182,8 @@ namespace VDrumExplorer.ViewModel.Data
             this.data = data;
             // TODO: t update this (and the results) if the device is plugged in later.
             IsMatchingDeviceConnected = deviceViewModel?.ConnectedDevice?.Schema.Identifier == data.Schema.Identifier;
-            readOnly = true;
-            EditCommand = new DelegateCommand(EnterEditMode, readOnly);
-            CommitCommand = new DelegateCommand(CommitEdit, !readOnly);
-            CancelEditCommand = new DelegateCommand(CancelEdit, !readOnly);
+            cleanSnapshot = data.CreateSnapshot();
+            RevertAllCommand = new DelegateCommand(RevertAll, true);
             PlayNoteCommand = new DelegateCommand(PlayNote, IsMatchingDeviceConnected);
             SaveFileCommand = new DelegateCommand(SaveFile, true);
             SaveFileAsCommand = new DelegateCommand(SaveFileAs, true);
@@ -157,21 +202,6 @@ namespace VDrumExplorer.ViewModel.Data
                 .Except(new[] { moduleId })
                 .Select(id => new ModuleIdentifierViewModel(id, true))
                 .ToList();
-        }
-
-        private bool readOnly;
-        public bool ReadOnly
-        {
-            get => readOnly;
-            private set
-            {
-                if (SetProperty(ref readOnly, value))
-                {
-                    EditCommand.Enabled = value;
-                    CommitCommand.Enabled = !value;
-                    CancelEditCommand.Enabled = !value;
-                }
-            }
         }
 
         private void SaveFileAs() => SaveFileImpl(null);
@@ -194,6 +224,7 @@ namespace VDrumExplorer.ViewModel.Data
             {
                 SaveToStream(stream);
             }
+            MarkClean();
         }
 
         private async void ExportJson()
@@ -205,24 +236,6 @@ namespace VDrumExplorer.ViewModel.Data
             }
             var json = FormatAsJson();
             File.WriteAllText(fileName, json);
-        }
-
-        private void EnterEditMode()
-        {
-            snapshot = data.CreateSnapshot();
-            ReadOnly = false;
-        }
-
-        private void CancelEdit()
-        {
-            // We don't really need to log errors here, given that we're going back to where we were.
-            data.LoadSnapshot(snapshot!, NullLogger.Instance);
-            ReadOnly = true;
-        }
-
-        private void CommitEdit()
-        {
-            ReadOnly = true;
         }
 
         private readonly Stack<ModuleDataSnapshot> undoStack = new();
@@ -257,6 +270,28 @@ namespace VDrumExplorer.ViewModel.Data
             redoStack.Clear();
             RaisePropertyChanged(nameof(CanUndo));
             RaisePropertyChanged(nameof(CanRedo));
+            // All undoable operations modify the data, so they make it dirty.
+            MarkDirty();
+        }
+
+        /// <summary>
+        /// Reverts all data to the state it had when it was last saved (or loaded).
+        /// The revert itself is undoable via the undo stack.
+        /// </summary>
+        private void RevertAll()
+        {
+            if (cleanSnapshot is null)
+            {
+                return;
+            }
+            PushUndoState();
+            data.LoadSnapshot(cleanSnapshot, NullLogger.Instance);
+            MarkClean();
+            // Refresh the details panel to reflect the reverted data.
+            if (SelectedNode is DataTreeNodeViewModel node)
+            {
+                SelectedNodeDetails = node.CreateDetails();
+            }
         }
 
         /// <summary>

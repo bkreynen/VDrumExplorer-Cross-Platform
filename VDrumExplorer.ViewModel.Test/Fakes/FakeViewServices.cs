@@ -78,6 +78,8 @@ namespace VDrumExplorer.ViewModel.Test.Fakes
             return null;
         }
 
+        public Task<bool> ConfirmCloseAsync() => Task.FromResult(true);
+
         public void AddRequerySuggestion(EventHandler handler)
         {
         }

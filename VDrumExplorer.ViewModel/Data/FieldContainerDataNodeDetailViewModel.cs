@@ -37,31 +37,38 @@ namespace VDrumExplorer.ViewModel.Data
 
         protected override void OnPropertyChangedHasSubscribers()
         {
-            windowViewModel.PropertyChanged += Parent_PropertyChanged;
             foreach (var field in Model.Fields.OfType<OverlayDataField>())
             {
                 field.PropertyChanged += FieldListChanged;
             }
-        }
-
-        private void Parent_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == nameof(windowViewModel.ReadOnly))
+            // Subscribe to all non-overlay fields for dirty tracking.
+            foreach (var field in Model.Fields)
             {
-                RefreshFields();
+                if (field is not OverlayDataField)
+                {
+                    field.PropertyChanged += FieldChanged;
+                }
             }
         }
 
         protected override void OnPropertyChangedHasNoSubscribers()
         {
-            windowViewModel.PropertyChanged -= Parent_PropertyChanged;
             foreach (var field in Model.Fields.OfType<OverlayDataField>())
             {
                 field.PropertyChanged -= FieldListChanged;
             }
+            foreach (var field in Model.Fields)
+            {
+                if (field is not OverlayDataField)
+                {
+                    field.PropertyChanged -= FieldChanged;
+                }
+            }
         }
 
         private void FieldListChanged(object sender, PropertyChangedEventArgs e) => RefreshFields();
+
+        private void FieldChanged(object sender, PropertyChangedEventArgs e) => windowViewModel.MarkDirty();
 
         private IEnumerable<DataFieldViewModel> GenerateFields(IEnumerable<IDataField> fields)
         {
@@ -76,7 +83,7 @@ namespace VDrumExplorer.ViewModel.Data
                 }
                 else
                 {
-                    yield return DataFieldViewModel.CreateViewModel(field, windowViewModel.ReadOnly);
+                    yield return DataFieldViewModel.CreateViewModel(field);
                 }
             }
         }

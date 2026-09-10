@@ -31,18 +31,12 @@
             <TextBox Margin="8,0,0,0" Width="50" Text="{Binding DefaultKitNumber}"/>
         </StackPanel>
 
-        <!-- Edit Mode Toolbar -->
-        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="16,8,16,0">
-            <Button Classes="accent" Command="{Binding EditCommand}" Content="Edit mode"/>
-            <Button Margin="8,0,0,0" Command="{Binding CommitCommand}" Content="Commit changes"/>
-            <Button Margin="8,0,0,0" Command="{Binding CancelEditCommand}" Content="Cancel changes"/>
-        </StackPanel>
-
         <!-- Copy/Paste Toolbar -->
         <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="16,8,16,0">
             <Button Command="{Binding CopyNodeCommand}" Content="Copy node"/>
             <Button Margin="8,0,0,0" Command="{Binding PasteNodeCommand}" Content="Paste node"/>
             <Button Margin="8,0,0,0" Command="{Binding MultiPasteCommand}" Content="Multi-paste"/>
+            <Button Margin="8,0,0,0" Command="{Binding RevertAllCommand}" Content="Revert all"/>
             <Button Margin="8,0,0,0" Command="{Binding CopyMultipleKitsCommand}" IsVisible="{Binding IsModuleExplorer}" Content="Copy kits..."/>
             <TextBlock Classes="label" Text="Copied node path:" Margin="16,0,0,0"/>
             <TextBlock Text="{Binding CopiedSnapshot.Path}" Margin="8,0,0,0" />
@@ -110,9 +104,6 @@
                                                     <TextBlock Classes="label" Grid.Column="0" Text="{Binding Description}" VerticalAlignment="Center" />
                                                     <ContentControl Grid.Column="1" Content="{Binding}" Margin="{StaticResource ValueMargin}" HorizontalAlignment="Left" VerticalAlignment="Center">
                                                         <ContentControl.DataTemplates>
-                                                            <DataTemplate DataType="vmd:ReadOnlyDataFieldViewModel">
-                                                                <TextBlock Text="{Binding FormattedText}" />
-                                                            </DataTemplate>
                                                             <DataTemplate DataType="vmd:EditableEnumDataFieldViewModel">
                                                                 <ComboBox ItemsSource="{Binding ValidValues}" SelectedItem="{Binding Value}" />
                                                             </DataTemplate>

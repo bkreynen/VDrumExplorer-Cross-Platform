@@ -6,7 +6,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Layout;
+using Avalonia.Media;
 using Avalonia.Platform.Storage;
 using VDrumExplorer.Gui.Avalonia.Views.Dialogs;
 using VDrumExplorer.ViewModel;
@@ -95,6 +98,46 @@ internal sealed class AvaloniaViewServices : IViewServices
             return false;
         }
         var dialog = new MultiPasteDialog { DataContext = viewModel };
+        var result = await dialog.ShowDialog<bool?>(MainWindow);
+        return result == true;
+    }
+
+    /// <summary>
+    /// Shows a confirmation dialog asking the user whether to close the explorer
+    /// despite having unsaved changes. Returns true if the user chooses to close
+    /// without saving; false otherwise. If no main window is available, closing
+    /// is allowed without prompting.
+    /// </summary>
+    public async Task<bool> ConfirmCloseAsync()
+    {
+        if (MainWindow is null)
+        {
+            return true;
+        }
+        var dialog = new Window
+        {
+            Title = "Unsaved Changes",
+            Width = 350,
+            Height = 150,
+            WindowStartupLocation = WindowStartupLocation.CenterOwner,
+            CanResize = false,
+            ShowInTaskbar = false,
+        };
+
+        var panel = new StackPanel { Margin = new Thickness(16), HorizontalAlignment = HorizontalAlignment.Center };
+        var text = new TextBlock { Text = "You have unsaved changes. Close anyway?", TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 0, 0, 16) };
+        var buttons = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Center };
+        var yesButton = new Button { Content = "Close without saving", Margin = new Thickness(0, 0, 8, 0) };
+        var noButton = new Button { Content = "Cancel" };
+        buttons.Children.Add(yesButton);
+        buttons.Children.Add(noButton);
+        panel.Children.Add(text);
+        panel.Children.Add(buttons);
+        dialog.Content = panel;
+
+        yesButton.Click += (_, _) => dialog.Close(true);
+        noButton.Click += (_, _) => dialog.Close(false);
+
         var result = await dialog.ShowDialog<bool?>(MainWindow);
         return result == true;
     }

@@ -90,5 +90,7 @@ namespace VDrumExplorer.ViewModel.Test.Helpers
 
         public void AddRequerySuggestion(EventHandler handler) { }
         public void RemoveRequerySuggestion(EventHandler handler) { }
+
+        public Task<bool> ConfirmCloseAsync() => Task.FromResult(true);
     }
 }

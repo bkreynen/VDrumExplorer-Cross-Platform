@@ -174,6 +174,7 @@ namespace VDrumExplorer.ViewModel.Test
             public void ShowInstrumentAudioExplorer(InstrumentAudioExplorerViewModel viewModel) => throw new NotImplementedException();
             public void ShowInstrumentRecorderDialog(InstrumentAudioRecorderViewModel viewModel) => throw new NotImplementedException();
             public Task<T?> ShowDataTransferDialog<T>(DataTransferViewModel<T> viewModel) where T : class => throw new NotImplementedException();
+            public Task<bool> ConfirmCloseAsync() => throw new NotImplementedException();
         }
 
         private sealed class CanExecuteChangedHandler

@@ -20,6 +20,24 @@ public partial class DataExplorer : Window
     {
         InitializeComponent();
         KeyDown += DataExplorer_KeyDown;
+        Closing += DataExplorer_Closing;
+    }
+
+    private async void DataExplorer_Closing(object? sender, WindowClosingEventArgs e)
+    {
+        if (ViewModel.IsDirty)
+        {
+            // Cancel the close first, then show the dialog.
+            // If the user confirms, close again programmatically.
+            e.Cancel = true;
+            var confirm = await ViewModel.ConfirmCloseAsync();
+            if (confirm)
+            {
+                // Re-trigger close without the closing handler intercepting
+                Closing -= DataExplorer_Closing;
+                Close();
+            }
+        }
     }
 
     private void TreeView_SelectionChanged(object? sender, SelectionChangedEventArgs e)
