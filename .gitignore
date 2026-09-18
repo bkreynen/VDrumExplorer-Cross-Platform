@@ -245,8 +245,9 @@ VDrumExplorer.Data.Test/td50.vdrum
 # Python virtual environment (local tooling)
 .venv/
 
-# Agent working artifacts (cross-session continuity, not project docs)
-.agents/
+# Agent working artifacts (cross-session continuity) — committed by convention;
+# only temporary scratch storage is ignored
+.agents/.tmp/
 
 # Local coverage analysis report (working artifact, not distributed)
 coverage-analysis-report.md
