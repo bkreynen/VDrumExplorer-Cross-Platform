@@ -6,7 +6,7 @@ This is a fork of [Jon Skeet's](https://github.com/jskeet) demo code
 repository, focused on the **VDrumExplorer** project — a tool for
 exploring and editing Roland V-Drum settings. The overwhelming
 majority of this codebase — the data model, schema system, MIDI
-communication layer, console application, Blazor web app, and the
+communication layer, console application, and the
 original WPF GUI — was written by Jon Skeet. This fork adds an
 [Avalonia UI](https://avaloniaui.net/) port and several UX
 improvements on top of that foundation.
@@ -51,16 +51,12 @@ The [Google.Protobuf](https://github.com/protocolbuffers/protobuf)
 library is licensed under the BSD 2.0 license. See
 [LICENSE.Protobuf.txt](LICENSE.Protobuf.txt) for details.
 
-The [byte-base64](https://github.com/euo/byte-base64) library (used in
-the Blazor app) is licensed under the MIT License. See
-[LICENCE.byte-base64.txt](LICENCE.byte-base64.txt) for details.
-
 ## Credits & Attribution
 
 The overwhelming majority of this codebase was authored by
 [Jon Skeet](https://github.com/jskeet), including the data model,
-schema system, MIDI communication layer, console application, Blazor
-web app, and the original WPF GUI. This fork builds on that foundation
+schema system, MIDI communication layer, console application,
+and the original WPF GUI. This fork builds on that foundation
 and is grateful for the original work.
 
 - **Original repository:** [jskeet/DemoCode (Drums)](https://github.com/jskeet/DemoCode/tree/master/Drums)
