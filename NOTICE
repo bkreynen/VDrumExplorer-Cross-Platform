@@ -8,7 +8,7 @@ https://github.com/jskeet/DemoCode/tree/master/Drums.
 
 The overwhelming majority of this codebase was authored by Jon Skeet,
 including the data model, schema system, MIDI communication layer,
-console application, Blazor web app, and the original WPF GUI.
+console application, and the original WPF GUI.
 
 This fork adds an Avalonia UI port and several UX improvements. Files
 modified from the original upstream carry prominent change notices as
@@ -21,5 +21,3 @@ respective licenses:
   Copyright (c) 2010 Atsushi Eno
 - Google.Protobuf (BSD 2-Clause License) — https://github.com/protocolbuffers/protobuf
   Copyright 2008 Google Inc. All rights reserved.
-- byte-base64 (MIT License) — https://github.com/euo/byte-base64
-  Copyright (c) 2020 Egor Nepomnyaschih

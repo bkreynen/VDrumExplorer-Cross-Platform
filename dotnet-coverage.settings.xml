@@ -17,7 +17,6 @@
         <!-- Test projects themselves (equivalent of coverlet's [*.Test]*). -->
         <ModulePath>.*\.Test\.dll$</ModulePath>
         <!-- Projects with no coverage of interest. -->
-        <ModulePath>.*VDrumExplorer\.Blazor\.dll$</ModulePath>
         <ModulePath>.*VDrumExplorer\.Console\.dll$</ModulePath>
         <ModulePath>.*VDrumExplorer\.Benchmarks\.dll$</ModulePath>
         <ModulePath>.*VDrumExplorer\.InstrumentParser\.dll$</ModulePath>
