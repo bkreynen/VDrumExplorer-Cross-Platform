@@ -36,6 +36,17 @@ namespace VDrumExplorer.Model.Device
         private static readonly ModuleAddress CurrentKitAddress = ModuleAddress.FromLogicalValue(0);
 
         /// <summary>
+        /// The default MIDI channel (1-16) used for device-control messages such as Program Change.
+        /// Channel 10 is the traditional drum-module channel.
+        /// </summary>
+        public const int DefaultMidiChannel = 10;
+
+        /// <summary>
+        /// The MIDI channel (1-16) used for device-control messages such as Program Change.
+        /// </summary>
+        private readonly int midiChannel;
+
+        /// <summary>
         /// How long we're prepared to wait for a single data segment to load.
         /// </summary>
         private readonly TimeSpan loadSegmentTimeout;
@@ -56,13 +67,43 @@ namespace VDrumExplorer.Model.Device
 
         public string OutputName => client.OutputName;
 
-        public DeviceController(RolandMidiClient client, ILogger logger) : this(client, logger, TimeSpan.FromSeconds(1))
+        /// <summary>
+        /// Creates a controller using the default MIDI channel (10).
+        /// </summary>
+        public DeviceController(RolandMidiClient client, ILogger logger)
+            : this(client, logger, DefaultMidiChannel)
         {
         }
 
-        private DeviceController(RolandMidiClient client, ILogger logger, TimeSpan loadSegmentTimeout) =>
-            (this.client, this.logger, this.loadSegmentTimeout, Schema) =
-            (client, logger, loadSegmentTimeout, ModuleSchema.KnownSchemas[client.Identifier].Value);
+        /// <summary>
+        /// Creates a controller that sends device-control messages (such as the Program Change
+        /// in <see cref="SetCurrentKitAsync"/>) on the given MIDI channel.
+        /// </summary>
+        /// <param name="midiChannel">MIDI channel to use, 1-16. Invalid values are rejected:
+        /// an <see cref="ArgumentOutOfRangeException"/> is thrown (never clamped).</param>
+        public DeviceController(RolandMidiClient client, ILogger logger, int midiChannel)
+            : this(client, logger, TimeSpan.FromSeconds(1), midiChannel)
+        {
+        }
+
+        private DeviceController(RolandMidiClient client, ILogger logger, TimeSpan loadSegmentTimeout, int midiChannel)
+        {
+            ValidateMidiChannel(midiChannel);
+            this.midiChannel = midiChannel;
+            this.client = client;
+            this.logger = logger;
+            this.loadSegmentTimeout = loadSegmentTimeout;
+            Schema = ModuleSchema.KnownSchemas[client.Identifier].Value;
+        }
+
+        private static void ValidateMidiChannel(int midiChannel)
+        {
+            if (midiChannel < 1 || midiChannel > 16)
+            {
+                throw new ArgumentOutOfRangeException(nameof(midiChannel), midiChannel,
+                    "MIDI channel must be between 1 and 16.");
+            }
+        }
 
         public async Task<int> GetCurrentKitAsync(CancellationToken cancellationToken)
         {
@@ -77,7 +118,7 @@ namespace VDrumExplorer.Model.Device
             // Program numbers are 0-indexed: kit 1 = program 0, kit 100 = program 99.
             // Note: SysEx Data Set to the "Current" register (address 0x00_00_00_00) only updates the
             // stored value but does not trigger the actual kit switch on the TD-17.
-            client.SendProgramChange(10, kit - 1);
+            client.SendProgramChange(midiChannel, kit - 1);
             return Task.CompletedTask;
         }
 

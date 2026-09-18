@@ -76,6 +76,75 @@ namespace VDrumExplorer.Model.Test.Device
         }
 
         [Test]
+        public void SetCurrentKitAsync_CustomMidiChannel_SendsProgramChangeOnThatChannel()
+        {
+            var (controller, input, output) = CreateController(ModuleIdentifier.TD17, midiChannel: 5);
+
+            controller.SetCurrentKitAsync(5, CancellationToken.None);
+
+            // Should send a program change: channel 5, program 4 (kit 5 - 1 = 4).
+            Assert.AreEqual(1, output.Messages.Count);
+            var message = output.Messages[0].Data;
+            // Program Change status: 0xC0 | (channel - 1) = 0xC0 | 0x04 = 0xC4
+            Assert.AreEqual(0xC4, message[0]);
+            Assert.AreEqual(4, message[1]);
+        }
+
+        [Test]
+        public void SetCurrentKitAsync_MidiChannel1_SendsProgramChangeOnChannel1()
+        {
+            var (controller, input, output) = CreateController(ModuleIdentifier.TD17, midiChannel: 1);
+
+            controller.SetCurrentKitAsync(1, CancellationToken.None);
+
+            Assert.AreEqual(1, output.Messages.Count);
+            var message = output.Messages[0].Data;
+            Assert.AreEqual(0xC0, message[0]); // Program Change, channel 1
+            Assert.AreEqual(0x00, message[1]);
+        }
+
+        [Test]
+        public void SetCurrentKitAsync_MidiChannel16_SendsProgramChangeOnChannel16()
+        {
+            var (controller, input, output) = CreateController(ModuleIdentifier.TD17, midiChannel: 16);
+
+            controller.SetCurrentKitAsync(5, CancellationToken.None);
+
+            Assert.AreEqual(1, output.Messages.Count);
+            var message = output.Messages[0].Data;
+            Assert.AreEqual(0xCF, message[0]); // Program Change, channel 16
+            Assert.AreEqual(4, message[1]);
+        }
+
+        [Test]
+        public void Constructor_MidiChannelZero_Throws()
+        {
+            Assert.Throws<ArgumentOutOfRangeException>(
+                () => CreateController(ModuleIdentifier.TD17, midiChannel: 0));
+        }
+
+        [Test]
+        public void Constructor_MidiChannelSeventeen_Throws()
+        {
+            Assert.Throws<ArgumentOutOfRangeException>(
+                () => CreateController(ModuleIdentifier.TD17, midiChannel: 17));
+        }
+
+        [Test]
+        public void Constructor_NegativeMidiChannel_Throws()
+        {
+            Assert.Throws<ArgumentOutOfRangeException>(
+                () => CreateController(ModuleIdentifier.TD17, midiChannel: -1));
+        }
+
+        [Test]
+        public void DefaultMidiChannelConstant_Is10()
+        {
+            // Guards the documented default: existing behavior (channel 10) must not change.
+            Assert.AreEqual(10, DeviceController.DefaultMidiChannel);
+        }
+
+        [Test]
         public void PlayNote_DelegatesToClient()
         {
             var (controller, input, output) = CreateController(ModuleIdentifier.TD17);
@@ -135,12 +204,13 @@ namespace VDrumExplorer.Model.Test.Device
         }
 
         // Helper to create a DeviceController with fake MIDI input/output.
-        private static (DeviceController controller, FakeMidiInput input, FakeMidiOutput output) CreateController(ModuleIdentifier id)
+        private static (DeviceController controller, FakeMidiInput input, FakeMidiOutput output) CreateController(
+            ModuleIdentifier id, int midiChannel = DeviceController.DefaultMidiChannel)
         {
             var input = new FakeMidiInput();
             var output = new FakeMidiOutput();
             var client = new RolandMidiClient(input, output, id.Name, id.Name, 0x10, id);
-            var controller = new DeviceController(client, NullLogger.Instance);
+            var controller = new DeviceController(client, NullLogger.Instance, midiChannel);
             return (controller, input, output);
         }
 
