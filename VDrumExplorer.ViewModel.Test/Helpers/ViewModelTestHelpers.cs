@@ -48,9 +48,15 @@ namespace VDrumExplorer.ViewModel.Test.Helpers
         {
             var type = typeof(DeviceController);
             var ctor = type.GetConstructor(BindingFlags.Instance | BindingFlags.NonPublic, null,
-                new[] { typeof(RolandMidiClient), typeof(ILogger), typeof(TimeSpan) }, null);
+                new[] { typeof(RolandMidiClient), typeof(ILogger), typeof(TimeSpan), typeof(int) }, null);
             if (ctor is null) throw new InvalidOperationException("DeviceController ctor not found");
-            return (DeviceController)ctor.Invoke(new object[] { client, logger ?? NullLogger.Instance, timeout ?? TimeSpan.FromSeconds(1) });
+            return (DeviceController)ctor.Invoke(new object[]
+            {
+                client,
+                logger ?? NullLogger.Instance,
+                timeout ?? TimeSpan.FromSeconds(1),
+                DeviceController.DefaultMidiChannel,
+            });
         }
 
         internal static DeviceViewModel CreateDeviceViewModel(ModuleIdentifier? identifier = null, IMidiOutput? output = null, IMidiInput? input = null, TimeSpan? timeout = null, string midiName = "Test MIDI")
