@@ -50,6 +50,118 @@
             <Setter Property="AutomationProperties.AutomationId" Value="data-explorer.tree.node-header" />
         </Style>
     </Window.Styles>
+    <Window.Resources>
+        <!--
+          Shared field row: the label + editor layout used by BOTH the details pane and the
+          flat field list (Phase 1 task 4). The editor inside the ContentControl resolves from
+          the implicit per-type DataTemplates in Window.DataTemplates below, so both areas use
+          identical editors bound to the same DataFieldViewModel instances (one editing path).
+        -->
+        <DataTemplate x:Key="FieldRowTemplate">
+            <Grid Margin="0,4,0,4">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="200" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Classes="label" Grid.Column="0" Text="{Binding Description}" VerticalAlignment="Center" />
+                <ContentControl Grid.Column="1" Content="{Binding}" Margin="{StaticResource ValueMargin}" HorizontalAlignment="Left" VerticalAlignment="Center" />
+            </Grid>
+        </DataTemplate>
+    </Window.Resources>
+    <!--
+      Implicit per-type field-editor DataTemplates, shared by the details pane and the flat
+      field list (moved from the details pane's inline DataTemplates; the details pane keeps
+      working exactly as before). The AutomationId is composed from the
+      <c>IdPrefix</c> of the nearest ItemsControl's DataContext — "data-explorer.details" in
+      the details pane (FieldContainerDataNodeDetailViewModel), "data-explorer.flat-fields"
+      in the flat list (FlatFieldSectionViewModel) — per docs/accessibility.md §3.1, with the
+      per-role suffix; template-level IDs repeat across instances (one per editor role),
+      which docs/accessibility.md §3.1 sanctions (Warning severity only). HelpText is the
+      schema-derived range/enum text on each editable field view model (§3).
+    -->
+    <Window.DataTemplates>
+        <DataTemplate DataType="vmd:EditableEnumDataFieldViewModel">
+            <ComboBox ItemsSource="{Binding ValidValues}" SelectedItem="{Binding Value}"
+                      AutomationProperties.AutomationId="{Binding $parent[ItemsControl].DataContext.IdPrefix, StringFormat='{}{0}.enum-value'}"
+                      AutomationProperties.Name="{Binding Description}"
+                      AutomationProperties.HelpText="{Binding HelpText}" />
+        </DataTemplate>
+        <DataTemplate DataType="vmd:EditableBooleanDataFieldViewModel">
+            <CheckBox IsChecked="{Binding Value}" VerticalAlignment="Center"
+                      AutomationProperties.AutomationId="{Binding $parent[ItemsControl].DataContext.IdPrefix, StringFormat='{}{0}.boolean-value'}"
+                      AutomationProperties.Name="{Binding Description}"
+                      AutomationProperties.HelpText="{Binding HelpText}" />
+        </DataTemplate>
+        <DataTemplate DataType="vmd:EditableStringDataFieldViewModel">
+            <TextBox Text="{Binding Text}" MaxLength="{Binding MaxLength}" MinWidth="{Binding MinWidth}"
+                     AutomationProperties.AutomationId="{Binding $parent[ItemsControl].DataContext.IdPrefix, StringFormat='{}{0}.string-value'}"
+                     AutomationProperties.Name="{Binding Description}"
+                     AutomationProperties.HelpText="{Binding HelpText}" />
+        </DataTemplate>
+        <DataTemplate DataType="vmd:EditableNumericDataFieldViewModel">
+            <StackPanel Orientation="Horizontal">
+                <Slider Padding="0" Value="{Binding Value}" Minimum="{Binding MinValue}" Maximum="{Binding MaxValue}" Width="250" SmallChange="1" LargeChange="{Binding LargeChange}" IsSnapToTickEnabled="True" TickFrequency="1"
+                        AutomationProperties.AutomationId="{Binding $parent[ItemsControl].DataContext.IdPrefix, StringFormat='{}{0}.numeric-slider'}"
+                        AutomationProperties.Name="{Binding Description}"
+                        AutomationProperties.HelpText="{Binding HelpText}" />
+                <TextBox Text="{Binding FormattedValue}" Width="60" Margin="{StaticResource ValueMargin}"
+                         AutomationProperties.AutomationId="{Binding $parent[ItemsControl].DataContext.IdPrefix, StringFormat='{}{0}.numeric-value'}"
+                         AutomationProperties.Name="{Binding Description, StringFormat='{}{0} value'}"
+                         AutomationProperties.HelpText="{Binding HelpText}" />
+            </StackPanel>
+        </DataTemplate>
+        <DataTemplate DataType="vmd:EditableInstrumentDataFieldViewModel">
+            <StackPanel Orientation="Horizontal">
+                <ComboBox ItemsSource="{Binding InstrumentGroups}"
+                          SelectedItem="{Binding Group}"
+                          VerticalAlignment="Center"
+                          AutomationProperties.AutomationId="{Binding $parent[ItemsControl].DataContext.IdPrefix, StringFormat='{}{0}.instrument-group'}"
+                          AutomationProperties.Name="{Binding Description, StringFormat='{}{0} group'}"
+                          AutomationProperties.HelpText="{Binding HelpText}" />
+                <ComboBox ItemsSource="{Binding Group.Instruments}"
+                          SelectedItem="{Binding Instrument}"
+                          Margin="8,0,0,0"
+                          IsVisible="{Binding IsPreset}"
+                          VerticalAlignment="Center"
+                          AutomationProperties.AutomationId="{Binding $parent[ItemsControl].DataContext.IdPrefix, StringFormat='{}{0}.instrument'}"
+                          AutomationProperties.Name="{Binding Description, StringFormat='{}{0} instrument'}"
+                          AutomationProperties.HelpText="{Binding HelpText}" />
+                <TextBlock IsVisible="{Binding IsUserSample}"
+                           VerticalAlignment="Center"
+                           Margin="{StaticResource ValueMargin}"
+                           Text="Sample number:" />
+                <TextBox Text="{Binding UserSample}"
+                         Width="50"
+                         IsVisible="{Binding IsUserSample}"
+                         Margin="{StaticResource ValueMargin}"
+                         VerticalAlignment="Center"
+                         AutomationProperties.AutomationId="{Binding $parent[ItemsControl].DataContext.IdPrefix, StringFormat='{}{0}.user-sample'}"
+                         AutomationProperties.Name="{Binding Description, StringFormat='{}{0} sample number'}"
+                         AutomationProperties.HelpText="{Binding HelpText}" />
+            </StackPanel>
+        </DataTemplate>
+        <DataTemplate DataType="vmd:EditableTempoDataFieldViewModel">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Tempo sync" VerticalAlignment="Center"/>
+                <CheckBox IsChecked="{Binding TempoSync}" Margin="{StaticResource ValueMargin}" VerticalAlignment="Center"
+                          AutomationProperties.AutomationId="{Binding $parent[ItemsControl].DataContext.IdPrefix, StringFormat='{}{0}.tempo-sync'}"
+                          AutomationProperties.Name="{Binding Description, StringFormat='{}{0} sync'}"
+                          AutomationProperties.HelpText="{Binding HelpText}" />
+                <ComboBox ItemsSource="{Binding ValidMusicalNoteValues}" SelectedItem="{Binding MusicalNote}" Margin="{StaticResource ValueMargin}"
+                           IsVisible="{Binding TempoSync}"
+                          AutomationProperties.AutomationId="{Binding $parent[ItemsControl].DataContext.IdPrefix, StringFormat='{}{0}.tempo-note'}"
+                          AutomationProperties.Name="{Binding Description, StringFormat='{}{0} note'}"
+                          AutomationProperties.HelpText="{Binding HelpText}" />
+                <Slider Padding="0" Value="{Binding NumericValue}" Minimum="{Binding MinNumericValue}" Maximum="{Binding MaxNumericValue}" Width="150" SmallChange="1" LargeChange="{Binding LargeNumericChange}"
+                         IsVisible="{Binding NotTempoSync}"
+                        AutomationProperties.AutomationId="{Binding $parent[ItemsControl].DataContext.IdPrefix, StringFormat='{}{0}.tempo-value'}"
+                        AutomationProperties.Name="{Binding Description}"
+                        AutomationProperties.HelpText="{Binding HelpText}" />
+                <TextBlock Text="{Binding NumericFormattedText}" Margin="{StaticResource ValueMargin}"
+                            IsVisible="{Binding NotTempoSync}"/>
+            </StackPanel>
+        </DataTemplate>
+    </Window.DataTemplates>
     <DockPanel>
 
         <!-- Menu Bar -->
@@ -62,6 +174,16 @@
                           AutomationProperties.AutomationId="data-explorer.menu.file.save-as"/>
                 <MenuItem Command="{Binding ExportJsonCommand}" Header="Export JSON"
                           AutomationProperties.AutomationId="data-explorer.menu.file.export-json"/>
+                <!-- Flat field-list mode toggle (Phase 1 task 4, docs/accessibility.md §4):
+                     a menu command is the least visually disruptive toggle placement — the
+                     closed File menu renders identically, so the default layout (and the
+                     visual baselines) are unchanged. The command shows the flat list in
+                     place of the tree + details pane. -->
+                <MenuItem Header="Flat field list"
+                          Command="{Binding FlatFields.ToggleFlatModeCommand}"
+                          AutomationProperties.AutomationId="data-explorer.flat-mode.toggle"
+                          AutomationProperties.Name="Flat field list"
+                          AutomationProperties.HelpText="Show every field of the current kit as a linear list by section, instead of the tree and details pane"/>
                 <MenuItem Header="Convert to..." ItemsSource="{Binding ConvertibleModuleIdentifiers}" IsVisible="{Binding HasConvertibleModuleIdentifiers}"
                           AutomationProperties.AutomationId="data-explorer.menu.file.convert">
                     <MenuItem.ItemTemplate>
@@ -233,8 +355,11 @@
                                AutomationProperties.AutomationId="data-explorer.search.no-results"
                                IsVisible="{Binding HasNoResults}" />
                 </StackPanel>
-                <!-- Details for the selected node. -->
+                <!-- Details for the selected node (hidden while the flat field list is on;
+                     both are bound to the same DataFieldViewModel instances, so there is
+                     exactly one editing path). -->
                 <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
+                              IsVisible="{Binding FlatFields.IsTreeModeVisible}"
                               AutomationProperties.LandmarkType="Main">
                     <StackPanel Margin="8,0,8,0">
                         <ItemsControl ItemsSource="{Binding SelectedNodeDetails}">
@@ -244,93 +369,11 @@
                                     <GroupBox Header="{Binding Description}"
                                               AutomationProperties.HeadingLevel="3"
                                               AutomationProperties.LandmarkType="Form">
-                                        <ItemsControl ItemsSource="{Binding Fields}">
-                                            <ItemsControl.ItemTemplate>
-                                                <DataTemplate>
-                                                    <Grid Margin="0,4,0,4">
-                                                        <Grid.ColumnDefinitions>
-                                                            <ColumnDefinition Width="200" />
-                                                            <ColumnDefinition Width="*" />
-                                                        </Grid.ColumnDefinitions>
-                                                        <TextBlock Classes="label" Grid.Column="0" Text="{Binding Description}" VerticalAlignment="Center" />
-                                                        <ContentControl Grid.Column="1" Content="{Binding}" Margin="{StaticResource ValueMargin}" HorizontalAlignment="Left" VerticalAlignment="Center">
-                                                            <ContentControl.DataTemplates>
-                                                                <DataTemplate DataType="vmd:EditableEnumDataFieldViewModel">
-                                                                    <ComboBox ItemsSource="{Binding ValidValues}" SelectedItem="{Binding Value}"
-                                                                              AutomationProperties.AutomationId="data-explorer.details.enum-value"
-                                                                              AutomationProperties.Name="{Binding Description}" />
-                                                                </DataTemplate>
-                                                                <DataTemplate DataType="vmd:EditableBooleanDataFieldViewModel">
-                                                                    <CheckBox IsChecked="{Binding Value}" VerticalAlignment="Center"
-                                                                              AutomationProperties.AutomationId="data-explorer.details.boolean-value"
-                                                                              AutomationProperties.Name="{Binding Description}" />
-                                                                </DataTemplate>
-                                                                <DataTemplate DataType="vmd:EditableStringDataFieldViewModel">
-                                                                    <TextBox Text="{Binding Text}" MaxLength="{Binding MaxLength}" MinWidth="{Binding MinWidth}"
-                                                                             AutomationProperties.AutomationId="data-explorer.details.string-value"
-                                                                             AutomationProperties.Name="{Binding Description}" />
-                                                                </DataTemplate>
-                                                                <DataTemplate DataType="vmd:EditableNumericDataFieldViewModel">
-                                                                    <StackPanel Orientation="Horizontal">
-                                                                        <Slider Padding="0" Value="{Binding Value}" Minimum="{Binding MinValue}" Maximum="{Binding MaxValue}" Width="250" SmallChange="1" LargeChange="{Binding LargeChange}" IsSnapToTickEnabled="True" TickFrequency="1"
-                                                                                AutomationProperties.AutomationId="data-explorer.details.numeric-slider"
-                                                                                AutomationProperties.Name="{Binding Description}" />
-                                                                        <TextBox Text="{Binding FormattedValue}" Width="60" Margin="{StaticResource ValueMargin}"
-                                                                                 AutomationProperties.AutomationId="data-explorer.details.numeric-value"
-                                                                                 AutomationProperties.Name="{Binding Description, StringFormat='{}{0} value'}" />
-                                                                    </StackPanel>
-                                                                </DataTemplate>
-                                                                <DataTemplate DataType="vmd:EditableInstrumentDataFieldViewModel">
-                                                                    <StackPanel Orientation="Horizontal">
-                                                                        <ComboBox ItemsSource="{Binding InstrumentGroups}"
-                                                                                  SelectedItem="{Binding Group}"
-                                                                                  VerticalAlignment="Center"
-                                                                                  AutomationProperties.AutomationId="data-explorer.details.instrument-group"
-                                                                                  AutomationProperties.Name="{Binding Description, StringFormat='{}{0} group'}" />
-                                                                        <ComboBox ItemsSource="{Binding Group.Instruments}"
-                                                                                  SelectedItem="{Binding Instrument}"
-                                                                                  Margin="8,0,0,0"
-                                                                                  IsVisible="{Binding IsPreset}"
-                                                                                  VerticalAlignment="Center"
-                                                                                  AutomationProperties.AutomationId="data-explorer.details.instrument"
-                                                                                  AutomationProperties.Name="{Binding Description, StringFormat='{}{0} instrument'}" />
-                                                                        <TextBlock IsVisible="{Binding IsUserSample}"
-                                                                                   VerticalAlignment="Center"
-                                                                                   Margin="{StaticResource ValueMargin}"
-                                                                                   Text="Sample number:" />
-                                                                        <TextBox Text="{Binding UserSample}"
-                                                                                 Width="50"
-                                                                                 IsVisible="{Binding IsUserSample}"
-                                                                                 Margin="{StaticResource ValueMargin}"
-                                                                                 VerticalAlignment="Center"
-                                                                                 AutomationProperties.AutomationId="data-explorer.details.user-sample"
-                                                                                 AutomationProperties.Name="{Binding Description, StringFormat='{}{0} sample number'}" />
-                                                                    </StackPanel>
-                                                                </DataTemplate>
-                                                                <DataTemplate DataType="vmd:EditableTempoDataFieldViewModel">
-                                                                    <StackPanel Orientation="Horizontal">
-                                                                        <TextBlock Text="Tempo sync" VerticalAlignment="Center"/>
-                                                                        <CheckBox IsChecked="{Binding TempoSync}" Margin="{StaticResource ValueMargin}" VerticalAlignment="Center"
-                                                                                  AutomationProperties.AutomationId="data-explorer.details.tempo-sync"
-                                                                                  AutomationProperties.Name="{Binding Description, StringFormat='{}{0} sync'}" />
-                                                                        <ComboBox ItemsSource="{Binding ValidMusicalNoteValues}" SelectedItem="{Binding MusicalNote}" Margin="{StaticResource ValueMargin}"
-                                                                                   IsVisible="{Binding TempoSync}"
-                                                                                   AutomationProperties.AutomationId="data-explorer.details.tempo-note"
-                                                                                   AutomationProperties.Name="{Binding Description, StringFormat='{}{0} note'}" />
-                                                                        <Slider Padding="0" Value="{Binding NumericValue}" Minimum="{Binding MinNumericValue}" Maximum="{Binding MaxNumericValue}" Width="150" SmallChange="1" LargeChange="{Binding LargeNumericChange}"
-                                                                                 IsVisible="{Binding NotTempoSync}"
-                                                                                 AutomationProperties.AutomationId="data-explorer.details.tempo-value"
-                                                                                 AutomationProperties.Name="{Binding Description}" />
-                                                                        <TextBlock Text="{Binding NumericFormattedText}" Margin="{StaticResource ValueMargin}"
-                                                                                    IsVisible="{Binding NotTempoSync}"/>
-                                                                    </StackPanel>
-                                                                </DataTemplate>
-                                                            </ContentControl.DataTemplates>
-                                                        </ContentControl>
-                                                    </Grid>
-                                                </DataTemplate>
-                                            </ItemsControl.ItemTemplate>
-                                        </ItemsControl>
+                                        <!-- Rows use the shared FieldRowTemplate (Window.Resources),
+                                             whose editors resolve from the implicit per-type
+                                             DataTemplates in Window.DataTemplates. -->
+                                        <ItemsControl ItemsSource="{Binding Fields}"
+                                                      ItemTemplate="{StaticResource FieldRowTemplate}" />
                                     </GroupBox>
                                 </DataTemplate>
 
@@ -351,6 +394,37 @@
                             </ItemsControl.DataTemplates>
                         </ItemsControl>
                     </StackPanel>
+            </ScrollViewer>
+
+            <!--
+              Flat field-list mode (Phase 1 task 4, docs/accessibility.md §4): all fields of
+              the current kit as a linear list ordered by schema-tree section, bound to the
+              same DataFieldViewModel instances as the details pane (one editing path, zero
+              divergence). Hidden by default so the visual layout — and the baselines — are
+              unchanged; toggled from the File menu (data-explorer.flat-mode.toggle). Section
+              headings carry HeadingLevel so heading navigation (H / Shift+H) traverses the
+              kit's sections; rows reuse the shared FieldRowTemplate and per-type editors.
+            -->
+            <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
+                          IsVisible="{Binding FlatFields.IsFlatModeEnabled}"
+                          AutomationProperties.AutomationId="data-explorer.flat-fields"
+                          AutomationProperties.Name="Flat field list"
+                          AutomationProperties.LandmarkType="Main">
+                <StackPanel Margin="8,0,8,0">
+                    <ItemsControl ItemsSource="{Binding FlatFields.Sections}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel>
+                                    <TextBlock Classes="label" Text="{Binding Heading}" Margin="0,8,0,4"
+                                               AutomationProperties.HeadingLevel="3"
+                                               AutomationProperties.Name="{Binding Heading}" />
+                                    <ItemsControl ItemsSource="{Binding Fields}"
+                                                  ItemTemplate="{StaticResource FieldRowTemplate}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
             </ScrollViewer>
             </Grid>
         </Grid>

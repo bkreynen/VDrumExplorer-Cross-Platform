@@ -7,14 +7,14 @@ Regenerate by rebuilding and running the test project, then commit the result.
 | View | Controls | Interactive | Errors | Warnings | Info |
 |------|----------|-------------|--------|----------|------|
 | ExplorerHome | 179 | 11 | 0 | 0 | 0 |
-| DataExplorer | 3447 | 190 | 0 | 6 | 0 |
+| DataExplorer | 3448 | 190 | 0 | 6 | 0 |
 | SchemaExplorer | 98 | 3 | 0 | 0 | 0 |
 | CopyKitTargetDialog | 43 | 3 | 0 | 0 | 0 |
 | CopyKitsDialog | 87 | 5 | 0 | 0 | 0 |
 | MultiPasteDialog | 51 | 6 | 0 | 0 | 0 |
 | DataTransferDialog | 27 | 1 | 0 | 0 | 0 |
 | ConfirmCloseDialog | 16 | 2 | 0 | 0 | 0 |
-| **TOTAL** | 3948 | 221 | 0 | 6 | 0 |
+| **TOTAL** | 3949 | 221 | 0 | 6 | 0 |
 
 ### ExplorerHome
 
@@ -26,7 +26,7 @@ Regenerate by rebuilding and running the test project, then commit the result.
 
 ### DataExplorer
 
-- Controls scanned: 3447
+- Controls scanned: 3448
 - Interactive controls: 190
 - Violations: 6 (errors 0, warnings 6, info 0)
 

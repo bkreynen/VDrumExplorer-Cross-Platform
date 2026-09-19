@@ -30,6 +30,13 @@ namespace VDrumExplorer.ViewModel.Data
         public bool IsPreset => Model.Instrument.Group.Preset;
         public bool IsUserSample => !IsPreset;
 
+        /// <summary>
+        /// Screen-reader help text (docs/accessibility.md §3): the schema description.
+        /// The instrument catalogue is far too large to enumerate in help text; the
+        /// group/instrument pickers announce their selections.
+        /// </summary>
+        public string HelpText => Description;
+
         public IReadOnlyList<InstrumentGroup> InstrumentGroups => Schema.InstrumentGroups;
 
         public InstrumentGroup Group

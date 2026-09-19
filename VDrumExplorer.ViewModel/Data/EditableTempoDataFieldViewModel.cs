@@ -30,6 +30,12 @@ namespace VDrumExplorer.ViewModel.Data
         public int MaxNumericValue => Model.SchemaField.NumericField.Max;
         public int LargeNumericChange => Math.Max((MaxNumericValue - MinNumericValue) / 10, 1);
 
+        /// <summary>
+        /// Screen-reader help text (docs/accessibility.md §3): the schema description plus
+        /// the fixed-tempo BPM range (docs example: "Tempo, 20 to 260 BPM").
+        /// </summary>
+        public string HelpText => $"{Description}, {MinNumericValue} to {MaxNumericValue} BPM";
+
         public bool TempoSync
         {
             get => Model.TempoSync;

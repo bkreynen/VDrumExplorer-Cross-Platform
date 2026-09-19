@@ -40,6 +40,14 @@ namespace VDrumExplorer.ViewModel.Data
         /// node and flagging the field so the view can focus its editor.
         /// </summary>
         public FieldSearchViewModel FieldSearch { get; }
+        /// <summary>
+        /// Flat/linear field-list mode (Phase 1 task 4, docs/accessibility.md §4): all fields
+        /// of the current kit as a flat list ordered by schema-tree section, bound to the
+        /// same <see cref="DataFieldViewModel"/> instances as the tree + details pane (one
+        /// editing path, zero divergence). Off by default; toggled via
+        /// <see cref="FlatFieldListViewModel.ToggleFlatModeCommand"/>.
+        /// </summary>
+        public FlatFieldListViewModel FlatFields { get; }
         private readonly ModuleData data;
         private readonly bool IsMatchingDeviceConnected;
 
@@ -288,6 +296,7 @@ namespace VDrumExplorer.ViewModel.Data
             Root = SingleItemCollection.Of(new DataTreeNodeViewModel(data.LogicalRoot, this));
             SelectedNode = Root[0];
             FieldSearch = new FieldSearchViewModel(this);
+            FlatFields = new FlatFieldListViewModel(this);
 
             ConvertCommand = new DelegateCommand<ModuleIdentifierViewModel>(ConvertToAlternativeSchema, true);
             var moduleId = data.Schema.Identifier;
