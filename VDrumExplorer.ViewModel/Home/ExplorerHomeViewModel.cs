@@ -17,6 +17,7 @@ using VDrumExplorer.ViewModel.Data;
 using VDrumExplorer.ViewModel.Dialogs;
 using VDrumExplorer.ViewModel.Logging;
 using VDrumExplorer.ViewModel.LogicalSchema;
+using VDrumExplorer.ViewModel.Status;
 
 namespace VDrumExplorer.ViewModel.Home
 {
@@ -28,6 +29,14 @@ namespace VDrumExplorer.ViewModel.Home
 
         public LogViewModel LogViewModel { get; }
         public DeviceViewModel DeviceViewModel { get; }
+
+        /// <summary>
+        /// Status line view model backing this window's live-region status line
+        /// (polite success announcements / assertive error announcements, see
+        /// docs/accessibility.md §5-§6). Connection progress/outcomes will flow
+        /// through it in a later task; it is exposed here so the view can bind to it.
+        /// </summary>
+        public StatusViewModel Status { get; } = new StatusViewModel();
 
         public ICommand OpenSchemaExplorerCommand { get; }
         public ICommand LoadKitFromDeviceCommand { get; }
