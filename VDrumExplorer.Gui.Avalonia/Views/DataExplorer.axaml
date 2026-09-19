@@ -16,6 +16,7 @@
         <KeyBinding Gesture="Ctrl+V" Command="{Binding PasteCommand}" />
         <KeyBinding Gesture="Ctrl+Z" Command="{Binding UndoCommand}" />
         <KeyBinding Gesture="Ctrl+Y" Command="{Binding RedoCommand}" />
+        <KeyBinding Gesture="Ctrl+K" Command="{Binding FieldSearch.OpenSearchCommand}" />
     </Window.KeyBindings>
     <!--
       Template-generated interactive controls (the TextBox inside each ComboBox theme, the
@@ -180,125 +181,178 @@
                           AutomationProperties.AutomationId="data-explorer.details.splitter"
                           AutomationProperties.Name="Details pane splitter"/>
 
-            <!-- Details for the selected node. -->
-            <ScrollViewer Grid.Column="2" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
-                          AutomationProperties.LandmarkType="Main">
-                <StackPanel Margin="8,0,8,0">
-                    <ItemsControl ItemsSource="{Binding SelectedNodeDetails}">
-                        <ItemsControl.DataTemplates>
-                            <!-- Read-only field containers -->
-                            <DataTemplate DataType="vmd:FieldContainerDataNodeDetailViewModel">
-                                <GroupBox Header="{Binding Description}"
-                                          AutomationProperties.HeadingLevel="3"
-                                          AutomationProperties.LandmarkType="Form">
-                                    <ItemsControl ItemsSource="{Binding Fields}">
-                                        <ItemsControl.ItemTemplate>
-                                            <DataTemplate>
-                                                <Grid Margin="0,4,0,4">
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="200" />
-                                                        <ColumnDefinition Width="*" />
-                                                    </Grid.ColumnDefinitions>
-                                                    <TextBlock Classes="label" Grid.Column="0" Text="{Binding Description}" VerticalAlignment="Center" />
-                                                    <ContentControl Grid.Column="1" Content="{Binding}" Margin="{StaticResource ValueMargin}" HorizontalAlignment="Left" VerticalAlignment="Center">
-                                                        <ContentControl.DataTemplates>
-                                                            <DataTemplate DataType="vmd:EditableEnumDataFieldViewModel">
-                                                                <ComboBox ItemsSource="{Binding ValidValues}" SelectedItem="{Binding Value}"
-                                                                          AutomationProperties.AutomationId="data-explorer.details.enum-value"
-                                                                          AutomationProperties.Name="{Binding Description}" />
-                                                            </DataTemplate>
-                                                            <DataTemplate DataType="vmd:EditableBooleanDataFieldViewModel">
-                                                                <CheckBox IsChecked="{Binding Value}" VerticalAlignment="Center"
-                                                                          AutomationProperties.AutomationId="data-explorer.details.boolean-value"
-                                                                          AutomationProperties.Name="{Binding Description}" />
-                                                            </DataTemplate>
-                                                            <DataTemplate DataType="vmd:EditableStringDataFieldViewModel">
-                                                                <TextBox Text="{Binding Text}" MaxLength="{Binding MaxLength}" MinWidth="{Binding MinWidth}"
-                                                                         AutomationProperties.AutomationId="data-explorer.details.string-value"
-                                                                         AutomationProperties.Name="{Binding Description}" />
-                                                            </DataTemplate>
-                                                            <DataTemplate DataType="vmd:EditableNumericDataFieldViewModel">
-                                                                <StackPanel Orientation="Horizontal">
-                                                                    <Slider Padding="0" Value="{Binding Value}" Minimum="{Binding MinValue}" Maximum="{Binding MaxValue}" Width="250" SmallChange="1" LargeChange="{Binding LargeChange}" IsSnapToTickEnabled="True" TickFrequency="1"
-                                                                            AutomationProperties.AutomationId="data-explorer.details.numeric-slider"
-                                                                            AutomationProperties.Name="{Binding Description}" />
-                                                                    <TextBox Text="{Binding FormattedValue}" Width="60" Margin="{StaticResource ValueMargin}"
-                                                                             AutomationProperties.AutomationId="data-explorer.details.numeric-value"
-                                                                             AutomationProperties.Name="{Binding Description, StringFormat='{}{0} value'}" />
-                                                                </StackPanel>
-                                                            </DataTemplate>
-                                                            <DataTemplate DataType="vmd:EditableInstrumentDataFieldViewModel">
-                                                                <StackPanel Orientation="Horizontal">
-                                                                    <ComboBox ItemsSource="{Binding InstrumentGroups}"
-                                                                              SelectedItem="{Binding Group}"
-                                                                              VerticalAlignment="Center"
-                                                                              AutomationProperties.AutomationId="data-explorer.details.instrument-group"
-                                                                              AutomationProperties.Name="{Binding Description, StringFormat='{}{0} group'}" />
-                                                                    <ComboBox ItemsSource="{Binding Group.Instruments}"
-                                                                              SelectedItem="{Binding Instrument}"
-                                                                              Margin="8,0,0,0"
-                                                                              IsVisible="{Binding IsPreset}"
-                                                                              VerticalAlignment="Center"
-                                                                              AutomationProperties.AutomationId="data-explorer.details.instrument"
-                                                                              AutomationProperties.Name="{Binding Description, StringFormat='{}{0} instrument'}" />
-                                                                    <TextBlock IsVisible="{Binding IsUserSample}"
-                                                                               VerticalAlignment="Center"
-                                                                               Margin="{StaticResource ValueMargin}"
-                                                                               Text="Sample number:" />
-                                                                    <TextBox Text="{Binding UserSample}"
-                                                                             Width="50"
-                                                                             IsVisible="{Binding IsUserSample}"
-                                                                             Margin="{StaticResource ValueMargin}"
-                                                                             VerticalAlignment="Center"
-                                                                             AutomationProperties.AutomationId="data-explorer.details.user-sample"
-                                                                             AutomationProperties.Name="{Binding Description, StringFormat='{}{0} sample number'}" />
-                                                                </StackPanel>
-                                                            </DataTemplate>
-                                                            <DataTemplate DataType="vmd:EditableTempoDataFieldViewModel">
-                                                                <StackPanel Orientation="Horizontal">
-                                                                    <TextBlock Text="Tempo sync" VerticalAlignment="Center"/>
-                                                                    <CheckBox IsChecked="{Binding TempoSync}" Margin="{StaticResource ValueMargin}" VerticalAlignment="Center"
-                                                                              AutomationProperties.AutomationId="data-explorer.details.tempo-sync"
-                                                                              AutomationProperties.Name="{Binding Description, StringFormat='{}{0} sync'}" />
-                                                                    <ComboBox ItemsSource="{Binding ValidMusicalNoteValues}" SelectedItem="{Binding MusicalNote}" Margin="{StaticResource ValueMargin}"
-                                                                               IsVisible="{Binding TempoSync}"
-                                                                               AutomationProperties.AutomationId="data-explorer.details.tempo-note"
-                                                                               AutomationProperties.Name="{Binding Description, StringFormat='{}{0} note'}" />
-                                                                    <Slider Padding="0" Value="{Binding NumericValue}" Minimum="{Binding MinNumericValue}" Maximum="{Binding MaxNumericValue}" Width="150" SmallChange="1" LargeChange="{Binding LargeNumericChange}"
-                                                                             IsVisible="{Binding NotTempoSync}"
-                                                                             AutomationProperties.AutomationId="data-explorer.details.tempo-value"
-                                                                             AutomationProperties.Name="{Binding Description}" />
-                                                                    <TextBlock Text="{Binding NumericFormattedText}" Margin="{StaticResource ValueMargin}"
-                                                                                IsVisible="{Binding NotTempoSync}"/>
-                                                                </StackPanel>
-                                                            </DataTemplate>
-                                                        </ContentControl.DataTemplates>
-                                                    </ContentControl>
-                                                </Grid>
-                                            </DataTemplate>
-                                        </ItemsControl.ItemTemplate>
-                                    </ItemsControl>
-                                </GroupBox>
+            <!--
+              Jump-to-field search (Ctrl+K, docs/accessibility.md §4). Hidden by default
+              (IsVisible collapses the row to zero height), so the visual layout — and the
+              visual baselines — are unchanged until the search is opened. The panel is the
+              Search landmark; Down/Up move between results and Enter jumps to the selected
+              field, so the whole flow stays on the keyboard.
+            -->
+            <Grid Grid.Column="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <StackPanel Grid.Row="0"
+                            DataContext="{Binding FieldSearch}"
+                            IsVisible="{Binding IsOpen}"
+                            AutomationProperties.LandmarkType="Search">
+                    <TextBox x:Name="fieldSearchBox"
+                             Text="{Binding Query}"
+                             AutomationProperties.AutomationId="data-explorer.search.box"
+                             AutomationProperties.Name="Search fields"
+                             AutomationProperties.HelpText="Type to search fields (Enter to jump)">
+                        <TextBox.KeyBindings>
+                            <KeyBinding Gesture="Escape" Command="{Binding CloseSearchCommand}" />
+                            <KeyBinding Gesture="Down" Command="{Binding FocusNextResultCommand}" />
+                            <KeyBinding Gesture="Up" Command="{Binding FocusPreviousResultCommand}" />
+                            <KeyBinding Gesture="Enter" Command="{Binding JumpToSelectedResultCommand}" />
+                        </TextBox.KeyBindings>
+                    </TextBox>
+                    <ItemsControl x:Name="fieldSearchResults" ItemsSource="{Binding Results}"
+                                  IsVisible="{Binding HasResults}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Button Content="{Binding DisplayText}"
+                                        HorizontalContentAlignment="Left"
+                                        Command="{Binding $parent[ItemsControl].DataContext.SelectSearchResultCommand}"
+                                        CommandParameter="{Binding}"
+                                        AutomationProperties.AutomationId="data-explorer.search.result"
+                                        AutomationProperties.Name="{Binding DisplayText}">
+                                    <Button.KeyBindings>
+                                        <KeyBinding Gesture="Escape" Command="{Binding $parent[ItemsControl].DataContext.CloseSearchCommand}" />
+                                        <KeyBinding Gesture="Down" Command="{Binding $parent[ItemsControl].DataContext.FocusNextResultCommand}" />
+                                        <KeyBinding Gesture="Up" Command="{Binding $parent[ItemsControl].DataContext.FocusPreviousResultCommand}" />
+                                        <KeyBinding Gesture="Enter" Command="{Binding $parent[ItemsControl].DataContext.JumpToSelectedResultCommand}" />
+                                    </Button.KeyBindings>
+                                </Button>
                             </DataTemplate>
-
-                            <!-- Lists (always read-only) -->
-                            <DataTemplate DataType="vmd:ListDataNodeDetailViewModel">
-                                <GroupBox Header="{Binding Description}"
-                                          AutomationProperties.HeadingLevel="3"
-                                          AutomationProperties.LandmarkType="ContentInfo">
-                                    <ItemsControl ItemsSource="{Binding Items}">
-                                        <ItemsControl.ItemTemplate>
-                                            <DataTemplate>
-                                                <TextBlock Text="{Binding Text}" />
-                                            </DataTemplate>
-                                        </ItemsControl.ItemTemplate>
-                                    </ItemsControl>
-                                </GroupBox>
-                            </DataTemplate>
-                        </ItemsControl.DataTemplates>
+                        </ItemsControl.ItemTemplate>
                     </ItemsControl>
+                    <TextBlock Text="No matching fields"
+                               AutomationProperties.AutomationId="data-explorer.search.no-results"
+                               IsVisible="{Binding HasNoResults}" />
                 </StackPanel>
+                <!-- Details for the selected node. -->
+                <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
+                              AutomationProperties.LandmarkType="Main">
+                    <StackPanel Margin="8,0,8,0">
+                        <ItemsControl ItemsSource="{Binding SelectedNodeDetails}">
+                            <ItemsControl.DataTemplates>
+                                <!-- Read-only field containers -->
+                                <DataTemplate DataType="vmd:FieldContainerDataNodeDetailViewModel">
+                                    <GroupBox Header="{Binding Description}"
+                                              AutomationProperties.HeadingLevel="3"
+                                              AutomationProperties.LandmarkType="Form">
+                                        <ItemsControl ItemsSource="{Binding Fields}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Grid Margin="0,4,0,4">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="200" />
+                                                            <ColumnDefinition Width="*" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Classes="label" Grid.Column="0" Text="{Binding Description}" VerticalAlignment="Center" />
+                                                        <ContentControl Grid.Column="1" Content="{Binding}" Margin="{StaticResource ValueMargin}" HorizontalAlignment="Left" VerticalAlignment="Center">
+                                                            <ContentControl.DataTemplates>
+                                                                <DataTemplate DataType="vmd:EditableEnumDataFieldViewModel">
+                                                                    <ComboBox ItemsSource="{Binding ValidValues}" SelectedItem="{Binding Value}"
+                                                                              AutomationProperties.AutomationId="data-explorer.details.enum-value"
+                                                                              AutomationProperties.Name="{Binding Description}" />
+                                                                </DataTemplate>
+                                                                <DataTemplate DataType="vmd:EditableBooleanDataFieldViewModel">
+                                                                    <CheckBox IsChecked="{Binding Value}" VerticalAlignment="Center"
+                                                                              AutomationProperties.AutomationId="data-explorer.details.boolean-value"
+                                                                              AutomationProperties.Name="{Binding Description}" />
+                                                                </DataTemplate>
+                                                                <DataTemplate DataType="vmd:EditableStringDataFieldViewModel">
+                                                                    <TextBox Text="{Binding Text}" MaxLength="{Binding MaxLength}" MinWidth="{Binding MinWidth}"
+                                                                             AutomationProperties.AutomationId="data-explorer.details.string-value"
+                                                                             AutomationProperties.Name="{Binding Description}" />
+                                                                </DataTemplate>
+                                                                <DataTemplate DataType="vmd:EditableNumericDataFieldViewModel">
+                                                                    <StackPanel Orientation="Horizontal">
+                                                                        <Slider Padding="0" Value="{Binding Value}" Minimum="{Binding MinValue}" Maximum="{Binding MaxValue}" Width="250" SmallChange="1" LargeChange="{Binding LargeChange}" IsSnapToTickEnabled="True" TickFrequency="1"
+                                                                                AutomationProperties.AutomationId="data-explorer.details.numeric-slider"
+                                                                                AutomationProperties.Name="{Binding Description}" />
+                                                                        <TextBox Text="{Binding FormattedValue}" Width="60" Margin="{StaticResource ValueMargin}"
+                                                                                 AutomationProperties.AutomationId="data-explorer.details.numeric-value"
+                                                                                 AutomationProperties.Name="{Binding Description, StringFormat='{}{0} value'}" />
+                                                                    </StackPanel>
+                                                                </DataTemplate>
+                                                                <DataTemplate DataType="vmd:EditableInstrumentDataFieldViewModel">
+                                                                    <StackPanel Orientation="Horizontal">
+                                                                        <ComboBox ItemsSource="{Binding InstrumentGroups}"
+                                                                                  SelectedItem="{Binding Group}"
+                                                                                  VerticalAlignment="Center"
+                                                                                  AutomationProperties.AutomationId="data-explorer.details.instrument-group"
+                                                                                  AutomationProperties.Name="{Binding Description, StringFormat='{}{0} group'}" />
+                                                                        <ComboBox ItemsSource="{Binding Group.Instruments}"
+                                                                                  SelectedItem="{Binding Instrument}"
+                                                                                  Margin="8,0,0,0"
+                                                                                  IsVisible="{Binding IsPreset}"
+                                                                                  VerticalAlignment="Center"
+                                                                                  AutomationProperties.AutomationId="data-explorer.details.instrument"
+                                                                                  AutomationProperties.Name="{Binding Description, StringFormat='{}{0} instrument'}" />
+                                                                        <TextBlock IsVisible="{Binding IsUserSample}"
+                                                                                   VerticalAlignment="Center"
+                                                                                   Margin="{StaticResource ValueMargin}"
+                                                                                   Text="Sample number:" />
+                                                                        <TextBox Text="{Binding UserSample}"
+                                                                                 Width="50"
+                                                                                 IsVisible="{Binding IsUserSample}"
+                                                                                 Margin="{StaticResource ValueMargin}"
+                                                                                 VerticalAlignment="Center"
+                                                                                 AutomationProperties.AutomationId="data-explorer.details.user-sample"
+                                                                                 AutomationProperties.Name="{Binding Description, StringFormat='{}{0} sample number'}" />
+                                                                    </StackPanel>
+                                                                </DataTemplate>
+                                                                <DataTemplate DataType="vmd:EditableTempoDataFieldViewModel">
+                                                                    <StackPanel Orientation="Horizontal">
+                                                                        <TextBlock Text="Tempo sync" VerticalAlignment="Center"/>
+                                                                        <CheckBox IsChecked="{Binding TempoSync}" Margin="{StaticResource ValueMargin}" VerticalAlignment="Center"
+                                                                                  AutomationProperties.AutomationId="data-explorer.details.tempo-sync"
+                                                                                  AutomationProperties.Name="{Binding Description, StringFormat='{}{0} sync'}" />
+                                                                        <ComboBox ItemsSource="{Binding ValidMusicalNoteValues}" SelectedItem="{Binding MusicalNote}" Margin="{StaticResource ValueMargin}"
+                                                                                   IsVisible="{Binding TempoSync}"
+                                                                                   AutomationProperties.AutomationId="data-explorer.details.tempo-note"
+                                                                                   AutomationProperties.Name="{Binding Description, StringFormat='{}{0} note'}" />
+                                                                        <Slider Padding="0" Value="{Binding NumericValue}" Minimum="{Binding MinNumericValue}" Maximum="{Binding MaxNumericValue}" Width="150" SmallChange="1" LargeChange="{Binding LargeNumericChange}"
+                                                                                 IsVisible="{Binding NotTempoSync}"
+                                                                                 AutomationProperties.AutomationId="data-explorer.details.tempo-value"
+                                                                                 AutomationProperties.Name="{Binding Description}" />
+                                                                        <TextBlock Text="{Binding NumericFormattedText}" Margin="{StaticResource ValueMargin}"
+                                                                                    IsVisible="{Binding NotTempoSync}"/>
+                                                                    </StackPanel>
+                                                                </DataTemplate>
+                                                            </ContentControl.DataTemplates>
+                                                        </ContentControl>
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </GroupBox>
+                                </DataTemplate>
+
+                                <!-- Lists (always read-only) -->
+                                <DataTemplate DataType="vmd:ListDataNodeDetailViewModel">
+                                    <GroupBox Header="{Binding Description}"
+                                              AutomationProperties.HeadingLevel="3"
+                                              AutomationProperties.LandmarkType="ContentInfo">
+                                        <ItemsControl ItemsSource="{Binding Items}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock Text="{Binding Text}" />
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </GroupBox>
+                                </DataTemplate>
+                            </ItemsControl.DataTemplates>
+                        </ItemsControl>
+                    </StackPanel>
             </ScrollViewer>
+            </Grid>
         </Grid>
     </DockPanel>
 </Window>

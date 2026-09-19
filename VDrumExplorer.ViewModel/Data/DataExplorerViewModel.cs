@@ -34,6 +34,12 @@ namespace VDrumExplorer.ViewModel.Data
         /// in a later task; it is exposed here so the view can bind to it.
         /// </summary>
         public StatusViewModel Status { get; } = new StatusViewModel();
+        /// <summary>
+        /// Jump-to-field search (Phase 1 task 4, docs/accessibility.md §4): opened with
+        /// Ctrl+K, matches fields of the current kit, jumps by selecting the owning tree
+        /// node and flagging the field so the view can focus its editor.
+        /// </summary>
+        public FieldSearchViewModel FieldSearch { get; }
         private readonly ModuleData data;
         private readonly bool IsMatchingDeviceConnected;
 
@@ -281,6 +287,7 @@ namespace VDrumExplorer.ViewModel.Data
             RedoCommand = new DelegateCommand(Redo, false);
             Root = SingleItemCollection.Of(new DataTreeNodeViewModel(data.LogicalRoot, this));
             SelectedNode = Root[0];
+            FieldSearch = new FieldSearchViewModel(this);
 
             ConvertCommand = new DelegateCommand<ModuleIdentifierViewModel>(ConvertToAlternativeSchema, true);
             var moduleId = data.Schema.Identifier;
