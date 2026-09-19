@@ -8,18 +8,74 @@
         Title="V-Drum Explorer"
         Width="900" Height="600"
         WindowStartupLocation="CenterScreen">
-    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+    <!--
+      Template-generated interactive controls (scrollbar line buttons, the TextBox inside
+      each ComboBox template) are Avalonia theme internals, not view-authored controls, but
+      A11yScanner treats them as interactive. The styles below give them accessible names and
+      stable per-area AutomationIds; scoping by ancestor keeps the IDs unique per scrollbar.
+    -->
+    <Window.Styles>
+        <Style Selector="ScrollViewer#homeScroller RepeatButton#PART_LineUpButton">
+            <Setter Property="AutomationProperties.Name" Value="Scroll up" />
+            <Setter Property="AutomationProperties.AutomationId" Value="explorer-home.page.scroll-line-up" />
+        </Style>
+        <Style Selector="ScrollViewer#homeScroller RepeatButton#PART_PageUpButton">
+            <Setter Property="AutomationProperties.Name" Value="Page up" />
+            <Setter Property="AutomationProperties.AutomationId" Value="explorer-home.page.scroll-page-up" />
+        </Style>
+        <Style Selector="ScrollViewer#homeScroller RepeatButton#PART_PageDownButton">
+            <Setter Property="AutomationProperties.Name" Value="Page down" />
+            <Setter Property="AutomationProperties.AutomationId" Value="explorer-home.page.scroll-page-down" />
+        </Style>
+        <Style Selector="ScrollViewer#homeScroller RepeatButton#PART_LineDownButton">
+            <Setter Property="AutomationProperties.Name" Value="Scroll down" />
+            <Setter Property="AutomationProperties.AutomationId" Value="explorer-home.page.scroll-line-down" />
+        </Style>
+        <!-- The log scroller shows no scrollbar parts in the test render (empty log), but
+             entries can create them at runtime; name them defensively. -->
+        <Style Selector="ScrollViewer#logScroller RepeatButton#PART_LineUpButton">
+            <Setter Property="AutomationProperties.Name" Value="Scroll up" />
+            <Setter Property="AutomationProperties.AutomationId" Value="explorer-home.log.scroll-line-up" />
+        </Style>
+        <Style Selector="ScrollViewer#logScroller RepeatButton#PART_PageUpButton">
+            <Setter Property="AutomationProperties.Name" Value="Page up" />
+            <Setter Property="AutomationProperties.AutomationId" Value="explorer-home.log.scroll-page-up" />
+        </Style>
+        <Style Selector="ScrollViewer#logScroller RepeatButton#PART_PageDownButton">
+            <Setter Property="AutomationProperties.Name" Value="Page down" />
+            <Setter Property="AutomationProperties.AutomationId" Value="explorer-home.log.scroll-page-down" />
+        </Style>
+        <Style Selector="ScrollViewer#logScroller RepeatButton#PART_LineDownButton">
+            <Setter Property="AutomationProperties.Name" Value="Scroll down" />
+            <Setter Property="AutomationProperties.AutomationId" Value="explorer-home.log.scroll-line-down" />
+        </Style>
+        <Style Selector="ComboBox#schemaPicker TextBox#PART_EditableTextBox">
+            <Setter Property="AutomationProperties.Name" Value="Selected schema" />
+            <Setter Property="AutomationProperties.AutomationId" Value="explorer-home.schema.selected-text" />
+        </Style>
+        <Style Selector="ComboBox#logLevelPicker TextBox#PART_EditableTextBox">
+            <Setter Property="AutomationProperties.Name" Value="Selected log level" />
+            <Setter Property="AutomationProperties.AutomationId" Value="explorer-home.log.selected-text" />
+        </Style>
+    </Window.Styles>
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" x:Name="homeScroller">
         <StackPanel Margin="16">
 
             <!-- Header -->
-            <TextBlock Classes="header" Text="V-Drum Explorer" />
+            <TextBlock Classes="header" Text="V-Drum Explorer"
+                       AutomationProperties.HeadingLevel="1" />
             <TextBlock Classes="subheader" Text="Explore and edit Roland V-Drum settings" />
 
             <!-- File & Device Section -->
-            <GroupBox Header="File &amp; Device" Margin="{StaticResource CardMargin}">
+            <GroupBox Header="File &amp; Device" Margin="{StaticResource CardMargin}"
+                      AutomationProperties.HeadingLevel="2"
+                      AutomationProperties.LandmarkType="Form"
+                      AutomationProperties.AutomationId="explorer-home.file.section">
                 <StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
-                        <Button Classes="accent" Command="{Binding LoadFileCommand}" Content="Load file"/>
+                        <Button Classes="accent" Command="{Binding LoadFileCommand}" Content="Load file"
+                                AutomationProperties.AutomationId="explorer-home.file.load-file-button"
+                                AutomationProperties.HelpText="Open a saved explorer file: module, kit or instrument audio."/>
                         <TextBlock Classes="label" Text="Connected device:" Margin="16,0,0,0" />
                         <TextBlock Text="{Binding DeviceViewModel.ConnectedDeviceName}" Margin="8,0,0,0" FontWeight="SemiBold"/>
                     </StackPanel>
@@ -27,46 +83,75 @@
             </GroupBox>
 
             <!-- Schema Section -->
-            <GroupBox Header="Schema" Margin="{StaticResource CardMargin}">
+            <GroupBox Header="Schema" Margin="{StaticResource CardMargin}"
+                      AutomationProperties.HeadingLevel="2"
+                      AutomationProperties.LandmarkType="Form"
+                      AutomationProperties.AutomationId="explorer-home.schema.section">
                 <StackPanel>
                     <TextBlock Classes="label" Text="Known schemas:" Margin="0,0,0,8" />
                     <StackPanel Orientation="Horizontal">
-                        <ComboBox Margin="0" ItemsSource="{Binding KnownSchemas}" SelectedItem="{Binding SelectedSchema}" MinWidth="250">
+                        <ComboBox Margin="0" x:Name="schemaPicker" ItemsSource="{Binding KnownSchemas}" SelectedItem="{Binding SelectedSchema}" MinWidth="250"
+                                  AutomationProperties.AutomationId="explorer-home.schema.known-schemas-picker"
+                                  AutomationProperties.Name="Known schemas"
+                                  AutomationProperties.HelpText="Module schemas available in this installation; select one before exploring.">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate x:DataType="vmh:ModuleIdentifierViewModel">
                                     <TextBlock Text="{Binding DisplayName}" />
                                 </DataTemplate>
                             </ComboBox.ItemTemplate>
                         </ComboBox>
-                        <Button Classes="accent" Margin="8,0,0,0" Command="{Binding OpenSchemaExplorerCommand}" Content="Explore" />
+                        <Button Classes="accent" Margin="8,0,0,0" Command="{Binding OpenSchemaExplorerCommand}" Content="Explore"
+                                AutomationProperties.AutomationId="explorer-home.schema.explore-button"
+                                AutomationProperties.Name="Explore schema"
+                                AutomationProperties.HelpText="Open the schema explorer for the selected module schema."/>
                     </StackPanel>
                 </StackPanel>
             </GroupBox>
 
             <!-- Device Options Section -->
             <GroupBox Header="Device Options" Margin="{StaticResource CardMargin}"
-                      IsEnabled="{Binding DeviceViewModel.DeviceConnected}">
+                      IsEnabled="{Binding DeviceViewModel.DeviceConnected}"
+                      AutomationProperties.HeadingLevel="2"
+                      AutomationProperties.LandmarkType="Form"
+                      AutomationProperties.AutomationId="explorer-home.device.section">
                 <StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
-                        <Button Command="{Binding LoadModuleFromDeviceCommand}" Content="Load all data"/>
-                        <Button Margin="8,0,0,0" Command="{Binding LoadKitFromDeviceCommand}" Content="Load single kit"/>
+                        <Button Command="{Binding LoadModuleFromDeviceCommand}" Content="Load all data"
+                                AutomationProperties.AutomationId="explorer-home.device.load-all-data-button"
+                                AutomationProperties.HelpText="Read all data from the connected device and open it in an explorer window."/>
+                        <Button Margin="8,0,0,0" Command="{Binding LoadKitFromDeviceCommand}" Content="Load single kit"
+                                AutomationProperties.AutomationId="explorer-home.device.load-kit-button"
+                                AutomationProperties.HelpText="Read one kit from the connected device and open it in an explorer window."/>
                         <TextBlock Classes="label" Text="Kit number:" Margin="16,0,0,0"/>
-                        <TextBox Margin="8,0,0,0" Text="{Binding LoadKitFromDeviceNumber}" Width="50"/>
+                        <TextBox Margin="8,0,0,0" Text="{Binding LoadKitFromDeviceNumber}" Width="50"
+                                 AutomationProperties.AutomationId="explorer-home.device.kit-number-input"
+                                 AutomationProperties.Name="Kit number"
+                                 AutomationProperties.HelpText="Number of the kit to read from the connected device."/>
                     </StackPanel>
-                    <Button Command="{Binding RecordInstrumentAudioCommand}" Content="Record instruments" />
+                    <Button Command="{Binding RecordInstrumentAudioCommand}" Content="Record instruments"
+                            AutomationProperties.AutomationId="explorer-home.device.record-instruments-button"
+                            AutomationProperties.HelpText="Record audio of every instrument on the connected device to a file."/>
                 </StackPanel>
             </GroupBox>
 
             <!-- Log Section -->
-            <GroupBox Header="Log" Margin="{StaticResource CardMargin}">
+            <GroupBox Header="Log" Margin="{StaticResource CardMargin}"
+                      AutomationProperties.HeadingLevel="2"
+                      AutomationProperties.LandmarkType="ContentInfo"
+                      AutomationProperties.AutomationId="explorer-home.log.section">
                 <StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
                         <TextBlock Classes="label" Text="Log level:"/>
-                        <ComboBox Margin="8,0,0,0" ItemsSource="{Binding LogViewModel.AllFilterLevels}" SelectedItem="{Binding LogViewModel.FilterLevel}" />
-                        <Button Margin="16,0,0,0" Command="{Binding SaveLogCommand}" Content="Save log file"/>
+                        <ComboBox Margin="8,0,0,0" x:Name="logLevelPicker" ItemsSource="{Binding LogViewModel.AllFilterLevels}" SelectedItem="{Binding LogViewModel.FilterLevel}"
+                                  AutomationProperties.AutomationId="explorer-home.log.level-picker"
+                                  AutomationProperties.Name="Log level"
+                                  AutomationProperties.HelpText="Minimum severity shown in the log display." />
+                        <Button Margin="16,0,0,0" Command="{Binding SaveLogCommand}" Content="Save log file"
+                                AutomationProperties.AutomationId="explorer-home.log.save-log-button"
+                                AutomationProperties.HelpText="Save all log entries to a file."/>
                     </StackPanel>
                     <Border Background="{DynamicResource LogBackground}" CornerRadius="{StaticResource CardCornerRadius}" Padding="12" MaxHeight="200">
-                        <ScrollViewer>
+                        <ScrollViewer x:Name="logScroller">
                             <ItemsControl ItemsSource="{Binding LogViewModel.LogEntries}">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
@@ -92,6 +177,15 @@
                     </Border>
                 </StackPanel>
             </GroupBox>
+
+            <!--
+              Status live region: placeholder for Phase 1 task 5, which binds the status line
+              to a status VM. A11yScanner enforces the live-region invariant per window, so an
+              empty (visually neutral, renders nothing) element carries it until then.
+            -->
+            <TextBlock AutomationProperties.AutomationId="explorer-home.status.message"
+                       AutomationProperties.Name="Status"
+                       AutomationProperties.LiveSetting="Polite" />
 
         </StackPanel>
     </ScrollViewer>

@@ -37,9 +37,11 @@ namespace VDrumExplorer.Gui.Avalonia.Test;
 /// retrofit backlog.
 /// </para>
 /// <para>
-/// These tests are REPORT-ONLY by design: they assert that the scanner runs and produces
-/// counts for each view, not that the views are accessible. To regenerate the committed
-/// report, rebuild and run the test project:
+/// These tests are REPORT-ONLY by design, except for views that have been retrofitted:
+/// <see cref="Scan_ExplorerHome_EnforcesInvariants"/> runs the ExplorerHome scan in
+/// enforcing mode (a retrofit landing in Phase 1), so any Error-severity violation there
+/// fails the build. Views stay report-only until retrofitted, then flip to enforcing
+/// permanently. To regenerate the committed report, rebuild and run the test project:
 /// <code>dotnet build VDrumExplorer.Gui.Avalonia.Test -c Release &amp;&amp;
 /// dotnet VDrumExplorer.Gui.Avalonia.Test/bin/Release/net10.0/VDrumExplorer.Gui.Avalonia.Test.dll</code>
 /// then commit the regenerated <c>A11yInventory/report.md</c>.
@@ -54,13 +56,18 @@ namespace VDrumExplorer.Gui.Avalonia.Test;
 public class A11yScannerTest
 {
     // === Per-view inventory scans (report-only; these pass regardless of violation counts) ===
+    // ExplorerHome was retrofitted (Phase 1 task 1) and is scanned in enforcing mode below;
+    // all other views are still report-only until they are retrofitted.
 
     [AvaloniaFact]
-    public void Scan_ExplorerHome_ProducesInventory()
+    public void Scan_ExplorerHome_EnforcesInvariants()
     {
-        var result = ScanView(CreateExplorerHome);
+        // Retrofitted view: enforcing mode. A11yScanner.Scan throws if any Error-severity
+        // violation is found, so reaching this assert proves the view has none.
+        var result = ScanView(CreateExplorerHome, enforce: true);
         Assert.True(result.ControlsScanned > 0, "No controls scanned.");
         Assert.True(result.InteractiveControls > 0, "No interactive controls found in ExplorerHome.");
+        Assert.Empty(result.Violations.Where(v => v.Severity == A11ySeverity.Error));
     }
 
     [AvaloniaFact]

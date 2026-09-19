@@ -6,7 +6,7 @@ Regenerate by rebuilding and running the test project, then commit the result.
 
 | View | Controls | Interactive | Errors | Warnings | Info |
 |------|----------|-------------|--------|----------|------|
-| ExplorerHome | 177 | 15 | 21 | 0 | 8 |
+| ExplorerHome | 178 | 15 | 0 | 0 | 0 |
 | DataExplorer | 3440 | 275 | 537 | 0 | 13 |
 | SchemaExplorer | 97 | 5 | 10 | 0 | 5 |
 | CopyKitTargetDialog | 42 | 3 | 5 | 0 | 0 |
@@ -14,53 +14,15 @@ Regenerate by rebuilding and running the test project, then commit the result.
 | MultiPasteDialog | 50 | 7 | 9 | 0 | 0 |
 | DataTransferDialog | 27 | 1 | 2 | 0 | 0 |
 | ConfirmCloseDialog | 16 | 2 | 3 | 0 | 0 |
-| **TOTAL** | 3935 | 313 | 596 | 0 | 26 |
+| **TOTAL** | 3936 | 313 | 575 | 0 | 18 |
 
 ### ExplorerHome
 
-- Controls scanned: 177
+- Controls scanned: 178
 - Interactive controls: 15
-- Violations: 29 (errors 21, warnings 0, info 8)
+- Violations: 0 (errors 0, warnings 0, info 0)
 
-- `LIVE_REGION_MISSING`: 1
-- `MISSING_AUTOMATION_ID`: 15
-- `MISSING_HEADING_LEVEL`: 4
-- `MISSING_LANDMARK`: 4
-- `MISSING_NAME`: 5
 
-<details><summary>Violation details</summary>
-
-- Info: [MISSING_HEADING_LEVEL] GroupBox 'File & Device': Section-header candidate has no AutomationProperties.HeadingLevel (report-only).
-- Info: [MISSING_LANDMARK] GroupBox 'File & Device': Major-region candidate has no AutomationProperties.LandmarkType (report-only).
-- Error: [MISSING_AUTOMATION_ID] Button 'Load file': Interactive control has no AutomationProperties.AutomationId.
-- Info: [MISSING_HEADING_LEVEL] GroupBox 'Schema': Section-header candidate has no AutomationProperties.HeadingLevel (report-only).
-- Info: [MISSING_LANDMARK] GroupBox 'Schema': Major-region candidate has no AutomationProperties.LandmarkType (report-only).
-- Error: [MISSING_AUTOMATION_ID] ComboBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] ComboBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] Button 'Explore': Interactive control has no AutomationProperties.AutomationId.
-- Info: [MISSING_HEADING_LEVEL] GroupBox 'Device Options': Section-header candidate has no AutomationProperties.HeadingLevel (report-only).
-- Info: [MISSING_LANDMARK] GroupBox 'Device Options': Major-region candidate has no AutomationProperties.LandmarkType (report-only).
-- Error: [MISSING_AUTOMATION_ID] Button 'Load all data': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_AUTOMATION_ID] Button 'Load single kit': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] Button 'Record instruments': Interactive control has no AutomationProperties.AutomationId.
-- Info: [MISSING_HEADING_LEVEL] GroupBox 'Log': Section-header candidate has no AutomationProperties.HeadingLevel (report-only).
-- Info: [MISSING_LANDMARK] GroupBox 'Log': Major-region candidate has no AutomationProperties.LandmarkType (report-only).
-- Error: [MISSING_AUTOMATION_ID] ComboBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] ComboBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] Button 'Save log file': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [LIVE_REGION_MISSING] ExplorerHome '': No element sets AutomationProperties.LiveSetting; the window has no live-region status line.
-
-</details>
 
 ### DataExplorer
 
