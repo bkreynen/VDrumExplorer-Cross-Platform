@@ -6,19 +6,19 @@ Regenerate by rebuilding and running the test project, then commit the result.
 
 | View | Controls | Interactive | Errors | Warnings | Info |
 |------|----------|-------------|--------|----------|------|
-| ExplorerHome | 178 | 11 | 0 | 0 | 0 |
-| DataExplorer | 3441 | 189 | 0 | 6 | 0 |
-| SchemaExplorer | 97 | 3 | 6 | 0 | 5 |
+| ExplorerHome | 179 | 11 | 0 | 0 | 0 |
+| DataExplorer | 3442 | 189 | 0 | 6 | 0 |
+| SchemaExplorer | 98 | 3 | 0 | 0 | 0 |
 | CopyKitTargetDialog | 42 | 3 | 5 | 0 | 0 |
 | CopyKitsDialog | 86 | 5 | 9 | 0 | 0 |
 | MultiPasteDialog | 50 | 6 | 7 | 0 | 0 |
 | DataTransferDialog | 27 | 1 | 2 | 0 | 0 |
 | ConfirmCloseDialog | 16 | 2 | 3 | 0 | 0 |
-| **TOTAL** | 3937 | 220 | 32 | 6 | 5 |
+| **TOTAL** | 3940 | 220 | 26 | 6 | 0 |
 
 ### ExplorerHome
 
-- Controls scanned: 178
+- Controls scanned: 179
 - Interactive controls: 11
 - Violations: 0 (errors 0, warnings 0, info 0)
 
@@ -26,7 +26,7 @@ Regenerate by rebuilding and running the test project, then commit the result.
 
 ### DataExplorer
 
-- Controls scanned: 3441
+- Controls scanned: 3442
 - Interactive controls: 189
 - Violations: 6 (errors 0, warnings 6, info 0)
 
@@ -45,32 +45,11 @@ Regenerate by rebuilding and running the test project, then commit the result.
 
 ### SchemaExplorer
 
-- Controls scanned: 97
+- Controls scanned: 98
 - Interactive controls: 3
-- Violations: 11 (errors 6, warnings 0, info 5)
+- Violations: 0 (errors 0, warnings 0, info 0)
 
-- `DECORATIVE_IN_ACCESSIBILITY_VIEW`: 1
-- `LIVE_REGION_MISSING`: 1
-- `MISSING_AUTOMATION_ID`: 3
-- `MISSING_HEADING_LEVEL`: 2
-- `MISSING_LANDMARK`: 2
-- `MISSING_NAME`: 2
 
-<details><summary>Violation details</summary>
-
-- Error: [MISSING_AUTOMATION_ID] TreeViewItem '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_AUTOMATION_ID] Border '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] Border '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] GridSplitter '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] GridSplitter '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Info: [MISSING_HEADING_LEVEL] GroupBox 'Tree node': Section-header candidate has no AutomationProperties.HeadingLevel (report-only).
-- Info: [MISSING_LANDMARK] GroupBox 'Tree node': Major-region candidate has no AutomationProperties.LandmarkType (report-only).
-- Info: [DECORATIVE_IN_ACCESSIBILITY_VIEW] Separator '': Decorative (non-interactive, unnamed) element is not excluded from the accessibility view.
-- Info: [MISSING_HEADING_LEVEL] GroupBox 'Current kit': Section-header candidate has no AutomationProperties.HeadingLevel (report-only).
-- Info: [MISSING_LANDMARK] GroupBox 'Current kit': Major-region candidate has no AutomationProperties.LandmarkType (report-only).
-- Error: [LIVE_REGION_MISSING] SchemaExplorer '': No element sets AutomationProperties.LiveSetting; the window has no live-region status line.
-
-</details>
 
 ### CopyKitTargetDialog
 

@@ -83,11 +83,14 @@ public class A11yScannerTest
     }
 
     [AvaloniaFact]
-    public void Scan_SchemaExplorer_ProducesInventory()
+    public void Scan_SchemaExplorer_EnforcesInvariants()
     {
-        var result = ScanView(CreateSchemaExplorer);
+        // Retrofitted view: enforcing mode. A11yScanner.Scan throws if any Error-severity
+        // violation is found, so reaching this assert proves the view has none.
+        var result = ScanView(CreateSchemaExplorer, enforce: true);
         Assert.True(result.ControlsScanned > 0, "No controls scanned.");
         Assert.True(result.InteractiveControls > 0, "No interactive controls found in SchemaExplorer.");
+        Assert.Empty(result.Violations.Where(v => v.Severity == A11ySeverity.Error));
     }
 
     [AvaloniaFact]
