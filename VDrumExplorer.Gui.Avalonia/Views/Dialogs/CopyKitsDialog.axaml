@@ -7,8 +7,19 @@
         Title="Copy Multiple Kits"
         SizeToContent="WidthAndHeight"
         CanResize="False"
-        WindowStartupLocation="CenterOwner">
-    <Grid Margin="16">
+        WindowStartupLocation="CenterOwner"
+        AutomationProperties.HeadingLevel="1">
+    <!--
+      Accessibility annotations (docs/accessibility.md §2–3): every interactive control
+      carries an AutomationId in the dialog-copy-kits.* scheme plus an identifier-first
+      Name; the kit-number TextBoxes need explicit Names because their editable values
+      are not names. The whole dialog is one Main landmark, and the empty status
+      TextBlock is a visually neutral Polite live-region placeholder (zero height when
+      empty; see the SchemaExplorer comment) that satisfies the scanner's
+      one-live-region-per-window invariant until this dialog has status text.
+    -->
+    <Grid Margin="16"
+          AutomationProperties.LandmarkType="Main">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -28,20 +39,38 @@
 
         <TextBox Grid.Column="1" Grid.Row="0"
                  Margin="{StaticResource ValueMarginWithVertical}" HorizontalAlignment="Left" Width="50"
+                 AutomationProperties.AutomationId="dialog-copy-kits.fields.source-from"
+                 AutomationProperties.Name="Source from kit"
+                 AutomationProperties.HelpText="First kit number to copy."
                  Text="{Binding SourceFrom}" />
         <TextBox Grid.Column="1" Grid.Row="1"
                  Margin="{StaticResource ValueMarginWithVertical}" HorizontalAlignment="Left" Width="50"
+                 AutomationProperties.AutomationId="dialog-copy-kits.fields.source-to"
+                 AutomationProperties.Name="Source to kit"
+                 AutomationProperties.HelpText="Last kit number to copy."
                  Text="{Binding SourceTo}" />
         <TextBox Grid.Column="1" Grid.Row="2"
                  Margin="{StaticResource ValueMarginWithVertical}" HorizontalAlignment="Left" Width="50"
+                 AutomationProperties.AutomationId="dialog-copy-kits.fields.destination-from"
+                 AutomationProperties.Name="Destination from kit"
+                 AutomationProperties.HelpText="Kit number where the first copied kit is placed; subsequent kits follow in order."
                  Text="{Binding DestinationFrom}" />
         <TextBlock Grid.Column="1" Grid.Row="3"
                    Margin="{StaticResource ValueMarginWithVertical}" HorizontalAlignment="Left"
+                   AutomationProperties.AutomationId="dialog-copy-kits.summary.copy-count"
+                   AutomationProperties.Name="Kits to copy"
                    Text="{Binding CopyCount}" FontWeight="SemiBold" />
 
         <UniformGrid Rows="1" Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="0,16,0,0">
-            <Button Classes="accent" Click="Copy" IsEnabled="{Binding CopyEnabled}" Content="Copy" />
-            <Button Margin="8,0,0,0" Click="Cancel" Content="Cancel" />
+            <Button Classes="accent" Click="Copy" IsEnabled="{Binding CopyEnabled}" Content="Copy"
+                    AutomationProperties.AutomationId="dialog-copy-kits.actions.copy"
+                    AutomationProperties.HelpText="Copy the selected range of kits starting at the destination kit number." />
+            <Button Margin="8,0,0,0" Click="Cancel" Content="Cancel"
+                    AutomationProperties.AutomationId="dialog-copy-kits.actions.cancel" />
         </UniformGrid>
+        <TextBlock Grid.Row="4" Grid.ColumnSpan="2"
+                   AutomationProperties.AutomationId="dialog-copy-kits.status.message"
+                   AutomationProperties.Name="Status"
+                   AutomationProperties.LiveSetting="Polite" />
     </Grid>
 </Window>

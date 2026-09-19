@@ -6,25 +6,64 @@
         x:DataType="vmd:MultiPasteViewModel"
         Title="Multi-paste" Height="500" Width="550"
         CanResize="False"
-        WindowStartupLocation="CenterOwner">
-    <DockPanel Margin="16">
+        WindowStartupLocation="CenterOwner"
+        AutomationProperties.HeadingLevel="1">
+    <!--
+      Template-generated interactive controls (the item containers generated for each
+      Candidates entry) are ItemsControl internals, not view-authored controls, but
+      A11yScanner treats them as interactive. The style below gives them a stable
+      per-item-role AutomationId; template-level IDs repeat across instances, which
+      docs/accessibility.md §3.1 sanctions (Warning severity only).
+    -->
+    <Window.Styles>
+        <Style Selector="ListBoxItem">
+            <Setter Property="AutomationProperties.AutomationId" Value="dialog-multi-paste.candidate-item" />
+        </Style>
+    </Window.Styles>
+    <!--
+      Accessibility annotations (docs/accessibility.md §2–3): every interactive control
+      carries an AutomationId in the dialog-multi-paste.* scheme; Buttons and the
+      candidate CheckBox take their Names from their visible text/content
+      (identifier-first). The whole dialog is one Main landmark, and the empty status
+      TextBlock is a visually neutral Polite live-region placeholder (zero height when
+      empty; see the SchemaExplorer comment) that satisfies the scanner's
+      one-live-region-per-window invariant until this dialog has status text.
+    -->
+    <DockPanel Margin="16"
+               AutomationProperties.LandmarkType="Main">
         <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,8">
             <TextBlock Classes="label" Text="Node snapshot path:" />
-            <TextBlock Margin="8,0,0,0" Text="{Binding Snapshot.Path}" FontWeight="SemiBold" />
+            <TextBlock Margin="8,0,0,0"
+                       AutomationProperties.AutomationId="dialog-multi-paste.snapshot.path"
+                       AutomationProperties.Name="Node snapshot path"
+                       Text="{Binding Snapshot.Path}" FontWeight="SemiBold" />
         </StackPanel>
         <TextBlock DockPanel.Dock="Top" Classes="label" Margin="0,0,0,8" Text="Select nodes to paste the snapshot into, then click Paste." />
         <UniformGrid Rows="1" DockPanel.Dock="Top" HorizontalAlignment="Left" Margin="0,0,0,8">
-            <Button Click="SelectAll" Content="Select all" />
-            <Button Margin="8,0,0,0" Click="SelectNone" Content="Select none" />
+            <Button Click="SelectAll" Content="Select all"
+                    AutomationProperties.AutomationId="dialog-multi-paste.actions.select-all"
+                    AutomationProperties.HelpText="Check every candidate node." />
+            <Button Margin="8,0,0,0" Click="SelectNone" Content="Select none"
+                    AutomationProperties.AutomationId="dialog-multi-paste.actions.select-none"
+                    AutomationProperties.HelpText="Uncheck every candidate node." />
         </UniformGrid>
         <UniformGrid Rows="1" DockPanel.Dock="Bottom" HorizontalAlignment="Left" Margin="0,12,0,0">
-            <Button Classes="accent" Click="Paste" Content="Paste" />
-            <Button Margin="8,0,0,0" Click="Cancel" Content="Cancel" />
+            <Button Classes="accent" Click="Paste" Content="Paste"
+                    AutomationProperties.AutomationId="dialog-multi-paste.actions.paste"
+                    AutomationProperties.HelpText="Paste the snapshot into every checked node." />
+            <Button Margin="8,0,0,0" Click="Cancel" Content="Cancel"
+                    AutomationProperties.AutomationId="dialog-multi-paste.actions.cancel" />
         </UniformGrid>
-        <ListBox DockPanel.Dock="Top" ItemsSource="{Binding Candidates}">
+        <TextBlock DockPanel.Dock="Bottom"
+                   AutomationProperties.AutomationId="dialog-multi-paste.status.message"
+                   AutomationProperties.Name="Status"
+                   AutomationProperties.LiveSetting="Polite" />
+        <ListBox DockPanel.Dock="Top" ItemsSource="{Binding Candidates}"
+                 AutomationProperties.AutomationId="dialog-multi-paste.candidates">
             <ListBox.ItemTemplate>
                 <DataTemplate x:DataType="vmd:MultiPasteViewModel+CheckableCandidate">
-                    <CheckBox Content="{Binding Candidate.Path}" IsChecked="{Binding Checked}" />
+                    <CheckBox Content="{Binding Candidate.Path}" IsChecked="{Binding Checked}"
+                              AutomationProperties.AutomationId="dialog-multi-paste.candidate" />
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
