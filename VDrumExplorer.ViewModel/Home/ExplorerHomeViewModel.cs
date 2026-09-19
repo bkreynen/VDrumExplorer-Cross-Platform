@@ -85,12 +85,14 @@ namespace VDrumExplorer.ViewModel.Home
             var device = DeviceViewModel.ConnectedDevice;
             if (device is null)
             {
+                Status.SetError("No device connected; cannot load module data");
                 return;
             }
             var transferViewModel = new DataTransferViewModel<Module>(logger, "Loading module data", "Loading {0}", device.LoadModuleAsync);
             var module = await viewServices.ShowDataTransferDialog(transferViewModel);
             if (module is object)
             {
+                Status.SetMessage("Loaded module from device");
                 var moduleViewModel = new ModuleExplorerViewModel(viewServices, logger, DeviceViewModel, module);
                 viewServices.ShowModuleExplorer(moduleViewModel);
             }
@@ -101,6 +103,7 @@ namespace VDrumExplorer.ViewModel.Home
             var device = DeviceViewModel.ConnectedDevice;
             if (device is null)
             {
+                Status.SetError("No device connected; cannot load kit data");
                 return;
             }
             var kitNumber = LoadKitFromDeviceNumber;
@@ -110,6 +113,7 @@ namespace VDrumExplorer.ViewModel.Home
             var kit = await viewServices.ShowDataTransferDialog(transferViewModel);
             if (kit is object)
             {
+                Status.SetMessage($"Loaded kit {kitNumber} from device");
                 var kitViewModel = new KitExplorerViewModel(viewServices, logger, DeviceViewModel, kit);
                 viewServices.ShowKitExplorer(kitViewModel);
             }
@@ -152,6 +156,7 @@ namespace VDrumExplorer.ViewModel.Home
             catch (Exception ex)
             {
                 logger.LogError(ex, $"Error loading {file}");
+                Status.SetError($"Load failed: {ex.Message}");
                 return;
             }
             // TODO: Potentially declare an IDrumData interface with the Schema property and Validate method.
@@ -159,18 +164,21 @@ namespace VDrumExplorer.ViewModel.Home
             {
                 case Kit kit:
                     {
+                        Status.SetMessage($"Opened {Path.GetFileName(file)}");
                         var vm = new KitExplorerViewModel(viewServices, logger, DeviceViewModel, kit) { FileName = file };
                         viewServices.ShowKitExplorer(vm);
                         break;
                     }
                 case Module module:
                     {
+                        Status.SetMessage($"Opened {Path.GetFileName(file)}");
                         var vm = new ModuleExplorerViewModel(viewServices, logger, DeviceViewModel, module) { FileName = file };
                         viewServices.ShowModuleExplorer(vm);
                         break;
                     }
                 case ModuleAudio audio:
                     {
+                        Status.SetMessage($"Opened {Path.GetFileName(file)}");
                         // TODO: Maybe refactor for consistency?
                         var vm = new InstrumentAudioExplorerViewModel(audioDeviceManager, audio, file);
                         viewServices.ShowInstrumentAudioExplorer(vm);
@@ -178,6 +186,7 @@ namespace VDrumExplorer.ViewModel.Home
                     }
                 default:
                     logger.LogError($"Unknown file data type");
+                    Status.SetError($"Unknown file type: {Path.GetFileName(file)}");
                     break;
             }
         }

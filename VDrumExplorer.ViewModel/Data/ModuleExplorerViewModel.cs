@@ -67,6 +67,7 @@ namespace VDrumExplorer.ViewModel.Data
             {
                 PushUndoState();
                 Module.ImportKit(kit, destination);
+                Status.SetMessage($"Copied kit to slot {destination}");
             }
         }
 
@@ -89,6 +90,7 @@ namespace VDrumExplorer.ViewModel.Data
                     var kit = Module.ExportKit(sourceKit);
                     Module.ImportKit(kit, destKit);
                 }
+                Status.SetMessage($"Copied {count} kits to kit {viewModel.DestinationFrom}");
             }
         }
 
@@ -111,21 +113,25 @@ namespace VDrumExplorer.ViewModel.Data
             catch (Exception ex)
             {
                 Logger.LogError($"Error loading {file}", ex);
+                Status.SetError($"Could not load kit file: {ex.Message}");
                 return;
             }
             if (!(loaded is Kit kit))
             {
                 Logger.LogError("Loaded file was not a kit");
+                Status.SetError("Could not import kit: loaded file was not a kit");
                 return;
             }
 
             if (!kit.Schema.Identifier.Equals(Module.Schema.Identifier))
             {
                 Logger.LogError($"Kit was from {kit.Schema.Identifier.Name}; this module is {Module.Schema.Identifier.Name}");
+                Status.SetError($"Could not import kit: kit was from {kit.Schema.Identifier.Name}; this module is {Module.Schema.Identifier.Name}");
                 return;
             }
             PushUndoState();
             Module.ImportKit(kit, kitNumber);
+            Status.SetMessage($"Imported kit {kitNumber} from {Path.GetFileName(file)}");
         }
 
         private async void ExportKit(DataTreeNodeViewModel kitNode)
@@ -141,9 +147,17 @@ namespace VDrumExplorer.ViewModel.Data
             {
                 return;
             }
-            using (var stream = File.Create(file))
+            try
             {
-                kit.Save(stream);
+                using (var stream = File.Create(file))
+                {
+                    kit.Save(stream);
+                }
+                Status.SetMessage($"Exported kit {kitNumber} to {Path.GetFileName(file)}");
+            }
+            catch (Exception ex)
+            {
+                Status.SetError($"Could not export kit {kitNumber}: {ex.Message}");
             }
         }
 
@@ -167,6 +181,7 @@ namespace VDrumExplorer.ViewModel.Data
                 copiedKit = Module.ExportKit(kitNumber);
                 RaisePropertyChanged(nameof(HasCopiedKit));
                 UpdatePasteCommandEnabled();
+                Status.SetMessage($"Copied kit {kitNumber}");
             }
         }
 
@@ -186,6 +201,7 @@ namespace VDrumExplorer.ViewModel.Data
             {
                 PushUndoState();
                 Module.ImportKit(copiedKit, destination);
+                Status.SetMessage($"Pasted kit into kit {destination}");
             }
         }
 

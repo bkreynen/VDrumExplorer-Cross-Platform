@@ -179,13 +179,20 @@
             </GroupBox>
 
             <!--
-              Status live region: placeholder for Phase 1 task 5, which binds the status line
-              to a status VM. A11yScanner enforces the live-region invariant per window, so an
-              empty (visually neutral, renders nothing) element carries it until then.
+              Status live regions (docs/accessibility.md §5–6): the polite element announces
+              successful operation outcomes, the assertive element announces failures (it is
+              only populated on error). Both are bound to this window's StatusViewModel; with
+              empty text a TextBlock has zero height, so the visual layout is unchanged while
+              the elements remain in the accessibility tree.
             -->
             <TextBlock AutomationProperties.AutomationId="explorer-home.status.message"
                        AutomationProperties.Name="Status"
-                       AutomationProperties.LiveSetting="Polite" />
+                       AutomationProperties.LiveSetting="Polite"
+                       Text="{Binding Status.Message}" />
+            <TextBlock AutomationProperties.AutomationId="explorer-home.status.error"
+                       AutomationProperties.Name="Status error"
+                       AutomationProperties.LiveSetting="Assertive"
+                       Text="{Binding Status.ErrorMessage}" />
 
         </StackPanel>
     </ScrollViewer>

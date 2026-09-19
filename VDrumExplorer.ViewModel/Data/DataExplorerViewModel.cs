@@ -307,11 +307,21 @@ namespace VDrumExplorer.ViewModel.Data
                 }
                 FileName = fileName;
             }
-            using (var stream = File.Create(fileName))
+            try
             {
-                SaveToStream(stream);
+                using (var stream = File.Create(fileName))
+                {
+                    SaveToStream(stream);
+                }
+                Status.SetMessage($"Saved {Path.GetFileName(fileName)}");
+                MarkClean();
             }
-            MarkClean();
+            catch (Exception ex)
+            {
+                // Previously an unhandled exception in async-void; now announced on the
+                // status line instead (docs/accessibility.md §5).
+                Status.SetError($"Could not save file: {ex.Message}");
+            }
         }
 
         private async void ExportJson()
@@ -321,8 +331,16 @@ namespace VDrumExplorer.ViewModel.Data
             {
                 return;
             }
-            var json = FormatAsJson();
-            File.WriteAllText(fileName, json);
+            try
+            {
+                var json = FormatAsJson();
+                File.WriteAllText(fileName, json);
+                Status.SetMessage($"Exported JSON to {Path.GetFileName(fileName)}");
+            }
+            catch (Exception ex)
+            {
+                Status.SetError($"Could not export JSON: {ex.Message}");
+            }
         }
 
         private readonly Stack<ModuleDataSnapshot> undoStack = new();
@@ -523,16 +541,26 @@ namespace VDrumExplorer.ViewModel.Data
                     // Give the TD-17 a moment to process the kit switch before sending the note.
                     await Task.Delay(100, CancellationToken.None);
                 }
-                catch
+                catch (Exception ex)
                 {
-                    // If we can't switch kits, play the note anyway with whatever kit is active.
+                    // If we can't switch kits, play the note anyway with whatever kit is
+                    // active, but announce the failed switch assertively with the reason
+                    // (docs/accessibility.md §5).
+                    Status.SetError($"Could not switch to kit {kitNumber}: {ex.Message}");
                 }
             }
 
             device.PlayNote(SelectedMidiChannel, midiNote.Value, Attack);
+            Status.SetMessage($"Previewing note {midiNote.Value}");
         }
 
-        protected async void CopyDataToDevice(DataTreeNode? node, ModuleAddress? targetAddress)
+        /// <summary>
+        /// Copies the given node's data to the device via the transfer dialog, announcing
+        /// the outcome on the status line (docs/accessibility.md §5): <paramref name="successMessage"/>
+        /// on a completed transfer; a cancelled or failed transfer is not announced (the
+        /// failure reason is already logged by <see cref="DataTransferViewModel{T}.TransferAsync"/>).
+        /// </summary>
+        protected async void CopyDataToDevice(DataTreeNode? node, ModuleAddress? targetAddress, string successMessage = "Copied data to device")
         {
             var device = DeviceViewModel.ConnectedDevice;
             if (device is null || node is null)
@@ -542,7 +570,11 @@ namespace VDrumExplorer.ViewModel.Data
             // We may or may not really need to bring up the dialog box, but it's simplest to always do that.
             var viewModel = new DataTransferViewModel<string>(Logger, "Copying data to device", "Copying {0}",
                 async (progress, token) => { await device.SaveDescendants(node, targetAddress, progress, token); return ""; });
-            await ViewServices.ShowDataTransferDialog(viewModel);
+            var result = await ViewServices.ShowDataTransferDialog(viewModel);
+            if (result is not null)
+            {
+                Status.SetMessage(successMessage);
+            }
         }
 
         protected abstract void CopyDataToDevice();

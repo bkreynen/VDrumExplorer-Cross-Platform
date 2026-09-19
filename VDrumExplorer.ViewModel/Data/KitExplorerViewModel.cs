@@ -52,10 +52,16 @@ namespace VDrumExplorer.ViewModel.Data
         protected override void SaveToStream(Stream stream) => Kit.Save(stream);
 
         protected override void CopyDataToDevice() =>
-            CopyDataToDevice(Model.LogicalRoot, Model.Schema.GetKitRoot(KitCopyTargetNumber).Container.Address);
+            CopyDataToDevice(
+                Model.LogicalRoot,
+                Model.Schema.GetKitRoot(KitCopyTargetNumber).Container.Address,
+                $"Copied kit to slot {KitCopyTargetNumber}");
 
         private void CopyDataToTemporaryStudioSet() =>
-            CopyDataToDevice(Model.LogicalRoot, Model.Schema.PhysicalRoot.ResolveContainer("TemporaryStudioSet").Address);
+            CopyDataToDevice(
+                Model.LogicalRoot,
+                Model.Schema.PhysicalRoot.ResolveContainer("TemporaryStudioSet").Address,
+                "Copied kit to temporary studio set");
 
         protected override void ConvertToAlternativeSchema(ModuleSchema schema)
         {
