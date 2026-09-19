@@ -5,12 +5,24 @@
         Width="350" Height="150"
         CanResize="False"
         ShowInTaskbar="False"
-        WindowStartupLocation="CenterOwner">
-    <StackPanel Margin="16" HorizontalAlignment="Center">
-        <TextBlock Text="You have unsaved changes. Close anyway?" TextWrapping="Wrap" Margin="0,0,0,16" />
+        WindowStartupLocation="CenterOwner"
+        AutomationProperties.HeadingLevel="1">
+    <!--
+      Accessibility annotations (docs/accessibility.md §2–3, §6): the warning message is
+      this dialog's real Polite live region — it is announced when the dialog opens, so
+      screen-reader users hear the question before reaching the action buttons. Buttons
+      take their Names from their visible text (identifier-first).
+    -->
+    <StackPanel Margin="16" HorizontalAlignment="Center"
+                AutomationProperties.LandmarkType="Main">
+        <TextBlock Text="You have unsaved changes. Close anyway?" TextWrapping="Wrap" Margin="0,0,0,16"
+                   AutomationProperties.AutomationId="dialog-confirm-close.message"
+                   AutomationProperties.LiveSetting="Polite" />
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-            <Button x:Name="closeButton" Content="Close without saving" Margin="0,0,8,0" Click="CloseButton_Click" />
-            <Button x:Name="cancelButton" Content="Cancel" Click="CancelButton_Click" />
+            <Button x:Name="closeButton" Content="Close without saving" Margin="0,0,8,0" Click="CloseButton_Click"
+                    AutomationProperties.AutomationId="dialog-confirm-close.actions.close-without-saving" />
+            <Button x:Name="cancelButton" Content="Cancel" Click="CancelButton_Click"
+                    AutomationProperties.AutomationId="dialog-confirm-close.actions.cancel" />
         </StackPanel>
     </StackPanel>
 </Window>

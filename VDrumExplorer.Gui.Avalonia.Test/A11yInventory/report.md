@@ -7,14 +7,14 @@ Regenerate by rebuilding and running the test project, then commit the result.
 | View | Controls | Interactive | Errors | Warnings | Info |
 |------|----------|-------------|--------|----------|------|
 | ExplorerHome | 179 | 11 | 0 | 0 | 0 |
-| DataExplorer | 3442 | 189 | 0 | 6 | 0 |
+| DataExplorer | 3447 | 190 | 0 | 6 | 0 |
 | SchemaExplorer | 98 | 3 | 0 | 0 | 0 |
-| CopyKitTargetDialog | 42 | 3 | 5 | 0 | 0 |
-| CopyKitsDialog | 86 | 5 | 9 | 0 | 0 |
-| MultiPasteDialog | 50 | 6 | 7 | 0 | 0 |
-| DataTransferDialog | 27 | 1 | 2 | 0 | 0 |
-| ConfirmCloseDialog | 16 | 2 | 3 | 0 | 0 |
-| **TOTAL** | 3940 | 220 | 26 | 6 | 0 |
+| CopyKitTargetDialog | 43 | 3 | 0 | 0 | 0 |
+| CopyKitsDialog | 87 | 5 | 0 | 0 | 0 |
+| MultiPasteDialog | 51 | 6 | 0 | 0 | 0 |
+| DataTransferDialog | 27 | 1 | 0 | 0 | 0 |
+| ConfirmCloseDialog | 16 | 2 | 0 | 0 | 0 |
+| **TOTAL** | 3948 | 221 | 0 | 6 | 0 |
 
 ### ExplorerHome
 
@@ -26,8 +26,8 @@ Regenerate by rebuilding and running the test project, then commit the result.
 
 ### DataExplorer
 
-- Controls scanned: 3442
-- Interactive controls: 189
+- Controls scanned: 3447
+- Interactive controls: 190
 - Violations: 6 (errors 0, warnings 6, info 0)
 
 - `DUPLICATE_AUTOMATION_ID`: 6
@@ -53,99 +53,41 @@ Regenerate by rebuilding and running the test project, then commit the result.
 
 ### CopyKitTargetDialog
 
-- Controls scanned: 42
+- Controls scanned: 43
 - Interactive controls: 3
-- Violations: 5 (errors 5, warnings 0, info 0)
+- Violations: 0 (errors 0, warnings 0, info 0)
 
-- `LIVE_REGION_MISSING`: 1
-- `MISSING_AUTOMATION_ID`: 3
-- `MISSING_NAME`: 1
 
-<details><summary>Violation details</summary>
-
-- Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] Button 'Copy': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_AUTOMATION_ID] Button 'Cancel': Interactive control has no AutomationProperties.AutomationId.
-- Error: [LIVE_REGION_MISSING] CopyKitTargetDialog '': No element sets AutomationProperties.LiveSetting; the window has no live-region status line.
-
-</details>
 
 ### CopyKitsDialog
 
-- Controls scanned: 86
+- Controls scanned: 87
 - Interactive controls: 5
-- Violations: 9 (errors 9, warnings 0, info 0)
+- Violations: 0 (errors 0, warnings 0, info 0)
 
-- `LIVE_REGION_MISSING`: 1
-- `MISSING_AUTOMATION_ID`: 5
-- `MISSING_NAME`: 3
 
-<details><summary>Violation details</summary>
-
-- Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] Button 'Copy': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_AUTOMATION_ID] Button 'Cancel': Interactive control has no AutomationProperties.AutomationId.
-- Error: [LIVE_REGION_MISSING] CopyKitsDialog '': No element sets AutomationProperties.LiveSetting; the window has no live-region status line.
-
-</details>
 
 ### MultiPasteDialog
 
-- Controls scanned: 50
+- Controls scanned: 51
 - Interactive controls: 6
-- Violations: 7 (errors 7, warnings 0, info 0)
+- Violations: 0 (errors 0, warnings 0, info 0)
 
-- `LIVE_REGION_MISSING`: 1
-- `MISSING_AUTOMATION_ID`: 6
 
-<details><summary>Violation details</summary>
-
-- Error: [MISSING_AUTOMATION_ID] Button 'Select all': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_AUTOMATION_ID] Button 'Select none': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_AUTOMATION_ID] Button 'Paste': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_AUTOMATION_ID] Button 'Cancel': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_AUTOMATION_ID] ListBoxItem '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_AUTOMATION_ID] CheckBox '/': Interactive control has no AutomationProperties.AutomationId.
-- Error: [LIVE_REGION_MISSING] MultiPasteDialog '': No element sets AutomationProperties.LiveSetting; the window has no live-region status line.
-
-</details>
 
 ### DataTransferDialog
 
 - Controls scanned: 27
 - Interactive controls: 1
-- Violations: 2 (errors 2, warnings 0, info 0)
+- Violations: 0 (errors 0, warnings 0, info 0)
 
-- `LIVE_REGION_MISSING`: 1
-- `MISSING_AUTOMATION_ID`: 1
 
-<details><summary>Violation details</summary>
-
-- Error: [MISSING_AUTOMATION_ID] Button 'Cancel': Interactive control has no AutomationProperties.AutomationId.
-- Error: [LIVE_REGION_MISSING] DataTransferDialog '': No element sets AutomationProperties.LiveSetting; the window has no live-region status line.
-
-</details>
 
 ### ConfirmCloseDialog
 
 - Controls scanned: 16
 - Interactive controls: 2
-- Violations: 3 (errors 3, warnings 0, info 0)
+- Violations: 0 (errors 0, warnings 0, info 0)
 
-- `LIVE_REGION_MISSING`: 1
-- `MISSING_AUTOMATION_ID`: 2
 
-<details><summary>Violation details</summary>
-
-- Error: [MISSING_AUTOMATION_ID] Button 'Close without saving': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_AUTOMATION_ID] Button 'Cancel': Interactive control has no AutomationProperties.AutomationId.
-- Error: [LIVE_REGION_MISSING] ConfirmCloseDialog '': No element sets AutomationProperties.LiveSetting; the window has no live-region status line.
-
-</details>
 

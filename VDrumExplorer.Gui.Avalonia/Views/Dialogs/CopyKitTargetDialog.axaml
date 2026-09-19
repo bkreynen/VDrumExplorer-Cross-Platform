@@ -7,8 +7,19 @@
         Title="Select Destination Kit"
         SizeToContent="WidthAndHeight"
         CanResize="False"
-        WindowStartupLocation="CenterOwner">
-    <Grid Margin="16">
+        WindowStartupLocation="CenterOwner"
+        AutomationProperties.HeadingLevel="1">
+    <!--
+      Accessibility annotations (docs/accessibility.md §2–3): every interactive control
+      carries an AutomationId in the dialog-copy-kit-target.* scheme plus an
+      identifier-first Name; the destination-kit TextBox needs an explicit Name because
+      its editable value is not a name. The whole dialog is one Main landmark, and the
+      empty status TextBlock is a visually neutral Polite live-region placeholder
+      (zero height when empty; see the SchemaExplorer comment) that satisfies the
+      scanner's one-live-region-per-window invariant until this dialog has status text.
+    -->
+    <Grid Margin="16"
+          AutomationProperties.LandmarkType="Main">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -25,17 +36,31 @@
 
         <TextBlock Grid.Column="1" Grid.Row="0"
                    Margin="{StaticResource ValueMarginWithVertical}" HorizontalAlignment="Left"
+                   AutomationProperties.AutomationId="dialog-copy-kit-target.source-kit.name"
+                   AutomationProperties.Name="Source kit"
                    Text="{Binding SourceKitName}" FontWeight="SemiBold" />
         <TextBox Grid.Column="1" Grid.Row="1"
                  Margin="{StaticResource ValueMarginWithVertical}" HorizontalAlignment="Left" Width="50"
+                 AutomationProperties.AutomationId="dialog-copy-kit-target.destination-kit.number"
+                 AutomationProperties.Name="Destination kit number"
+                 AutomationProperties.HelpText="Number of the kit in the destination module to copy into; the destination kit name below updates as you edit it."
                  Text="{Binding DestinationKitNumber}" />
         <TextBlock Grid.Column="1" Grid.Row="2"
                    Margin="{StaticResource ValueMarginWithVertical}" HorizontalAlignment="Left"
+                   AutomationProperties.AutomationId="dialog-copy-kit-target.destination-kit.name"
+                   AutomationProperties.Name="Destination kit name"
                    Text="{Binding DestinationKitName}" FontWeight="SemiBold" />
 
         <UniformGrid Rows="1" Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="0,16,0,0">
-            <Button Classes="accent" Click="Copy" IsEnabled="{Binding CopyEnabled}" Content="Copy" />
-            <Button Margin="8,0,0,0" Click="Cancel" Content="Cancel" />
+            <Button Classes="accent" Click="Copy" IsEnabled="{Binding CopyEnabled}" Content="Copy"
+                    AutomationProperties.AutomationId="dialog-copy-kit-target.actions.copy"
+                    AutomationProperties.HelpText="Copy the source kit to the destination kit number." />
+            <Button Margin="8,0,0,0" Click="Cancel" Content="Cancel"
+                    AutomationProperties.AutomationId="dialog-copy-kit-target.actions.cancel" />
         </UniformGrid>
+        <TextBlock Grid.Row="3" Grid.ColumnSpan="2"
+                   AutomationProperties.AutomationId="dialog-copy-kit-target.status.message"
+                   AutomationProperties.Name="Status"
+                   AutomationProperties.LiveSetting="Polite" />
     </Grid>
 </Window>

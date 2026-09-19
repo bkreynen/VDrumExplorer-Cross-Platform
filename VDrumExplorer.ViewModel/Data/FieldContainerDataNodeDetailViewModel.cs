@@ -25,6 +25,19 @@ namespace VDrumExplorer.ViewModel.Data
             set => SetProperty(ref fields, value);
         }
 
+        private DataFieldViewModel? focusedField;
+        /// <summary>
+        /// The field view model that keyboard focus should move to after a jump-to-field
+        /// search jump (Phase 1 task 4). Set by <see cref="FieldSearchViewModel"/>; the view
+        /// focuses the editor whose DataContext equals this value. Null when no jump has
+        /// targeted this container.
+        /// </summary>
+        public DataFieldViewModel? FocusedField
+        {
+            get => focusedField;
+            set => SetProperty(ref focusedField, value);
+        }
+
         public FieldContainerDataNodeDetailViewModel(FieldContainerDataNodeDetail model, DataExplorerViewModel windowViewModel) : base(model)
         {
             Description = model.Description;

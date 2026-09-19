@@ -8,17 +8,30 @@
         Height="160" Width="340"
         CanResize="False"
         WindowStartupLocation="CenterOwner"
-        Closing="HandleClosing">
-    <StackPanel Margin="16">
-        <TextBlock Text="{Binding ProgressDescription}" FontWeight="Medium" />
+        Closing="HandleClosing"
+        AutomationProperties.HeadingLevel="1">
+    <!--
+      Accessibility annotations (docs/accessibility.md §2–3, §5–6): the progress
+      description TextBlock is this dialog's real Polite live region — it is updated for
+      every transfer step, so screen readers announce each progress change. The
+      Cancel command is the dialog's only interactive control.
+    -->
+    <StackPanel Margin="16"
+                AutomationProperties.LandmarkType="Main">
+        <TextBlock Text="{Binding ProgressDescription}" FontWeight="Medium"
+                   AutomationProperties.AutomationId="dialog-data-transfer.progress.description"
+                   AutomationProperties.LiveSetting="Polite" />
         <Grid Margin="0,12,0,0" Height="28">
-            <ProgressBar Value="{Binding Completed, Mode=OneWay}" Maximum="{Binding Total}" />
+            <ProgressBar Value="{Binding Completed, Mode=OneWay}" Maximum="{Binding Total}"
+                         AutomationProperties.AutomationId="dialog-data-transfer.progress.bar" />
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <TextBlock Text="{Binding Completed}" Foreground="White" FontWeight="SemiBold" />
                 <TextBlock Text=" / " Foreground="White" />
                 <TextBlock Text="{Binding Total}" Foreground="White" FontWeight="SemiBold" />
             </StackPanel>
         </Grid>
-        <Button Margin="0,16,0,0" Command="{Binding CancelCommand}" HorizontalAlignment="Left" Content="Cancel" />
+        <Button Margin="0,16,0,0" Command="{Binding CancelCommand}" HorizontalAlignment="Left" Content="Cancel"
+                AutomationProperties.AutomationId="dialog-data-transfer.actions.cancel"
+                AutomationProperties.HelpText="Cancel the transfer and close the dialog." />
     </StackPanel>
 </Window>
