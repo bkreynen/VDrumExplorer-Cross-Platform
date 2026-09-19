@@ -38,10 +38,11 @@ namespace VDrumExplorer.Gui.Avalonia.Test;
 /// </para>
 /// <para>
 /// These tests are REPORT-ONLY by design, except for views that have been retrofitted:
-/// <see cref="Scan_ExplorerHome_EnforcesInvariants"/> runs the ExplorerHome scan in
-/// enforcing mode (a retrofit landing in Phase 1), so any Error-severity violation there
-/// fails the build. Views stay report-only until retrofitted, then flip to enforcing
-/// permanently. To regenerate the committed report, rebuild and run the test project:
+/// <see cref="Scan_ExplorerHome_EnforcesInvariants"/> and
+/// <see cref="Scan_DataExplorer_EnforcesInvariants"/> run their scans in enforcing mode
+/// (retrofits landing in Phase 1), so any Error-severity violation there fails the build.
+/// Views stay report-only until retrofitted, then flip to enforcing permanently. To
+/// regenerate the committed report, rebuild and run the test project:
 /// <code>dotnet build VDrumExplorer.Gui.Avalonia.Test -c Release &amp;&amp;
 /// dotnet VDrumExplorer.Gui.Avalonia.Test/bin/Release/net10.0/VDrumExplorer.Gui.Avalonia.Test.dll</code>
 /// then commit the regenerated <c>A11yInventory/report.md</c>.
@@ -56,8 +57,8 @@ namespace VDrumExplorer.Gui.Avalonia.Test;
 public class A11yScannerTest
 {
     // === Per-view inventory scans (report-only; these pass regardless of violation counts) ===
-    // ExplorerHome was retrofitted (Phase 1 task 1) and is scanned in enforcing mode below;
-    // all other views are still report-only until they are retrofitted.
+    // ExplorerHome and DataExplorer were retrofitted (Phase 1) and are scanned in enforcing
+    // mode below; all other views are still report-only until they are retrofitted.
 
     [AvaloniaFact]
     public void Scan_ExplorerHome_EnforcesInvariants()
@@ -71,11 +72,14 @@ public class A11yScannerTest
     }
 
     [AvaloniaFact]
-    public void Scan_DataExplorer_ProducesInventory()
+    public void Scan_DataExplorer_EnforcesInvariants()
     {
-        var result = ScanView(CreateDataExplorer);
+        // Retrofitted view: enforcing mode. A11yScanner.Scan throws if any Error-severity
+        // violation is found, so reaching this assert proves the view has none.
+        var result = ScanView(CreateDataExplorer, enforce: true);
         Assert.True(result.ControlsScanned > 0, "No controls scanned.");
         Assert.True(result.InteractiveControls > 0, "No interactive controls found in DataExplorer.");
+        Assert.Empty(result.Violations.Where(v => v.Severity == A11ySeverity.Error));
     }
 
     [AvaloniaFact]

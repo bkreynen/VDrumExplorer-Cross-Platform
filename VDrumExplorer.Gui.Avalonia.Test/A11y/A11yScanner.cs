@@ -396,9 +396,26 @@ public static class A11yScanner
         }
     }
 
-    /// <summary>Checks whether a control is interactive (focusable or a known interactive type).</summary>
+    /// <summary>
+    /// Checks whether a control is interactive (focusable or a known interactive type).
+    /// <para>
+    /// A control that is attached to a rendered visual tree has its <c>Focusable</c> value
+    /// fully resolved through its theme, and that resolved state is authoritative: Avalonia's
+    /// Fluent theme marks theme internals such as the slider's repeat buttons
+    /// (<c>PART_IncreaseButton</c>/<c>PART_DecreaseButton</c>) and the tree's expand/collapse
+    /// chevron as non-focusable, and non-focusable controls are neither tab stops nor part of
+    /// the interactive UI at runtime. The known-type fallback only covers controls whose
+    /// theme has not been applied yet (not attached to a visual root).
+    /// </para>
+    /// </summary>
     private static bool IsInteractive(Control control)
     {
+        // GetVisualRoot() no longer exists in Avalonia 12; IsAttachedToVisualTree() is the
+        // equivalent check that a theme (and therefore the resolved Focusable) has been applied.
+        if (control.IsAttachedToVisualTree())
+        {
+            return control.Focusable;
+        }
         if (control.Focusable)
         {
             return true;
