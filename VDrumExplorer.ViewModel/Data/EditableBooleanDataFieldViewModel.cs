@@ -16,6 +16,12 @@ namespace VDrumExplorer.ViewModel.Data
         protected override void OnPropertyModelChanged(object sender, PropertyChangedEventArgs e) =>
             RaisePropertyChanged(nameof(Value));
 
+        /// <summary>
+        /// Screen-reader help text (docs/accessibility.md §3): boolean fields use the
+        /// schema description alone.
+        /// </summary>
+        public string HelpText => Description;
+
         public bool Value
         {
             get => Model.Value;

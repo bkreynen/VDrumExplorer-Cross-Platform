@@ -19,6 +19,13 @@ namespace VDrumExplorer.ViewModel.Data
 
         public IReadOnlyList<string> ValidValues => Model.SchemaField.Values;
 
+        /// <summary>
+        /// Screen-reader help text (docs/accessibility.md §3): the schema description
+        /// followed by the allowed enum values (the full list is fine — screen readers
+        /// let users re-read it).
+        /// </summary>
+        public string HelpText => $"{Description}: {string.Join(", ", ValidValues)}";
+
         public string Value
         {
             get => Model.Value;

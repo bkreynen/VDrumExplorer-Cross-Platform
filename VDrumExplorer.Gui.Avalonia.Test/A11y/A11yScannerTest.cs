@@ -84,6 +84,20 @@ public class A11yScannerTest
     }
 
     [AvaloniaFact]
+    public void Scan_DataExplorer_FlatModeOn_EnforcesInvariants()
+    {
+        // Retrofitted view with the flat field-list mode enabled: enforcing mode.
+        // The flat list replaces the visible tree + details pane, but both stay in the
+        // visual tree (hidden panes + visible flat list coexist), so duplicate
+        // automation IDs across the hidden and visible copies are Warnings only — any
+        // Error-severity violation (e.g. a missing name on a flat-list editor) fails.
+        var result = ScanView(CreateFlatModeDataExplorer, enforce: true);
+        Assert.True(result.ControlsScanned > 0, "No controls scanned.");
+        Assert.True(result.InteractiveControls > 0, "No interactive controls found in DataExplorer (flat mode on).");
+        Assert.Empty(result.Violations.Where(v => v.Severity == A11ySeverity.Error));
+    }
+
+    [AvaloniaFact]
     public void Scan_SchemaExplorer_EnforcesInvariants()
     {
         // Retrofitted view: enforcing mode. A11yScanner.Scan throws if any Error-severity
@@ -272,6 +286,17 @@ public class A11yScannerTest
         DataContext = new KitExplorerViewModel(
             new StubViewServices(), NullLogger.Instance, new DeviceViewModel(), TestData.LoadTD27Kit()),
     };
+
+    private static Window CreateFlatModeDataExplorer()
+    {
+        var vm = new KitExplorerViewModel(
+            new StubViewServices(), NullLogger.Instance, new DeviceViewModel(), TestData.LoadTD27Kit());
+        // Enable flat field-list mode via the same command the File-menu item executes
+        // (the property setter is private). Sections are built immediately, and the
+        // flat area's visibility binding reflects the state when the window is shown.
+        vm.FlatFields.ToggleFlatModeCommand.Execute(null!);
+        return new DataExplorer { DataContext = vm };
+    }
 
     private static Window CreateSchemaExplorer() => new SchemaExplorer
     {

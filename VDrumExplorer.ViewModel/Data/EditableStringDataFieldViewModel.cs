@@ -18,6 +18,15 @@ namespace VDrumExplorer.ViewModel.Data
 
         public int MaxLength => Model.SchemaField.Length;
 
+        /// <summary>
+        /// Screen-reader help text (docs/accessibility.md §3): the schema description plus
+        /// the maximum string length.
+        /// </summary>
+        public string HelpText =>
+            MaxLength == 1
+                ? $"{Description}, up to {MaxLength} character"
+                : $"{Description}, up to {MaxLength} characters";
+
         // TODO: This is horrible, as it's really a GUI concern. We need to be able to guess a "reasonable average character width".
         public int MinWidth => MaxLength * 8;
 

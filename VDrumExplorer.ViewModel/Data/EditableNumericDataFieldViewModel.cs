@@ -25,6 +25,13 @@ namespace VDrumExplorer.ViewModel.Data
         public int MaxValue => Model.SchemaField.Max;
         public int LargeChange => Math.Max((MaxValue - MinValue) / 10, 1);
 
+        /// <summary>
+        /// Screen-reader help text (docs/accessibility.md §3): the schema description plus
+        /// the min/max range, each bound formatted with the field's own unit/suffix.
+        /// </summary>
+        public string HelpText =>
+            $"{Description}, {Model.SchemaField.FormatRawValue(Model.SchemaField.Min)} to {Model.SchemaField.FormatRawValue(Model.SchemaField.Max)}";
+
         public int Value
         {
             get => Model.RawValue;

@@ -14,6 +14,16 @@ namespace VDrumExplorer.ViewModel.Data
 {
     public class FieldContainerDataNodeDetailViewModel : ViewModelBase<FieldContainerDataNodeDetail>, IDataNodeDetailViewModel
     {
+        /// <summary>
+        /// Prefix for the schema-driven editor AutomationIds of this container's rows
+        /// (docs/accessibility.md §3.1, area <c>details</c>). The shared per-type editor
+        /// templates in DataExplorer.axaml resolve this from the nearest ItemsControl's
+        /// DataContext, so the same templates produce <c>data-explorer.details.*</c> IDs
+        /// here and <c>data-explorer.flat-fields.*</c> IDs in the flat field list
+        /// (see <see cref="FlatFieldSectionViewModel.IdPrefix"/>).
+        /// </summary>
+        public string IdPrefix => "data-explorer.details";
+
         public string Description { get; }
 
         private readonly DataExplorerViewModel windowViewModel;
