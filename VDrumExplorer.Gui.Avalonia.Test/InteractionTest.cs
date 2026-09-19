@@ -9,6 +9,7 @@ using System.Linq;
 using System.Reflection;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -216,7 +217,10 @@ public class InteractionTest
         window.Close();
     }
 
-    // === DataExplorer KeyDown handler ===
+    // === DataExplorer window key bindings (Ctrl+C/V/Z/Y → ViewModel commands) ===
+    // The shortcuts are declarative Window.KeyBindings in DataExplorer.axaml; these tests
+    // press real keys headlessly and assert the resulting ViewModel state. CopiedSnapshot
+    // is backed by a static field, so it is nulled before each test for isolation.
 
     [AvaloniaFact]
     public void DataExplorer_KeyDown_CtrlC_CopiesNode()
@@ -224,12 +228,12 @@ public class InteractionTest
         var kit = TestData.LoadTD27Kit();
         var vm = new KitExplorerViewModel(
             new StubViewServices(), NullLogger.Instance, new DeviceViewModel(), kit);
+        vm.CopiedSnapshot = null;
         var window = new DataExplorer { DataContext = vm };
         window.Show();
 
-        var e = new KeyEventArgs { Key = Key.C, KeyModifiers = KeyModifiers.Control };
-        InvokePrivate(window, "DataExplorer_KeyDown", e);
-        Assert.True(e.Handled);
+        window.KeyPressQwerty(PhysicalKey.C, RawInputModifiers.Control);
+
         Assert.NotNull(vm.CopiedSnapshot);
         window.Close();
     }
@@ -240,17 +244,17 @@ public class InteractionTest
         var kit = TestData.LoadTD27Kit();
         var vm = new KitExplorerViewModel(
             new StubViewServices(), NullLogger.Instance, new DeviceViewModel(), kit);
+        vm.CopiedSnapshot = null;
         var window = new DataExplorer { DataContext = vm };
         window.Show();
 
         // First copy
-        var copyArgs = new KeyEventArgs { Key = Key.C, KeyModifiers = KeyModifiers.Control };
-        InvokePrivate(window, "DataExplorer_KeyDown", copyArgs);
+        window.KeyPressQwerty(PhysicalKey.C, RawInputModifiers.Control);
+        Assert.NotNull(vm.CopiedSnapshot);
 
         // Then paste
-        var pasteArgs = new KeyEventArgs { Key = Key.V, KeyModifiers = KeyModifiers.Control };
-        InvokePrivate(window, "DataExplorer_KeyDown", pasteArgs);
-        Assert.True(pasteArgs.Handled);
+        window.KeyPressQwerty(PhysicalKey.V, RawInputModifiers.Control);
+        Assert.True(vm.CanUndo);
         window.Close();
     }
 
@@ -260,19 +264,19 @@ public class InteractionTest
         var kit = TestData.LoadTD27Kit();
         var vm = new KitExplorerViewModel(
             new StubViewServices(), NullLogger.Instance, new DeviceViewModel(), kit);
+        vm.CopiedSnapshot = null;
         var window = new DataExplorer { DataContext = vm };
         window.Show();
 
         // Copy and paste to create an undo state
-        InvokePrivate(window, "DataExplorer_KeyDown",
-            new KeyEventArgs { Key = Key.C, KeyModifiers = KeyModifiers.Control });
-        InvokePrivate(window, "DataExplorer_KeyDown",
-            new KeyEventArgs { Key = Key.V, KeyModifiers = KeyModifiers.Control });
+        window.KeyPressQwerty(PhysicalKey.C, RawInputModifiers.Control);
+        window.KeyPressQwerty(PhysicalKey.V, RawInputModifiers.Control);
+        Assert.True(vm.CanUndo);
 
         // Undo
-        var undoArgs = new KeyEventArgs { Key = Key.Z, KeyModifiers = KeyModifiers.Control };
-        InvokePrivate(window, "DataExplorer_KeyDown", undoArgs);
-        Assert.True(undoArgs.Handled);
+        window.KeyPressQwerty(PhysicalKey.Z, RawInputModifiers.Control);
+        Assert.False(vm.CanUndo);
+        Assert.True(vm.CanRedo);
         window.Close();
     }
 
@@ -282,20 +286,19 @@ public class InteractionTest
         var kit = TestData.LoadTD27Kit();
         var vm = new KitExplorerViewModel(
             new StubViewServices(), NullLogger.Instance, new DeviceViewModel(), kit);
+        vm.CopiedSnapshot = null;
         var window = new DataExplorer { DataContext = vm };
         window.Show();
 
         // Copy, paste, undo, then redo
-        InvokePrivate(window, "DataExplorer_KeyDown",
-            new KeyEventArgs { Key = Key.C, KeyModifiers = KeyModifiers.Control });
-        InvokePrivate(window, "DataExplorer_KeyDown",
-            new KeyEventArgs { Key = Key.V, KeyModifiers = KeyModifiers.Control });
-        InvokePrivate(window, "DataExplorer_KeyDown",
-            new KeyEventArgs { Key = Key.Z, KeyModifiers = KeyModifiers.Control });
+        window.KeyPressQwerty(PhysicalKey.C, RawInputModifiers.Control);
+        window.KeyPressQwerty(PhysicalKey.V, RawInputModifiers.Control);
+        window.KeyPressQwerty(PhysicalKey.Z, RawInputModifiers.Control);
+        Assert.True(vm.CanRedo);
 
-        var redoArgs = new KeyEventArgs { Key = Key.Y, KeyModifiers = KeyModifiers.Control };
-        InvokePrivate(window, "DataExplorer_KeyDown", redoArgs);
-        Assert.True(redoArgs.Handled);
+        window.KeyPressQwerty(PhysicalKey.Y, RawInputModifiers.Control);
+        Assert.True(vm.CanUndo);
+        Assert.False(vm.CanRedo);
         window.Close();
     }
 
@@ -317,15 +320,6 @@ public class InteractionTest
     // HandleClosing(object?, WindowClosingEventArgs) event handler).
 
     private static void InvokePrivate(object target, string methodName, RoutedEventArgs e)
-    {
-        var method = target.GetType().GetMethod(methodName,
-            BindingFlags.NonPublic | BindingFlags.Instance,
-            new[] { typeof(object), e.GetType() });
-        Assert.NotNull(method);
-        method!.Invoke(target, new object?[] { null, e });
-    }
-
-    private static void InvokePrivate(object target, string methodName, KeyEventArgs e)
     {
         var method = target.GetType().GetMethod(methodName,
             BindingFlags.NonPublic | BindingFlags.Instance,

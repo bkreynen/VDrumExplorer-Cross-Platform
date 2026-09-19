@@ -5,6 +5,18 @@
         x:CompileBindings="False"
         Title="{Binding Title}" Height="600" Width="1000"
         WindowStartupLocation="CenterScreen">
+    <!-- App shortcuts as declarative bindings to ViewModel commands (docs/accessibility.md §4).
+         Ctrl+C/V dispatch between node copy/paste and whole-kit copy/paste (see CopyCommand /
+         PasteCommand); Ctrl+Z/Y drive the undo/redo stack. Note: Avalonia evaluates KeyBindings
+         before the bubbled KeyDown event, so when a details-pane TextBox has focus these app
+         shortcuts take precedence over the TextBox's built-in text copy/paste/undo for any
+         command whose CanExecute is true (a disabled command falls through to the TextBox). -->
+    <Window.KeyBindings>
+        <KeyBinding Gesture="Ctrl+C" Command="{Binding CopyCommand}" />
+        <KeyBinding Gesture="Ctrl+V" Command="{Binding PasteCommand}" />
+        <KeyBinding Gesture="Ctrl+Z" Command="{Binding UndoCommand}" />
+        <KeyBinding Gesture="Ctrl+Y" Command="{Binding RedoCommand}" />
+    </Window.KeyBindings>
     <DockPanel>
 
         <!-- Menu Bar -->

@@ -34,6 +34,28 @@ namespace VDrumExplorer.ViewModel.Data
         public DelegateCommand CopyNodeCommand { get; }
         public DelegateCommand PasteNodeCommand { get; }
         public DelegateCommand MultiPasteCommand { get; }
+        /// <summary>
+        /// Dispatching copy command for the Ctrl+C shortcut: in the Module Explorer a
+        /// selected kit root copies the whole kit, otherwise the node's settings are
+        /// copied (the branching that used to live in the view's KeyDown handler).
+        /// </summary>
+        public DelegateCommand CopyCommand { get; }
+        /// <summary>
+        /// Dispatching paste command for the Ctrl+V shortcut: if a kit was copied
+        /// (Module Explorer), paste the kit into the selected kit's slot; otherwise
+        /// paste the node's settings when a valid snapshot is available.
+        /// </summary>
+        public DelegateCommand PasteCommand { get; }
+        /// <summary>
+        /// Undo command (wraps <see cref="Undo"/>) for the Ctrl+Z shortcut.
+        /// CanExecute tracks <see cref="CanUndo"/>.
+        /// </summary>
+        public DelegateCommand UndoCommand { get; }
+        /// <summary>
+        /// Redo command (wraps <see cref="Redo"/>) for the Ctrl+Y shortcut.
+        /// CanExecute tracks <see cref="CanRedo"/>.
+        /// </summary>
+        public DelegateCommand RedoCommand { get; }
         // There are app commands of course, but it's not clear how we bind them.
         public DelegateCommand SaveFileCommand { get; }
         public DelegateCommand SaveFileAsCommand { get; }
@@ -117,11 +139,21 @@ namespace VDrumExplorer.ViewModel.Data
                 {
                     PasteNodeCommand.Enabled = IsPasteNodeCommandValid;
                     MultiPasteCommand.Enabled = value is not null;
+                    UpdatePasteCommandEnabled();
                 }
             }
         }
 
         private bool IsPasteNodeCommandValid => copiedSnapshot?.IsValidForTarget(SelectedNode?.Model.SchemaNode) ?? false;
+
+        /// <summary>
+        /// Updates <see cref="PasteCommand.Enabled"/> to reflect everything that can make
+        /// a paste possible: a copied kit (Module Explorer) or a node snapshot valid for
+        /// the selected node. Must be called whenever either input changes.
+        /// </summary>
+        protected void UpdatePasteCommandEnabled() =>
+            PasteCommand.Enabled = (this is ModuleExplorerViewModel moduleVm && moduleVm.HasCopiedKit)
+                || IsPasteNodeCommandValid;
 
         /// <summary>
         /// Snapshot of the data as of the last save (or load). Used as the baseline
@@ -235,6 +267,10 @@ namespace VDrumExplorer.ViewModel.Data
             CopyNodeCommand = new DelegateCommand(CopyNode, true);
             PasteNodeCommand = new DelegateCommand(PasteNode, true);
             MultiPasteCommand = new DelegateCommand(MultiPaste, false);
+            CopyCommand = new DelegateCommand(CopySelected, true);
+            PasteCommand = new DelegateCommand(PasteSelected, false);
+            UndoCommand = new DelegateCommand(Undo, false);
+            RedoCommand = new DelegateCommand(Redo, false);
             Root = SingleItemCollection.Of(new DataTreeNodeViewModel(data.LogicalRoot, this));
             SelectedNode = Root[0];
 
@@ -313,6 +349,7 @@ namespace VDrumExplorer.ViewModel.Data
             redoStack.Clear();
             RaisePropertyChanged(nameof(CanUndo));
             RaisePropertyChanged(nameof(CanRedo));
+            UpdateUndoRedoCommandEnabled();
             // All undoable operations modify the data, so they make it dirty.
             MarkDirty();
             RevertAllCommand.Enabled = true;
@@ -352,6 +389,7 @@ namespace VDrumExplorer.ViewModel.Data
             data.LoadSnapshot(previous, NullLogger.Instance);
             RaisePropertyChanged(nameof(CanUndo));
             RaisePropertyChanged(nameof(CanRedo));
+            UpdateUndoRedoCommandEnabled();
             UpdateDirtyState();
             // Refresh the details panel to reflect the restored data.
             if (SelectedNode is DataTreeNodeViewModel node)
@@ -374,11 +412,57 @@ namespace VDrumExplorer.ViewModel.Data
             data.LoadSnapshot(next, NullLogger.Instance);
             RaisePropertyChanged(nameof(CanUndo));
             RaisePropertyChanged(nameof(CanRedo));
+            UpdateUndoRedoCommandEnabled();
             UpdateDirtyState();
             if (SelectedNode is DataTreeNodeViewModel node)
             {
                 SelectedNodeDetails = node.CreateDetails();
             }
+        }
+
+        /// <summary>
+        /// Ctrl+C dispatch: in the Module Explorer, a selected kit root copies the whole
+        /// kit to the kit clipboard; otherwise copies the node's settings (like a tom's
+        /// parameters). This branching used to live in the view's KeyDown handler.
+        /// </summary>
+        private void CopySelected()
+        {
+            if (this is ModuleExplorerViewModel moduleVm && SelectedNode?.IsKitRoot == true)
+            {
+                moduleVm.CopySelectedKitToClipboard();
+            }
+            else
+            {
+                CopyNodeCommand.Execute(null!);
+            }
+        }
+
+        /// <summary>
+        /// Ctrl+V dispatch: if a kit was copied (Module Explorer), paste the kit into the
+        /// selected kit's slot; otherwise paste the node's settings into the selected
+        /// node when a valid snapshot is available.
+        /// </summary>
+        private void PasteSelected()
+        {
+            if (this is ModuleExplorerViewModel moduleVm && moduleVm.HasCopiedKit)
+            {
+                moduleVm.PasteKitFromClipboard();
+            }
+            else if (CopiedSnapshot is not null && PasteNodeCommand.Enabled)
+            {
+                PasteNodeCommand.Execute(null!);
+            }
+        }
+
+        /// <summary>
+        /// Updates <see cref="UndoCommand"/>/<see cref="RedoCommand"/> enabled state from
+        /// <see cref="CanUndo"/>/<see cref="CanRedo"/>. Must be called whenever either
+        /// undo stack changes, so <see cref="UndoCommand.CanExecute"/> stays accurate.
+        /// </summary>
+        private void UpdateUndoRedoCommandEnabled()
+        {
+            UndoCommand.Enabled = CanUndo;
+            RedoCommand.Enabled = CanRedo;
         }
 
         public SingleItemCollection<DataTreeNodeViewModel> Root { get; }
@@ -394,7 +478,9 @@ namespace VDrumExplorer.ViewModel.Data
                     PlayNoteCommand.Enabled = IsMatchingDeviceConnected && SelectedNode?.MidiNotePath is object;
                     SelectedNodeDetails = selectedNode?.CreateDetails();
                     CopyNodeCommand.Enabled = selectedNode is object;
+                    CopyCommand.Enabled = selectedNode is object;
                     PasteNodeCommand.Enabled = IsPasteNodeCommandValid;
+                    UpdatePasteCommandEnabled();
                 }
             }
         }
