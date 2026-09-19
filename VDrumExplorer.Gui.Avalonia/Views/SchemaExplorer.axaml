@@ -6,7 +6,33 @@
         x:DataType="vmls:ModuleSchemaViewModel"
         Title="{Binding Title}" Height="600" Width="1000"
         WindowStartupLocation="CenterScreen">
+    <!--
+      Template-generated interactive controls (the focusable header border of each
+      TreeViewItem) are Avalonia theme internals, not view-authored controls, but
+      A11yScanner treats them as interactive. The styles below give them accessible
+      names and stable per-area AutomationIds. Template-level IDs repeat across
+      instances (one per tree node), which docs/accessibility.md §3.1 sanctions
+      (Warning severity only).
+    -->
+    <Window.Styles>
+        <!-- Tree nodes: one template AutomationId per node role, name from the node title. -->
+        <Style Selector="TreeViewItem">
+            <Setter Property="AutomationProperties.AutomationId" Value="schema-explorer.tree.node" />
+        </Style>
+        <!-- The focusable header border inside the TreeViewItem theme carries the node's
+             announced name (the item itself derives its name from the header text).
+             The item's DataContext is the TreeNodeViewModel; x:DataType enables the
+             compiled binding required by x:CompileBindings="True" on this window. -->
+        <Style Selector="TreeViewItem Border#PART_LayoutRoot" x:DataType="vmls:TreeNodeViewModel">
+            <Setter Property="AutomationProperties.Name" Value="{Binding Format.FormatString}" />
+            <Setter Property="AutomationProperties.AutomationId" Value="schema-explorer.tree.node-header" />
+        </Style>
+    </Window.Styles>
     <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*" />
             <ColumnDefinition Width="5" />
@@ -15,19 +41,27 @@
 
         <!-- Tree of container nodes. -->
         <TreeView x:Name="treeView" Grid.Column="0" ItemsSource="{Binding Root}"
-                  SelectionChanged="TreeView_SelectionChanged">
+                  SelectionChanged="TreeView_SelectionChanged"
+                  AutomationProperties.AutomationId="schema-explorer.tree"
+                  AutomationProperties.LandmarkType="Navigation">
             <TreeView.ItemTemplate>
                 <TreeDataTemplate ItemsSource="{Binding Children}" x:DataType="vmls:TreeNodeViewModel">
                     <TextBlock Text="{Binding Format.FormatString}" />
                 </TreeDataTemplate>
             </TreeView.ItemTemplate>
         </TreeView>
-        <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" />
+        <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch"
+                      AutomationProperties.AutomationId="schema-explorer.details.splitter"
+                      AutomationProperties.Name="Details pane splitter"/>
 
         <!-- Details for the selected node. -->
-        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" Grid.Column="2">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" Grid.Column="2"
+                      AutomationProperties.AutomationId="schema-explorer.details"
+                      AutomationProperties.LandmarkType="Main">
             <StackPanel Margin="8,0,8,0">
-                <GroupBox Header="Tree node">
+                <GroupBox Header="Tree node"
+                          AutomationProperties.HeadingLevel="2"
+                          AutomationProperties.LandmarkType="Form">
                     <ItemsControl ItemsSource="{Binding SelectedNode.Table}" ItemTemplate="{StaticResource KeyValueItemTemplate}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
@@ -36,11 +70,13 @@
                         </ItemsControl.ItemsPanel>
                     </ItemsControl>
                 </GroupBox>
-                <Separator />
+                <Separator AutomationProperties.AccessibilityView="Raw" />
                 <ItemsControl ItemsSource="{Binding SelectedNode.Details}">
                     <ItemsControl.DataTemplates>
                         <DataTemplate DataType="vmls:FieldContainerNodeDetailViewModel" x:DataType="vmls:FieldContainerNodeDetailViewModel">
-                            <GroupBox Header="{Binding Description}">
+                            <GroupBox Header="{Binding Description}"
+                                      AutomationProperties.HeadingLevel="2"
+                                      AutomationProperties.LandmarkType="Form">
                                 <ItemsControl ItemsSource="{Binding Fields}" ItemTemplate="{StaticResource KeyValueItemTemplate}">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
@@ -51,7 +87,9 @@
                             </GroupBox>
                         </DataTemplate>
                         <DataTemplate DataType="vmls:ListNodeDetailViewModel" x:DataType="vmls:ListNodeDetailViewModel">
-                            <GroupBox Header="{Binding Description}">
+                            <GroupBox Header="{Binding Description}"
+                                      AutomationProperties.HeadingLevel="2"
+                                      AutomationProperties.LandmarkType="ContentInfo">
                                 <ItemsControl ItemsSource="{Binding Items}">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate x:DataType="vmls:FieldFormattableStringViewModel">
@@ -65,5 +103,17 @@
                 </ItemsControl>
             </StackPanel>
         </ScrollViewer>
+
+        <!--
+          Status live region: placeholder for the status-wiring task, which binds the status
+          line to a StatusViewModel (as ExplorerHomeViewModel/DataExplorerViewModel already
+          hold). A11yScanner enforces the live-region invariant per window, so an empty
+          (visually neutral, renders nothing) element carries it until then
+          (docs/accessibility.md §6).
+        -->
+        <TextBlock Grid.Row="1" Grid.ColumnSpan="3"
+                   AutomationProperties.AutomationId="schema-explorer.status.message"
+                   AutomationProperties.Name="Status"
+                   AutomationProperties.LiveSetting="Polite" />
     </Grid>
 </Window>

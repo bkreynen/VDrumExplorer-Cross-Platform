@@ -128,15 +128,22 @@
                    AutomationProperties.AccessibilityView="Raw"/>
 
         <!--
-          Status live region: placeholder for Phase 1 task 5, which binds the status line
-          to a status VM. A11yScanner enforces the live-region invariant per window, so an
-          empty (visually neutral, zero-height) element carries it until then
-          (docs/accessibility.md §6).
+          Status live regions (docs/accessibility.md §5–6): the polite element announces
+          successful operation outcomes, the assertive element announces failures (it is
+          only populated on error). Both are bound to this window's StatusViewModel; with
+          empty text a TextBlock has zero height, so the visual layout is unchanged while
+          the elements remain in the accessibility tree.
         -->
         <TextBlock DockPanel.Dock="Bottom"
                    AutomationProperties.AutomationId="data-explorer.status.message"
                    AutomationProperties.Name="Status"
-                   AutomationProperties.LiveSetting="Polite" />
+                   AutomationProperties.LiveSetting="Polite"
+                   Text="{Binding Status.Message}" />
+        <TextBlock DockPanel.Dock="Bottom"
+                   AutomationProperties.AutomationId="data-explorer.status.error"
+                   AutomationProperties.Name="Status error"
+                   AutomationProperties.LiveSetting="Assertive"
+                   Text="{Binding Status.ErrorMessage}" />
 
         <!-- Main Content: Tree + Details -->
         <Grid Margin="16,8,16,16">
