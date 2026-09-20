@@ -7,14 +7,14 @@ Regenerate by rebuilding and running the test project, then commit the result.
 | View | Controls | Interactive | Errors | Warnings | Info |
 |------|----------|-------------|--------|----------|------|
 | ExplorerHome | 178 | 15 | 0 | 0 | 0 |
-| DataExplorer | 3440 | 275 | 537 | 0 | 13 |
-| SchemaExplorer | 97 | 5 | 10 | 0 | 5 |
+| DataExplorer | 3440 | 275 | 287 | 0 | 13 |
+| SchemaExplorer | 97 | 5 | 6 | 0 | 5 |
 | CopyKitTargetDialog | 42 | 3 | 5 | 0 | 0 |
 | CopyKitsDialog | 86 | 5 | 9 | 0 | 0 |
 | MultiPasteDialog | 50 | 7 | 9 | 0 | 0 |
 | DataTransferDialog | 27 | 1 | 2 | 0 | 0 |
 | ConfirmCloseDialog | 16 | 2 | 3 | 0 | 0 |
-| **TOTAL** | 3936 | 313 | 575 | 0 | 18 |
+| **TOTAL** | 3936 | 313 | 321 | 0 | 18 |
 
 ### ExplorerHome
 
@@ -28,14 +28,14 @@ Regenerate by rebuilding and running the test project, then commit the result.
 
 - Controls scanned: 3440
 - Interactive controls: 275
-- Violations: 550 (errors 537, warnings 0, info 13)
+- Violations: 300 (errors 287, warnings 0, info 13)
 
 - `DECORATIVE_IN_ACCESSIBILITY_VIEW`: 1
 - `LIVE_REGION_MISSING`: 1
-- `MISSING_AUTOMATION_ID`: 275
+- `MISSING_AUTOMATION_ID`: 148
 - `MISSING_HEADING_LEVEL`: 6
 - `MISSING_LANDMARK`: 6
-- `MISSING_NAME`: 261
+- `MISSING_NAME`: 138
 
 <details><summary>Violation details</summary>
 
@@ -60,10 +60,6 @@ Regenerate by rebuilding and running the test project, then commit the result.
 - Error: [MISSING_AUTOMATION_ID] TreeView '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] TreeView '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] TreeViewItem '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_AUTOMATION_ID] Border '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] Border '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] ToggleButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] ToggleButton '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] GridSplitter '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] GridSplitter '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Info: [MISSING_HEADING_LEVEL] GroupBox 'Kit common': Section-header candidate has no AutomationProperties.HeadingLevel (report-only).
@@ -74,64 +70,36 @@ Regenerate by rebuilding and running the test project, then commit the result.
 - Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] Slider '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] Slider '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] Slider '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] Slider '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] CheckBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] CheckBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] ComboBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] ComboBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] Slider '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] Slider '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] CheckBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] CheckBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] Slider '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] Slider '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] ComboBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] ComboBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] CheckBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] CheckBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] Slider '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] Slider '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] Slider '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] Slider '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Info: [MISSING_HEADING_LEVEL] GroupBox 'Instruments': Section-header candidate has no AutomationProperties.HeadingLevel (report-only).
@@ -142,34 +110,18 @@ Regenerate by rebuilding and running the test project, then commit the result.
 - Error: [MISSING_NAME] CheckBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] ComboBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] ComboBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] Slider '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] Slider '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] ComboBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] ComboBox '': Interactive control has no AutomationProperties.Name and no visible text content.
+- Error: [MISSING_AUTOMATION_ID] Slider '': Interactive control has no AutomationProperties.AutomationId.
+- Error: [MISSING_NAME] Slider '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] Slider '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] Slider '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] Slider '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] Slider '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Info: [MISSING_HEADING_LEVEL] GroupBox 'Kit Overhead': Section-header candidate has no AutomationProperties.HeadingLevel (report-only).
@@ -178,238 +130,122 @@ Regenerate by rebuilding and running the test project, then commit the result.
 - Error: [MISSING_NAME] CheckBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] ComboBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] ComboBox '': Interactive control has no AutomationProperties.Name and no visible text content.
+- Error: [MISSING_AUTOMATION_ID] Slider '': Interactive control has no AutomationProperties.AutomationId.
+- Error: [MISSING_NAME] Slider '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] Slider '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] Slider '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] Slider '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] Slider '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] CheckBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] CheckBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] Slider '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] Slider '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] Slider '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] Slider '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] ComboBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] ComboBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] ComboBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] ComboBox '': Interactive control has no AutomationProperties.Name and no visible text content.
+- Error: [MISSING_AUTOMATION_ID] Slider '': Interactive control has no AutomationProperties.AutomationId.
+- Error: [MISSING_NAME] Slider '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] Slider '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] Slider '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] Slider '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] Slider '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] CheckBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] CheckBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] Slider '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] Slider '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] Slider '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] Slider '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] ComboBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] ComboBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] ComboBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] ComboBox '': Interactive control has no AutomationProperties.Name and no visible text content.
+- Error: [MISSING_AUTOMATION_ID] Slider '': Interactive control has no AutomationProperties.AutomationId.
+- Error: [MISSING_NAME] Slider '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] Slider '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] Slider '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
+- Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
+- Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
+- Error: [MISSING_AUTOMATION_ID] ComboBox '': Interactive control has no AutomationProperties.AutomationId.
+- Error: [MISSING_NAME] ComboBox '': Interactive control has no AutomationProperties.Name and no visible text content.
+- Error: [MISSING_AUTOMATION_ID] ComboBox '': Interactive control has no AutomationProperties.AutomationId.
+- Error: [MISSING_NAME] ComboBox '': Interactive control has no AutomationProperties.Name and no visible text content.
+- Error: [MISSING_AUTOMATION_ID] ComboBox '': Interactive control has no AutomationProperties.AutomationId.
+- Error: [MISSING_NAME] ComboBox '': Interactive control has no AutomationProperties.Name and no visible text content.
+- Error: [MISSING_AUTOMATION_ID] ComboBox '': Interactive control has no AutomationProperties.AutomationId.
+- Error: [MISSING_NAME] ComboBox '': Interactive control has no AutomationProperties.Name and no visible text content.
+- Error: [MISSING_AUTOMATION_ID] ComboBox '': Interactive control has no AutomationProperties.AutomationId.
+- Error: [MISSING_NAME] ComboBox '': Interactive control has no AutomationProperties.Name and no visible text content.
+- Error: [MISSING_AUTOMATION_ID] Slider '': Interactive control has no AutomationProperties.AutomationId.
+- Error: [MISSING_NAME] Slider '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] Slider '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] Slider '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] ComboBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] ComboBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] ComboBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] ComboBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] ComboBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] ComboBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] ComboBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] ComboBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] ComboBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] ComboBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] Slider '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] Slider '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
+- Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
+- Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
+- Error: [MISSING_AUTOMATION_ID] ComboBox '': Interactive control has no AutomationProperties.AutomationId.
+- Error: [MISSING_NAME] ComboBox '': Interactive control has no AutomationProperties.Name and no visible text content.
+- Error: [MISSING_AUTOMATION_ID] ComboBox '': Interactive control has no AutomationProperties.AutomationId.
+- Error: [MISSING_NAME] ComboBox '': Interactive control has no AutomationProperties.Name and no visible text content.
+- Error: [MISSING_AUTOMATION_ID] ComboBox '': Interactive control has no AutomationProperties.AutomationId.
+- Error: [MISSING_NAME] ComboBox '': Interactive control has no AutomationProperties.Name and no visible text content.
+- Error: [MISSING_AUTOMATION_ID] ComboBox '': Interactive control has no AutomationProperties.AutomationId.
+- Error: [MISSING_NAME] ComboBox '': Interactive control has no AutomationProperties.Name and no visible text content.
+- Error: [MISSING_AUTOMATION_ID] ComboBox '': Interactive control has no AutomationProperties.AutomationId.
+- Error: [MISSING_NAME] ComboBox '': Interactive control has no AutomationProperties.Name and no visible text content.
+- Error: [MISSING_AUTOMATION_ID] ComboBox '': Interactive control has no AutomationProperties.AutomationId.
+- Error: [MISSING_NAME] ComboBox '': Interactive control has no AutomationProperties.Name and no visible text content.
+- Error: [MISSING_AUTOMATION_ID] ComboBox '': Interactive control has no AutomationProperties.AutomationId.
+- Error: [MISSING_NAME] ComboBox '': Interactive control has no AutomationProperties.Name and no visible text content.
+- Error: [MISSING_AUTOMATION_ID] ComboBox '': Interactive control has no AutomationProperties.AutomationId.
+- Error: [MISSING_NAME] ComboBox '': Interactive control has no AutomationProperties.Name and no visible text content.
+- Error: [MISSING_AUTOMATION_ID] Slider '': Interactive control has no AutomationProperties.AutomationId.
+- Error: [MISSING_NAME] Slider '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] Slider '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] Slider '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] Slider '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] Slider '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] ComboBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] ComboBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] ComboBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] ComboBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] ComboBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] ComboBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] ComboBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] ComboBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] ComboBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] ComboBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] ComboBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] ComboBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] ComboBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] ComboBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] ComboBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] ComboBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] Slider '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] Slider '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] Slider '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] Slider '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] Slider '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] Slider '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] Slider '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] Slider '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] ComboBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] ComboBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] ComboBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] ComboBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] ComboBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] ComboBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] ComboBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] ComboBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] Slider '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] Slider '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Info: [MISSING_HEADING_LEVEL] GroupBox 'Kit Master Equalizer': Section-header candidate has no AutomationProperties.HeadingLevel (report-only).
@@ -418,74 +254,38 @@ Regenerate by rebuilding and running the test project, then commit the result.
 - Error: [MISSING_NAME] CheckBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] ComboBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] ComboBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] ComboBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] ComboBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] ComboBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] ComboBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] Slider '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] Slider '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] ComboBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] ComboBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] ComboBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] ComboBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] Slider '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] Slider '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] ComboBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] ComboBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] ComboBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] ComboBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] Slider '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] Slider '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] ComboBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] ComboBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] ComboBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] ComboBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] ComboBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] ComboBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] Slider '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] Slider '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Info: [MISSING_HEADING_LEVEL] GroupBox 'Kit Master Compressor': Section-header candidate has no AutomationProperties.HeadingLevel (report-only).
@@ -494,100 +294,50 @@ Regenerate by rebuilding and running the test project, then commit the result.
 - Error: [MISSING_NAME] CheckBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] ComboBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] ComboBox '': Interactive control has no AutomationProperties.Name and no visible text content.
+- Error: [MISSING_AUTOMATION_ID] Slider '': Interactive control has no AutomationProperties.AutomationId.
+- Error: [MISSING_NAME] Slider '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] Slider '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] Slider '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] Slider '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] Slider '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] Slider '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] Slider '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] Slider '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] Slider '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] Slider '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] Slider '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] ComboBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] ComboBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] ComboBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] ComboBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] ComboBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] ComboBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] ComboBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] ComboBox '': Interactive control has no AutomationProperties.Name and no visible text content.
+- Error: [MISSING_AUTOMATION_ID] Slider '': Interactive control has no AutomationProperties.AutomationId.
+- Error: [MISSING_NAME] Slider '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] Slider '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] Slider '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] Slider '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] Slider '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] Slider '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] Slider '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] Slider '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] Slider '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] RepeatButton '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] TextBox '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] TextBox '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_AUTOMATION_ID] RepeatButton '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [LIVE_REGION_MISSING] DataExplorer '': No element sets AutomationProperties.LiveSetting; the window has no live-region status line.
 
 </details>
@@ -596,24 +346,20 @@ Regenerate by rebuilding and running the test project, then commit the result.
 
 - Controls scanned: 97
 - Interactive controls: 5
-- Violations: 15 (errors 10, warnings 0, info 5)
+- Violations: 11 (errors 6, warnings 0, info 5)
 
 - `DECORATIVE_IN_ACCESSIBILITY_VIEW`: 1
 - `LIVE_REGION_MISSING`: 1
-- `MISSING_AUTOMATION_ID`: 5
+- `MISSING_AUTOMATION_ID`: 3
 - `MISSING_HEADING_LEVEL`: 2
 - `MISSING_LANDMARK`: 2
-- `MISSING_NAME`: 4
+- `MISSING_NAME`: 2
 
 <details><summary>Violation details</summary>
 
 - Error: [MISSING_AUTOMATION_ID] TreeView '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] TreeView '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] TreeViewItem '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_AUTOMATION_ID] Border '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] Border '': Interactive control has no AutomationProperties.Name and no visible text content.
-- Error: [MISSING_AUTOMATION_ID] ToggleButton '': Interactive control has no AutomationProperties.AutomationId.
-- Error: [MISSING_NAME] ToggleButton '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Error: [MISSING_AUTOMATION_ID] GridSplitter '': Interactive control has no AutomationProperties.AutomationId.
 - Error: [MISSING_NAME] GridSplitter '': Interactive control has no AutomationProperties.Name and no visible text content.
 - Info: [MISSING_HEADING_LEVEL] GroupBox 'Tree node': Section-header candidate has no AutomationProperties.HeadingLevel (report-only).

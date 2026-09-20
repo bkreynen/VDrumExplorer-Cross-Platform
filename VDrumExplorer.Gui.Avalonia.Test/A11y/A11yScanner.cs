@@ -284,15 +284,26 @@ public static class A11yScanner
 
             var type = control.GetType();
 
+            // --- Interactive-control rules. Controls instantiated by a control/theme
+            // template (TemplatedParent != null — e.g. the spinner RepeatButtons inside
+            // a NumericUpDown theme) are owned by the control theme, not the view author,
+            // so the view-author rules below skip them, matching the existing exemption
+            // in the decorative rule. Duplicate-id detection and the tab-order heuristic
+            // still apply to template parts.
+            bool isTemplated = control.TemplatedParent is not null;
+
             // --- AutomationId presence + duplicate detection (interactive controls only).
             if (IsInteractive(control))
             {
                 var id = AutomationProperties.GetAutomationId(styled);
                 if (string.IsNullOrWhiteSpace(id))
                 {
-                    violations.Add(new A11yViolation(
-                        "MISSING_AUTOMATION_ID", A11ySeverity.Error, type.Name, Describe(control),
-                        "Interactive control has no AutomationProperties.AutomationId."));
+                    if (!isTemplated)
+                    {
+                        violations.Add(new A11yViolation(
+                            "MISSING_AUTOMATION_ID", A11ySeverity.Error, type.Name, Describe(control),
+                            "Interactive control has no AutomationProperties.AutomationId."));
+                    }
                 }
                 else
                 {
@@ -310,7 +321,7 @@ public static class A11yScanner
                 string? derivedText = GetDerivedText(control);
                 string name = hasAttachedName ? attachedName! : derivedText ?? "";
 
-                if (!hasAttachedName && derivedText is null)
+                if (!hasAttachedName && derivedText is null && !isTemplated)
                 {
                     violations.Add(new A11yViolation(
                         "MISSING_NAME", A11ySeverity.Error, type.Name, Describe(control),
@@ -318,13 +329,16 @@ public static class A11yScanner
                 }
 
                 // --- Naming convention: no control-type words in the name.
-                foreach (var (word, pattern) in TypeWordBlocklist.Zip(TypeWordPatterns))
+                if (!isTemplated)
                 {
-                    if (name.Length > 0 && pattern.IsMatch(name))
+                    foreach (var (word, pattern) in TypeWordBlocklist.Zip(TypeWordPatterns))
                     {
-                        violations.Add(new A11yViolation(
-                            "NAME_CONTAINS_TYPE_WORD", A11ySeverity.Error, type.Name, Describe(control),
-                            $"Name '{name}' contains the control-type word '{word}'."));
+                        if (name.Length > 0 && pattern.IsMatch(name))
+                        {
+                            violations.Add(new A11yViolation(
+                                "NAME_CONTAINS_TYPE_WORD", A11ySeverity.Error, type.Name, Describe(control),
+                                $"Name '{name}' contains the control-type word '{word}'."));
+                        }
                     }
                 }
 
@@ -429,15 +443,16 @@ public static class A11yScanner
 
         if (NameSourceTypeHierarchy.Any(t => t.IsAssignableFrom(type)))
         {
-            switch (control)
+            // An empty or whitespace-only string is not a usable accessible name: the
+            // control still counts as unnamed (same filter the item-container branch uses).
+            string? text = control switch
             {
-                case TextBlock textBlock:
-                    return textBlock.Text;
-                case HeaderedContentControl headered:
-                    return headered.Header as string;
-                case ContentControl content:
-                    return content.Content as string;
-            }
+                TextBlock textBlock => textBlock.Text,
+                HeaderedContentControl headered => headered.Header as string,
+                ContentControl content => content.Content as string,
+                _ => null,
+            };
+            return string.IsNullOrWhiteSpace(text) ? null : text;
         }
 
         return null;
