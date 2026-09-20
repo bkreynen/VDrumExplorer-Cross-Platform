@@ -443,15 +443,16 @@ public static class A11yScanner
 
         if (NameSourceTypeHierarchy.Any(t => t.IsAssignableFrom(type)))
         {
-            switch (control)
+            // An empty or whitespace-only string is not a usable accessible name: the
+            // control still counts as unnamed (same filter the item-container branch uses).
+            string? text = control switch
             {
-                case TextBlock textBlock:
-                    return textBlock.Text;
-                case HeaderedContentControl headered:
-                    return headered.Header as string;
-                case ContentControl content:
-                    return content.Content as string;
-            }
+                TextBlock textBlock => textBlock.Text,
+                HeaderedContentControl headered => headered.Header as string,
+                ContentControl content => content.Content as string,
+                _ => null,
+            };
+            return string.IsNullOrWhiteSpace(text) ? null : text;
         }
 
         return null;
