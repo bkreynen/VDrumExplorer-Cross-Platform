@@ -462,11 +462,14 @@ public static class A11yScanner
     /// Determines whether the element is a decorative candidate: a TextBlock/Image/Separator
     /// that is not interactive and carries no name or text. Template-generated elements
     /// (<see cref="Visual.TemplatedParent"/> is set, e.g. the watermark inside a TextBox
-    /// theme) are control-authored, not view-authored, and are never flagged.
+    /// theme) are control-authored, not view-authored, and are never flagged. Elements that
+    /// are not effectively visible are also never flagged: a hidden element is not exposed
+    /// in the accessibility view at all, so it cannot be a decorative-in-view violation
+    /// (e.g. a status TextBlock hidden while its bound value is null).
     /// </summary>
     private static bool IsDecorativeCandidate(Control control, StyledElement styled)
     {
-        if (IsInteractive(control) || control.TemplatedParent is not null)
+        if (!control.IsEffectivelyVisible || IsInteractive(control) || control.TemplatedParent is not null)
         {
             return false;
         }
