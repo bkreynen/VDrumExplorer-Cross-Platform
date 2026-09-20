@@ -5,6 +5,20 @@
         x:CompileBindings="False"
         Title="{Binding Title}" Height="600" Width="1000"
         WindowStartupLocation="CenterScreen">
+    <!-- App shortcuts as declarative bindings to ViewModel commands (docs/accessibility.md §4).
+         Ctrl+C/V dispatch between node copy/paste and whole-kit copy/paste (see CopyCommand /
+         PasteCommand); Ctrl+Z/Y drive the undo/redo stack. Avalonia evaluates KeyBindings from
+         the focused element upward before raising KeyDown, and a binding only wins when its
+         command's CanExecute is true. Dispatch is focus-aware: the code-behind sets
+         TextEditorFocused while a TextBox has focus, which disables these commands so the
+         TextBox's native text copy/paste/undo applies; with no TextBox focused the window
+         commands handle the keys as usual. -->
+    <Window.KeyBindings>
+        <KeyBinding Gesture="Ctrl+C" Command="{Binding CopyCommand}" />
+        <KeyBinding Gesture="Ctrl+V" Command="{Binding PasteCommand}" />
+        <KeyBinding Gesture="Ctrl+Z" Command="{Binding UndoCommand}" />
+        <KeyBinding Gesture="Ctrl+Y" Command="{Binding RedoCommand}" />
+    </Window.KeyBindings>
     <DockPanel>
 
         <!-- Menu Bar -->
@@ -39,7 +53,7 @@
             <Button Margin="8,0,0,0" Command="{Binding RevertAllCommand}" Content="Revert all"/>
             <Button Margin="8,0,0,0" Command="{Binding CopyMultipleKitsCommand}" IsVisible="{Binding IsModuleExplorer}" Content="Copy kits..."/>
             <TextBlock Classes="label" Text="Copied node path:" Margin="16,0,0,0"/>
-            <TextBlock Text="{Binding CopiedSnapshot.Path}" Margin="8,0,0,0" />
+            <TextBlock Text="{Binding CopiedSnapshot.Path}" IsVisible="{Binding CopiedSnapshot, Converter={x:Static ObjectConverters.IsNotNull}}" Margin="8,0,0,0" />
         </StackPanel>
 
         <!-- Device Toolbar -->

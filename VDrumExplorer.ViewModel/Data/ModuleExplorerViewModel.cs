@@ -157,7 +157,8 @@ namespace VDrumExplorer.ViewModel.Data
 
         /// <summary>
         /// Copies the currently selected kit to the internal clipboard.
-        /// Called by Ctrl+C in the DataExplorer window.
+        /// Called by <see cref="DataExplorerViewModel.CopyCommand"/> (Ctrl+C) when a kit
+        /// root is selected in the Module Explorer.
         /// </summary>
         public void CopySelectedKitToClipboard()
         {
@@ -165,12 +166,14 @@ namespace VDrumExplorer.ViewModel.Data
             {
                 copiedKit = Module.ExportKit(kitNumber);
                 RaisePropertyChanged(nameof(HasCopiedKit));
+                UpdatePasteCommandEnabled();
             }
         }
 
         /// <summary>
         /// Pastes the kit from the internal clipboard directly into the currently selected kit's slot.
-        /// Called by Ctrl+V in the DataExplorer window. No dialog — just paste.
+        /// Called by <see cref="DataExplorerViewModel.PasteCommand"/> (Ctrl+V) when a kit is on the
+        /// kit clipboard. No dialog — just paste.
         /// </summary>
         public void PasteKitFromClipboard()
         {
