@@ -224,7 +224,9 @@ public class InteractionTest
     // focus-aware: while a TextBox has focus the window commands are disabled
     // (TextEditorFocused) and the keys fall through to the TextBox's native handling.
     // CopiedSnapshot is backed by a static field, so it is nulled before each test for
-    // isolation.
+    // isolation, and nulled again after each test that may have set it so the static
+    // clipboard never leaks into other tests (e.g. the a11y inventory scan, whose
+    // committed report depends on the DataExplorer scan starting with an empty clipboard).
 
     [AvaloniaFact]
     public void DataExplorer_Shortcut_CtrlC_CopiesNode()
@@ -239,6 +241,7 @@ public class InteractionTest
         window.KeyPressQwerty(PhysicalKey.C, RawInputModifiers.Control);
 
         Assert.NotNull(vm.CopiedSnapshot);
+        vm.CopiedSnapshot = null;
         window.Close();
     }
 
@@ -259,6 +262,7 @@ public class InteractionTest
         // Then paste
         window.KeyPressQwerty(PhysicalKey.V, RawInputModifiers.Control);
         Assert.True(vm.CanUndo);
+        vm.CopiedSnapshot = null;
         window.Close();
     }
 
@@ -281,6 +285,7 @@ public class InteractionTest
         window.KeyPressQwerty(PhysicalKey.Z, RawInputModifiers.Control);
         Assert.False(vm.CanUndo);
         Assert.True(vm.CanRedo);
+        vm.CopiedSnapshot = null;
         window.Close();
     }
 
@@ -303,6 +308,7 @@ public class InteractionTest
         window.KeyPressQwerty(PhysicalKey.Y, RawInputModifiers.Control);
         Assert.True(vm.CanUndo);
         Assert.False(vm.CanRedo);
+        vm.CopiedSnapshot = null;
         window.Close();
     }
 
@@ -352,6 +358,7 @@ public class InteractionTest
         window.KeyPressQwerty(PhysicalKey.C, RawInputModifiers.Control);
 
         Assert.NotNull(vm.CopiedSnapshot);
+        vm.CopiedSnapshot = null;
         window.Close();
     }
 

@@ -53,7 +53,7 @@
             <Button Margin="8,0,0,0" Command="{Binding RevertAllCommand}" Content="Revert all"/>
             <Button Margin="8,0,0,0" Command="{Binding CopyMultipleKitsCommand}" IsVisible="{Binding IsModuleExplorer}" Content="Copy kits..."/>
             <TextBlock Classes="label" Text="Copied node path:" Margin="16,0,0,0"/>
-            <TextBlock Text="{Binding CopiedSnapshot.Path}" Margin="8,0,0,0" />
+            <TextBlock Text="{Binding CopiedSnapshot.Path}" IsVisible="{Binding CopiedSnapshot, Converter={x:Static ObjectConverters.IsNotNull}}" Margin="8,0,0,0" />
         </StackPanel>
 
         <!-- Device Toolbar -->

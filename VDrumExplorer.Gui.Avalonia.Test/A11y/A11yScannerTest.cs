@@ -139,6 +139,15 @@ public class A11yScannerTest
     [AvaloniaFact]
     public void Scan_AllViews_WritesInventoryReport()
     {
+        // CopiedSnapshot is backed by a static field shared across DataExplorerViewModel
+        // instances (see DataExplorerViewModel.cs); visual tests may have left it set. Pin
+        // it to null so the DataExplorer scan is deterministic regardless of test order —
+        // a stale snapshot would otherwise surface as an extra DECORATIVE_IN_
+        // ACCESSIBILITY_VIEW info violation and make the committed report order-dependent.
+        // The property is instance-level (backed by the static field), so pinning goes
+        // through a throwaway view-model built the same way as CreateDataExplorer's.
+        CreateKitExplorerViewModel().CopiedSnapshot = null;
+
         var views = new (string Name, Func<Window> Create)[]
         {
             ("ExplorerHome", CreateExplorerHome),
@@ -168,8 +177,11 @@ public class A11yScannerTest
 
         if (committed is not null)
         {
-            Assert.True(NormalizeNewlines(committed) == NormalizeNewlines(generated),
-                "Committed A11yInventory/report.md is stale — regenerate by running this test locally and committing the result.");
+            string committedNormalized = NormalizeNewlines(committed);
+            string generatedNormalized = NormalizeNewlines(generated);
+            Assert.True(committedNormalized == generatedNormalized,
+                "Committed A11yInventory/report.md is stale — regenerate by running this test locally and committing the result.\n" +
+                BuildLineDiff(committedNormalized, generatedNormalized));
         }
 
         Assert.True(File.Exists(reportPath), $"Inventory report was not written to {reportPath}.");
@@ -264,9 +276,11 @@ public class A11yScannerTest
 
     private static Window CreateDataExplorer() => new DataExplorer
     {
-        DataContext = new KitExplorerViewModel(
-            new StubViewServices(), NullLogger.Instance, new DeviceViewModel(), TestData.LoadTD27Kit()),
+        DataContext = CreateKitExplorerViewModel(),
     };
+
+    private static KitExplorerViewModel CreateKitExplorerViewModel() => new KitExplorerViewModel(
+        new StubViewServices(), NullLogger.Instance, new DeviceViewModel(), TestData.LoadTD27Kit());
 
     private static Window CreateSchemaExplorer() => new SchemaExplorer
     {
@@ -391,4 +405,63 @@ public class A11yScannerTest
 
     /// <summary>Normalizes line endings so the staleness comparison is platform-independent.</summary>
     private static string NormalizeNewlines(string text) => text.Replace("\r\n", "\n");
+
+    /// <summary>
+    /// Builds a bounded, unified-style line diff between the committed and generated
+    /// reports for the staleness-failure message: the first differing hunk plus its
+    /// surrounding context, with committed lines prefixed <c>&lt;</c> and generated
+    /// lines prefixed <c>&gt;</c> (1-based line numbers). The output is capped so the
+    /// assertion message stays readable even when the reports have diverged widely.
+    /// </summary>
+    private static string BuildLineDiff(string committed, string generated)
+    {
+        const int maxDiffLines = 100;
+        const int contextLines = 3;
+
+        string[] committedLines = committed.Split('\n');
+        string[] generatedLines = generated.Split('\n');
+
+        int firstDifference = 0;
+        while (firstDifference < committedLines.Length &&
+               firstDifference < generatedLines.Length &&
+               committedLines[firstDifference] == generatedLines[firstDifference])
+        {
+            firstDifference++;
+        }
+
+        var diff = new StringBuilder();
+        diff.AppendLine($"--- committed ({committedLines.Length} lines) vs generated ({generatedLines.Length} lines); first difference at line {firstDifference + 1}:");
+
+        // Show the first differing line plus surrounding context, then keep going until
+        // the budget is exhausted (or the tail of both files is reached).
+        int shown = 0;
+        int line = Math.Max(0, firstDifference - contextLines);
+        while (line < Math.Max(committedLines.Length, generatedLines.Length) && shown < maxDiffLines)
+        {
+            bool inContext = line <= firstDifference + contextLines;
+            string? committedLine = line < committedLines.Length ? committedLines[line] : null;
+            string? generatedLine = line < generatedLines.Length ? generatedLines[line] : null;
+
+            if (inContext || committedLine != generatedLine)
+            {
+                if (committedLine is not null)
+                {
+                    diff.AppendLine($"  < {line + 1}: {committedLine}");
+                    shown++;
+                }
+                if (generatedLine is not null && generatedLine != committedLine)
+                {
+                    diff.AppendLine($"  > {line + 1}: {generatedLine}");
+                    shown++;
+                }
+            }
+            line++;
+        }
+
+        if (line < Math.Max(committedLines.Length, generatedLines.Length))
+        {
+            diff.AppendLine("  … (diff truncated)");
+        }
+        return diff.ToString().TrimEnd();
+    }
 }
