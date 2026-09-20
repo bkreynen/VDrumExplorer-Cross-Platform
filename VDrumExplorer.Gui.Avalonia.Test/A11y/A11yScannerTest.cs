@@ -123,6 +123,11 @@ public class A11yScannerTest
     /// Scans all eight views and writes the violation inventory report to
     /// <c>VDrumExplorer.Gui.Avalonia.Test/A11yInventory/report.md</c> (committed to the
     /// repository as the retrofit backlog; see the class comment for regeneration).
+    /// <para>
+    /// Also guards against staleness: the freshly generated report is compared with the
+    /// committed copy (read before overwriting) and the test fails when they drift, so a
+    /// stale committed report cannot silently keep CI green.
+    /// </para>
     /// </summary>
     [AvaloniaFact]
     public void Scan_AllViews_WritesInventoryReport()
@@ -145,10 +150,23 @@ public class A11yScannerTest
             results.Add(ScanView(create));
         }
 
-        string reportPath = WriteInventoryReport(results);
-        string report = File.ReadAllText(reportPath);
+        string reportPath = GetInventoryReportPath();
+        string generated = BuildInventoryReport(results);
+
+        // Staleness guard: the committed copy (read before it is overwritten below) must
+        // match what the current scanner produces, otherwise it is out of date. The file
+        // is still written first so local regeneration works even when the assert fails.
+        string? committed = File.Exists(reportPath) ? File.ReadAllText(reportPath) : null;
+        File.WriteAllText(reportPath, generated);
+
+        if (committed is not null)
+        {
+            Assert.True(NormalizeNewlines(committed) == NormalizeNewlines(generated),
+                "Committed A11yInventory/report.md is stale — regenerate by running this test locally and committing the result.");
+        }
 
         Assert.True(File.Exists(reportPath), $"Inventory report was not written to {reportPath}.");
+        string report = File.ReadAllText(reportPath);
         foreach (var view in views)
         {
             Assert.Contains(view.Name, report);
@@ -310,11 +328,12 @@ public class A11yScannerTest
     }
 
     /// <summary>
-    /// Writes the inventory report into the source project directory (found by walking up
-    /// from the test output directory, mirroring <see cref="VisualTestHelper"/>'s baseline
-    /// lookup) so the committed copy stays authoritative. Returns the path written.
+    /// Resolves the inventory report path inside the source project directory (found by
+    /// walking up from the test output directory, mirroring <see cref="VisualTestHelper"/>'s
+    /// baseline lookup) so the committed copy stays authoritative, creating the directory
+    /// if needed.
     /// </summary>
-    private static string WriteInventoryReport(IReadOnlyList<A11yScanResult> results)
+    private static string GetInventoryReportPath()
     {
         var directory = new DirectoryInfo(AppContext.BaseDirectory);
         while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "VDrumExplorer.Gui.Avalonia.Test.csproj")))
@@ -324,8 +343,12 @@ public class A11yScannerTest
         string root = directory?.FullName ?? AppContext.BaseDirectory;
         string inventoryDirectory = Path.Combine(root, "A11yInventory");
         Directory.CreateDirectory(inventoryDirectory);
-        string path = Path.Combine(inventoryDirectory, "report.md");
+        return Path.Combine(inventoryDirectory, "report.md");
+    }
 
+    /// <summary>Renders the full inventory report (summary table + per-view sections).</summary>
+    private static string BuildInventoryReport(IReadOnlyList<A11yScanResult> results)
+    {
         var sb = new StringBuilder();
         sb.AppendLine("# A11y violation inventory (Phase 0, report-only)");
         sb.AppendLine();
@@ -355,7 +378,9 @@ public class A11yScannerTest
             sb.AppendLine(A11yScanner.ToMarkdown(result));
         }
 
-        File.WriteAllText(path, sb.ToString());
-        return path;
+        return sb.ToString();
     }
+
+    /// <summary>Normalizes line endings so the staleness comparison is platform-independent.</summary>
+    private static string NormalizeNewlines(string text) => text.Replace("\r\n", "\n");
 }
