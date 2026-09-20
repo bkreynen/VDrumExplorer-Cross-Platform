@@ -56,6 +56,27 @@ namespace VDrumExplorer.ViewModel.Data
         /// CanExecute tracks <see cref="CanRedo"/>.
         /// </summary>
         public DelegateCommand RedoCommand { get; }
+
+        private bool textEditorFocused;
+        /// <summary>
+        /// Indicates whether a text editor (TextBox) currently has keyboard focus inside
+        /// the explorer window. While true, the window shortcut commands (Ctrl+C/V/Z/Y)
+        /// are disabled so the focused TextBox's native text copy/paste/undo handling
+        /// wins; when false, the window commands handle the keys as usual. The view sets
+        /// this from focus events (see DataExplorer.axaml.cs).
+        /// </summary>
+        public bool TextEditorFocused
+        {
+            get => textEditorFocused;
+            set
+            {
+                if (SetProperty(ref textEditorFocused, value))
+                {
+                    UpdateShortcutCommandEnabled();
+                }
+            }
+        }
+
         // There are app commands of course, but it's not clear how we bind them.
         public DelegateCommand SaveFileCommand { get; }
         public DelegateCommand SaveFileAsCommand { get; }
@@ -149,11 +170,13 @@ namespace VDrumExplorer.ViewModel.Data
         /// <summary>
         /// Updates <see cref="PasteCommand.Enabled"/> to reflect everything that can make
         /// a paste possible: a copied kit (Module Explorer) or a node snapshot valid for
-        /// the selected node. Must be called whenever either input changes.
+        /// the selected node — and not a focused text editor (see <see cref="TextEditorFocused"/>).
+        /// Must be called whenever either input changes.
         /// </summary>
         protected void UpdatePasteCommandEnabled() =>
-            PasteCommand.Enabled = (this is ModuleExplorerViewModel moduleVm && moduleVm.HasCopiedKit)
-                || IsPasteNodeCommandValid;
+            PasteCommand.Enabled = !TextEditorFocused
+                && ((this is ModuleExplorerViewModel moduleVm && moduleVm.HasCopiedKit)
+                    || IsPasteNodeCommandValid);
 
         /// <summary>
         /// Snapshot of the data as of the last save (or load). Used as the baseline
@@ -427,6 +450,12 @@ namespace VDrumExplorer.ViewModel.Data
         /// </summary>
         private void CopySelected()
         {
+            // Disabled commands are safe no-ops even when Execute is invoked directly
+            // (e.g. while a text editor has focus and the shortcut has yielded).
+            if (!CopyCommand.Enabled)
+            {
+                return;
+            }
             if (this is ModuleExplorerViewModel moduleVm && SelectedNode?.IsKitRoot == true)
             {
                 moduleVm.CopySelectedKitToClipboard();
@@ -444,6 +473,12 @@ namespace VDrumExplorer.ViewModel.Data
         /// </summary>
         private void PasteSelected()
         {
+            // Disabled commands are safe no-ops even when Execute is invoked directly
+            // (e.g. while a text editor has focus and the shortcut has yielded).
+            if (!PasteCommand.Enabled)
+            {
+                return;
+            }
             if (this is ModuleExplorerViewModel moduleVm && moduleVm.HasCopiedKit)
             {
                 moduleVm.PasteKitFromClipboard();
@@ -456,13 +491,28 @@ namespace VDrumExplorer.ViewModel.Data
 
         /// <summary>
         /// Updates <see cref="UndoCommand"/>/<see cref="RedoCommand"/> enabled state from
-        /// <see cref="CanUndo"/>/<see cref="CanRedo"/>. Must be called whenever either
-        /// undo stack changes, so <see cref="UndoCommand.CanExecute"/> stays accurate.
+        /// <see cref="CanUndo"/>/<see cref="CanRedo"/> (and the text-editor focus gate, see
+        /// <see cref="TextEditorFocused"/>). Must be called whenever either undo stack
+        /// changes, so <see cref="UndoCommand.CanExecute"/> stays accurate.
         /// </summary>
         private void UpdateUndoRedoCommandEnabled()
         {
-            UndoCommand.Enabled = CanUndo;
-            RedoCommand.Enabled = CanRedo;
+            UndoCommand.Enabled = !TextEditorFocused && CanUndo;
+            RedoCommand.Enabled = !TextEditorFocused && CanRedo;
+        }
+
+        /// <summary>
+        /// Recomputes the enabled state of all four window shortcut commands
+        /// (<see cref="CopyCommand"/>, <see cref="PasteCommand"/>, <see cref="UndoCommand"/>,
+        /// <see cref="RedoCommand"/>) from their current inputs. Called when
+        /// <see cref="TextEditorFocused"/> changes so the shortcuts yield to (or take back
+        /// control from) the focused TextBox's native handling.
+        /// </summary>
+        private void UpdateShortcutCommandEnabled()
+        {
+            CopyCommand.Enabled = !TextEditorFocused && selectedNode is object;
+            UpdatePasteCommandEnabled();
+            UpdateUndoRedoCommandEnabled();
         }
 
         public SingleItemCollection<DataTreeNodeViewModel> Root { get; }
@@ -478,9 +528,8 @@ namespace VDrumExplorer.ViewModel.Data
                     PlayNoteCommand.Enabled = IsMatchingDeviceConnected && SelectedNode?.MidiNotePath is object;
                     SelectedNodeDetails = selectedNode?.CreateDetails();
                     CopyNodeCommand.Enabled = selectedNode is object;
-                    CopyCommand.Enabled = selectedNode is object;
                     PasteNodeCommand.Enabled = IsPasteNodeCommandValid;
-                    UpdatePasteCommandEnabled();
+                    UpdateShortcutCommandEnabled();
                 }
             }
         }

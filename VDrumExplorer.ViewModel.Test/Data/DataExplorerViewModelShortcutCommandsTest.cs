@@ -264,5 +264,115 @@ namespace VDrumExplorer.ViewModel.Test.Data
 
             Assert.Equal(new[] { true, false }, fired);
         }
+
+        // === TextEditorFocused gating (focus-aware shortcut dispatch) ===
+        // While a text editor has focus in the window, the window shortcut commands must
+        // yield so the TextBox's native copy/paste/undo applies (the view sets the flag
+        // from focus events; see DataExplorer.axaml.cs).
+
+        [Fact]
+        public void TextEditorFocused_True_DisablesAllShortcutCommands_AndFiresCanExecuteChanged()
+        {
+            var vm = CreateModuleExplorer();
+            var kitRoots = FindAllKitRoots(vm.Root[0]);
+            vm.SelectedNode = kitRoots[0];
+            vm.CopyCommand.Execute(null!); // node snapshot copied
+            vm.SelectedNode = kitRoots[1];
+            vm.PasteCommand.Execute(null!); // undo stack now has an entry
+
+            Assert.True(vm.CopyCommand.Enabled);
+            Assert.True(vm.PasteCommand.Enabled);
+            Assert.True(vm.UndoCommand.Enabled);
+            Assert.False(vm.RedoCommand.Enabled);
+
+            var copyFired = new List<bool>();
+            var pasteFired = new List<bool>();
+            var undoFired = new List<bool>();
+            var redoFired = new List<bool>();
+            vm.CopyCommand.CanExecuteChanged += (s, e) => copyFired.Add(((VDrumExplorer.ViewModel.CommandBase)s!).Enabled);
+            vm.PasteCommand.CanExecuteChanged += (s, e) => pasteFired.Add(((VDrumExplorer.ViewModel.CommandBase)s!).Enabled);
+            vm.UndoCommand.CanExecuteChanged += (s, e) => undoFired.Add(((VDrumExplorer.ViewModel.CommandBase)s!).Enabled);
+            vm.RedoCommand.CanExecuteChanged += (s, e) => redoFired.Add(((VDrumExplorer.ViewModel.CommandBase)s!).Enabled);
+
+            vm.TextEditorFocused = true;
+
+            Assert.All(
+                new[] { vm.CopyCommand, vm.PasteCommand, vm.UndoCommand, vm.RedoCommand },
+                c => Assert.False(c.CanExecute(null!)));
+            // Commands that were enabled fire CanExecuteChanged with the new (false) state;
+            // RedoCommand was already disabled, so no change (and no event) for it.
+            Assert.Equal(new[] { false }, copyFired);
+            Assert.Equal(new[] { false }, pasteFired);
+            Assert.Equal(new[] { false }, undoFired);
+            Assert.Empty(redoFired);
+        }
+
+        [Fact]
+        public void TextEditorFocused_False_RestoresPriorEnabledState()
+        {
+            var vm = CreateModuleExplorer();
+            var kitRoots = FindAllKitRoots(vm.Root[0]);
+            vm.SelectedNode = kitRoots[0];
+            vm.CopyCommand.Execute(null!);
+            vm.SelectedNode = kitRoots[1];
+            vm.PasteCommand.Execute(null!);
+            vm.UndoCommand.Execute(null!); // undo stack empty again; redo possible
+
+            vm.TextEditorFocused = true;
+            Assert.All(
+                new[] { vm.CopyCommand, vm.PasteCommand, vm.UndoCommand, vm.RedoCommand },
+                c => Assert.False(c.CanExecute(null!)));
+
+            vm.TextEditorFocused = false;
+
+            // Back to the pre-gating state: copy/paste enabled again, undo disabled
+            // (stack empty), redo enabled (the undone edit is still redoable).
+            Assert.True(vm.CopyCommand.Enabled);
+            Assert.True(vm.PasteCommand.Enabled);
+            Assert.False(vm.UndoCommand.Enabled);
+            Assert.True(vm.RedoCommand.Enabled);
+        }
+
+        // === Edge cases ===
+
+        [Fact]
+        public void NewEdit_AfterUndo_ClearsRedoStack()
+        {
+            var vm = CreateModuleExplorer();
+            var kitRoots = FindAllKitRoots(vm.Root[0]);
+            vm.SelectedNode = kitRoots[0];
+            vm.CopyCommand.Execute(null!);
+            vm.SelectedNode = kitRoots[1];
+            vm.PasteCommand.Execute(null!);
+            vm.UndoCommand.Execute(null!);
+            Assert.True(vm.CanRedo);
+
+            // A new edit (paste pushes undo state) must clear the redo stack.
+            vm.PasteCommand.Execute(null!);
+
+            Assert.True(vm.CanUndo);
+            Assert.False(vm.CanRedo);
+            Assert.False(vm.RedoCommand.Enabled);
+        }
+
+        [Fact]
+        public void ExecuteWhileDisabled_IsSafeNoOp()
+        {
+            var vm = CreateModuleExplorer();
+            vm.SelectedNode = vm.Root[0];
+            vm.TextEditorFocused = true; // all four shortcut commands disabled
+
+            // Direct Execute while disabled must not throw or corrupt state: nothing is
+            // copied, no undo/redo state is pushed.
+            vm.CopyCommand.Execute(null!);
+            vm.PasteCommand.Execute(null!);
+            vm.UndoCommand.Execute(null!);
+            vm.RedoCommand.Execute(null!);
+
+            Assert.Null(vm.CopiedSnapshot);
+            Assert.False(vm.HasCopiedKit);
+            Assert.False(vm.CanUndo);
+            Assert.False(vm.CanRedo);
+        }
     }
 }

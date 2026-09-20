@@ -157,13 +157,13 @@ Exactly **one** `Polite` status element per window (the status line). Failure an
 <!-- Status area at the bottom of the window layout -->
 <TextBlock AutomationProperties.AutomationId="data-explorer.status.message"
            AutomationProperties.LiveSetting="Polite"
-           AutomationProperties.LandmarkType="Status"
            Text="{Binding StatusMessage}" />
 <TextBlock AutomationProperties.AutomationId="data-explorer.status.error"
            AutomationProperties.LiveSetting="Assertive"
            Text="{Binding ErrorMessage}" />
 ```
 
+- Live regions are conveyed via `AutomationProperties.LiveSetting` (`Polite`/`Assertive`), not via landmark types. `AutomationLandmarkType` is limited to the values in the Avalonia enum (`Banner`, `Complementary`, `ContentInfo`, `Form`, `Main`, `Navigation`, `Region`, `Search`) — there is no `Status` landmark, so the status line is not a landmark; it is announced through its `LiveSetting`.
 - No view may add a second `Polite` live region (e.g. per-control `LiveSetting` on a field). Progress for long operations updates the one status line.
 - The `Assertive` element must stay empty outside failures — assertive announcements interrupt speech, so they are reserved for errors.
 

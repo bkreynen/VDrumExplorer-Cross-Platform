@@ -3,6 +3,8 @@
 // as found in the LICENSE.txt file.
 
 using Avalonia.Controls;
+using Avalonia.Input;
+using Avalonia.Interactivity;
 using VDrumExplorer.ViewModel.Data;
 
 namespace VDrumExplorer.Gui.Avalonia.Views;
@@ -12,7 +14,9 @@ namespace VDrumExplorer.Gui.Avalonia.Views;
 /// with the behavior determined by the <see cref="DataExplorerViewModel"/> subclass set as DataContext.
 /// Keyboard shortcuts (Ctrl+C/V/Z/Y) are declarative <c>KeyBinding</c>s in
 /// <c>DataExplorer.axaml</c>, bound to ViewModel commands — no code-behind key handling
-/// (see docs/accessibility.md §4).
+/// (see docs/accessibility.md §4). The only code-behind logic is focus tracking: when a
+/// TextBox has focus, <see cref="DataExplorerViewModel.TextEditorFocused"/> is set so the
+/// window shortcuts yield to the TextBox's native text copy/paste/undo handling.
 /// </summary>
 public partial class DataExplorer : Window
 {
@@ -22,6 +26,18 @@ public partial class DataExplorer : Window
     {
         InitializeComponent();
         Closing += DataExplorer_Closing;
+        // Focus-aware shortcut dispatch: GotFocus/LostFocus bubble from the focused
+        // element to the window; NewFocusedElement tells us where focus went.
+        AddHandler(InputElement.GotFocusEvent, FocusChanged, RoutingStrategies.Bubble);
+        AddHandler(InputElement.LostFocusEvent, FocusChanged, RoutingStrategies.Bubble);
+    }
+
+    private void FocusChanged(object? sender, FocusChangedEventArgs e)
+    {
+        if (DataContext is DataExplorerViewModel viewModel)
+        {
+            viewModel.TextEditorFocused = e.NewFocusedElement is TextBox;
+        }
     }
 
     private bool isClosing;

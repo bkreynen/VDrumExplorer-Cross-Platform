@@ -13,6 +13,7 @@ using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.VisualTree;
 using Microsoft.Extensions.Logging.Abstractions;
 using VDrumExplorer.Gui.Avalonia.ViewServices;
 using VDrumExplorer.Gui.Avalonia.Views;
@@ -219,11 +220,14 @@ public class InteractionTest
 
     // === DataExplorer window key bindings (Ctrl+C/V/Z/Y → ViewModel commands) ===
     // The shortcuts are declarative Window.KeyBindings in DataExplorer.axaml; these tests
-    // press real keys headlessly and assert the resulting ViewModel state. CopiedSnapshot
-    // is backed by a static field, so it is nulled before each test for isolation.
+    // press real keys headlessly and assert the resulting ViewModel state. Dispatch is
+    // focus-aware: while a TextBox has focus the window commands are disabled
+    // (TextEditorFocused) and the keys fall through to the TextBox's native handling.
+    // CopiedSnapshot is backed by a static field, so it is nulled before each test for
+    // isolation.
 
     [AvaloniaFact]
-    public void DataExplorer_KeyDown_CtrlC_CopiesNode()
+    public void DataExplorer_Shortcut_CtrlC_CopiesNode()
     {
         var kit = TestData.LoadTD27Kit();
         var vm = new KitExplorerViewModel(
@@ -239,7 +243,7 @@ public class InteractionTest
     }
 
     [AvaloniaFact]
-    public void DataExplorer_KeyDown_CtrlV_PastesNode()
+    public void DataExplorer_Shortcut_CtrlV_PastesNode()
     {
         var kit = TestData.LoadTD27Kit();
         var vm = new KitExplorerViewModel(
@@ -259,7 +263,7 @@ public class InteractionTest
     }
 
     [AvaloniaFact]
-    public void DataExplorer_KeyDown_CtrlZ_UndoesEdit()
+    public void DataExplorer_Shortcut_CtrlZ_UndoesEdit()
     {
         var kit = TestData.LoadTD27Kit();
         var vm = new KitExplorerViewModel(
@@ -281,7 +285,7 @@ public class InteractionTest
     }
 
     [AvaloniaFact]
-    public void DataExplorer_KeyDown_CtrlY_RedoesEdit()
+    public void DataExplorer_Shortcut_CtrlY_RedoesEdit()
     {
         var kit = TestData.LoadTD27Kit();
         var vm = new KitExplorerViewModel(
@@ -299,6 +303,55 @@ public class InteractionTest
         window.KeyPressQwerty(PhysicalKey.Y, RawInputModifiers.Control);
         Assert.True(vm.CanUndo);
         Assert.False(vm.CanRedo);
+        window.Close();
+    }
+
+    // === Focus-aware dispatch: the window commands yield to a focused TextBox ===
+
+    [AvaloniaFact]
+    public void DataExplorer_Shortcut_CtrlC_YieldsToFocusedTextBox()
+    {
+        var kit = TestData.LoadTD27Kit();
+        var vm = new KitExplorerViewModel(
+            new StubViewServices(), NullLogger.Instance, new DeviceViewModel(), kit);
+        vm.CopiedSnapshot = null;
+        var window = new DataExplorer { DataContext = vm };
+        window.Show();
+        window.UpdateLayout();
+
+        // Focus a TextBox in the details pane (the kit root's "Kit common" fields
+        // include string fields rendered as TextBoxes).
+        var textBox = window.GetVisualDescendants().OfType<TextBox>().FirstOrDefault();
+        Assert.NotNull(textBox);
+        textBox!.Focus();
+        Assert.True(vm.TextEditorFocused, "Focusing a TextBox must set TextEditorFocused.");
+
+        window.KeyPressQwerty(PhysicalKey.C, RawInputModifiers.Control);
+
+        // The window CopyCommand must have yielded: no node snapshot was copied.
+        Assert.Null(vm.CopiedSnapshot);
+        window.Close();
+    }
+
+    [AvaloniaFact]
+    public void DataExplorer_Shortcut_CtrlC_FiresWhenTreeFocused()
+    {
+        var kit = TestData.LoadTD27Kit();
+        var vm = new KitExplorerViewModel(
+            new StubViewServices(), NullLogger.Instance, new DeviceViewModel(), kit);
+        vm.CopiedSnapshot = null;
+        var window = new DataExplorer { DataContext = vm };
+        window.Show();
+
+        // Focus the tree (no TextBox focused): the window command must still win.
+        var treeView = window.FindControl<TreeView>("treeView");
+        Assert.NotNull(treeView);
+        treeView!.Focus();
+        Assert.False(vm.TextEditorFocused);
+
+        window.KeyPressQwerty(PhysicalKey.C, RawInputModifiers.Control);
+
+        Assert.NotNull(vm.CopiedSnapshot);
         window.Close();
     }
 
